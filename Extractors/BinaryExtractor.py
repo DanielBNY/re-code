@@ -2,7 +2,7 @@ import r2pipe
 import json
 
 
-class BinaryAnalysis:
+class BinaryExtractor:
     """
     This class consist of functionality and initialization
     required by any binary analysis
@@ -31,9 +31,9 @@ class BinaryAnalysis:
         return self.get_current_address()
 
 
-class FunctionAnalysis:
+class FunctionExtractor:
     """
-    The class consist of functionality and data about function in the binary
+    The class consist of analysis functionality and data about a function in the binary
     """
 
     def __init__(self, function_offset, binary_analysis):
