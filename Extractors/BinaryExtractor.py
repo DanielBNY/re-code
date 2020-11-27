@@ -31,6 +31,29 @@ class BinaryExtractor:
         return self.get_current_address()
 
 
+class MultipleFunctionExtractor:
+    """
+    the class contain extracted data about functions in the binary
+    """
+    def __init__(self, binary_analysis):
+        """
+
+        :param binary_analysis: BinaryExtractor object
+        """
+        self.binary_analysis = binary_analysis
+        self.all_functions_info = self.get_all_functions_info()
+        self.all_function_addresses = self.get_functions_addresses()
+
+    def get_all_functions_info(self):
+        return json.loads(self.binary_analysis.command_pipe.cmd('aflj'))
+
+    def get_functions_addresses(self):
+        functions_addresses = []
+        for function in self.all_functions_info:
+            functions_addresses.append(function['offset'])
+        return functions_addresses
+
+
 class FunctionExtractor:
     """
     The class consist of analysis functionality and data about a function in the binary
