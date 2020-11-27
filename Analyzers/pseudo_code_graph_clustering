@@ -1,0 +1,26 @@
+Node Metadata
+
+
+
+tag_sons_with_close_fathers(current_node, directed_neighbors)
+    for node in directed_neighbors
+        if node do not have a close father
+            set node close father to the current node
+
+
+go_over(node, longest connection in the graph)
+    returned directed neighbors = func2(first node)
+    depth = 1
+    while longest connection in the graph > depth
+        returned directed neighbors = func2(returned directed neighbors)
+        depth += 1
+
+tag_sons_of_nodes(nodes)
+    for node in nodes
+        directed_neighbors = get nodes that current_node point to
+        all nodes directed neighbors += directed_neighbors
+        tag_sons_with_close_fathers(node, directed_neighbors)
+    return all nodes directed neighbors
+
+
+
