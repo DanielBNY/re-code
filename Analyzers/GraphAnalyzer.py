@@ -14,7 +14,7 @@ class FunctionsGraph:
         Return the valid function address or None if the address is not a function
         The function is used because some function references are 4-bit behind the exact function address
         :param address: function address
-        :return: int\None
+        :return: int or None
         """
         if address in self.all_function_addresses:
             return address
