@@ -2,7 +2,7 @@ import r2pipe
 import json
 
 
-class BinaryExtractor:
+class BinaryAnalysis:
     """
     This class consist of functionality and initialization
     required by any binary analysis
@@ -38,7 +38,7 @@ class MultipleFunctionExtractor:
     def __init__(self, binary_analysis):
         """
 
-        :param binary_analysis: BinaryExtractor object
+        :param binary_analysis: BinaryAnalysis object
         """
         self.binary_analysis = binary_analysis
         self.all_functions_info = self.get_all_functions_info()
