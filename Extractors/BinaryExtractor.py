@@ -1,4 +1,5 @@
 import r2pipe
+import json
 
 
 class BinaryAnalysis:
@@ -28,3 +29,34 @@ class BinaryAnalysis:
     def get_main_address(self):
         self.jmp_to_main()
         return self.get_current_address()
+
+
+class FunctionAnalysis:
+    """
+    The class consist of functionality and data about function in the binary
+    """
+
+    def __init__(self, function_offset, binary_analysis):
+        """
+        :param function_offset: int
+        :param binary_analysis: BinaryAnalysis object
+        """
+        self.binary_analysis = binary_analysis
+        self.function_offset = function_offset
+
+    def decompile_function(self):
+        """
+        :return: string, c like code in text
+        """
+        self.binary_analysis.jmp_to_address(self.function_offset)
+        decompile = self.binary_analysis.command_pipe.cmd('pdc')
+        return decompile
+
+    def disassemble_function(self):
+        """
+        :return: dictionary, assembly function code
+        """
+        self.binary_analysis.jmp_to_address(self.function_offset)
+        disassemble = json.loads(self.binary_analysis.command_pipe.cmd('pdfj'))
+        # pdj - disassemble to json
+        return disassemble
