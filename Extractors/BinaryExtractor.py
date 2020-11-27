@@ -15,7 +15,7 @@ class BinaryAnalysis:
         """
         self.binary_path = binary_path
         self.command_pipe = r2pipe.open(self.binary_path)  # provide an API to interact with the binary by CLI commands
-        self.command_pipe.cmd('aaa')  # Analyze the binary to enable further analysis on it
+        self.command_pipe.cmd('aaaa')  # Analyze the binary to enable further analysis on it
 
     def jmp_to_address(self, address):
         self.command_pipe.cmd('s 0x' + hex(address))
@@ -35,6 +35,7 @@ class MultipleFunctionExtractor:
     """
     the class contain extracted data about functions in the binary
     """
+
     def __init__(self, binary_analysis):
         """
 
