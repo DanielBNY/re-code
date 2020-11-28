@@ -54,30 +54,33 @@ Clustering functions, files and folders
 ---------------------------------------
 
 
-Cluster functions to files
---------------------------
+Cluster graph
+-------------
 
-init()
-    get average function size
-    if average is bigger than max file size
-        set max file size to the average
-    for close_father in collection 2
+cluster graph(father nodes, graph, max file size, number of max files in folder, cluster files \ cluster functions)
+    get average size of all nodes in graph
+    if average is bigger than max size
+        set max size to the node size average
+    if cluster files
+        max size * number of max files in folder
+    for father node in father nodes
         get sum of sons clusters (remove duplicate clusters from nodes in the same cluster)
-        if sum of sons clusters smaller than max file size
-            if bigger than half of max file size
-                divide to clusters(number of files is 1, sons of father)
+        if sum of sons clusters smaller than max cluster size
+            if bigger than half of max cluster size
+                merge clusters(sons of father clusters)
             else
-                if sons clusters size plus close_father cluster size is smaller than max file size
-                    divide to clusters(number of files is 1, sons of father and close_father)
+                if sons clusters size plus close_father cluster size is smaller than max cluster size
+                    merge first cluster to second cluster(sons of father cluster, father cluster)
                 else
-                    divide to clusters(number of files is 1, sons of father)
-        else if sum of sons clusters is bigger or equal to max file size
-            number of files to divide into = (sum of sons clusters / MAX) + 1
+                    merge clusters(sons of father clusters)
+        else if sum of sons clusters is bigger or equal to max cluster size
+            number of clusters to divide into = (sum of sons clusters / max cluster size) + 1
             divide to clusters(number of clusters to divide into, sons of father)
 
+            
 
-(percent %) of max file size
+(percent %) of max cluster size
 
-0%   50%      100%      200%      300%   ...         100n%
-O----O---------O---------O---------O---------O---------O >
-1 file  1 file    2 files   3 files       ...   n files
+0%       50%          100%          200%          300%   ...    100n%
+O--------O-------------O-------------O-------------O-------------O-------------O >
+1 cluster   1 cluster    2 cluster      3 cluster        ...         n files
