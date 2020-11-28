@@ -80,4 +80,4 @@ init()
 
 0%   50%      100%      200%      300%   ...         100n%
 O----O---------O---------O---------O---------O---------O >
-above  1 file    2 files   3 files       ...   n files
+1 file  1 file    2 files   3 files       ...   n files
