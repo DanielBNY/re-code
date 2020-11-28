@@ -1,19 +1,43 @@
-Node Metadata
+==============================
+        Collections
+==============================
+
+Node Metadata - collection 1
+point to nodes: nodes
+cluster: cluster id
+father id
+Node size
+
+node closest fathers - collection 2
+father node: node
+sons nodes: nodes
+
+clusters - collection 3
+cluster id
+nodes in cluster: nodes
+cluster size
 
 
+files - collection 4
+file id
+cluster id
+
+------------------------------------------------------------------------------------------------------
+
+Find closest fathers of nodes
+-----------------------------
+
+init(first node)
+    returned directed neighbors = tag_sons_of_nodes(first node)
+    depth = 1
+    while returned directed neighbors
+        returned directed neighbors = tag_sons_of_nodes(returned directed neighbors)
+        depth += 1
 
 tag_sons_with_close_fathers(current_node, directed_neighbors)
     for node in directed_neighbors
         if node do not have a close father
-            set node close father to the current node
-
-
-go_over(node, longest connection in the graph)
-    returned directed neighbors = func2(first node)
-    depth = 1
-    while longest connection in the graph > depth
-        returned directed neighbors = func2(returned directed neighbors)
-        depth += 1
+            set node close father to the current node - in collection 2
 
 tag_sons_of_nodes(nodes)
     for node in nodes
@@ -24,3 +48,36 @@ tag_sons_of_nodes(nodes)
 
 
 
+------------------------------------------------------------------------------------------------------
+
+Clustering functions, files and folders
+---------------------------------------
+
+
+Cluster functions to files
+--------------------------
+
+init()
+    get average function size
+    if average is bigger than max file size
+        set max file size to the average
+    for close_father in collection 2
+        get sum of sons clusters (remove duplicate clusters from nodes in the same cluster)
+        if sum of sons clusters smaller than max file size
+            if bigger than half of max file size
+                divide to clusters(number of files is 1, sons of father)
+            else
+                if sons clusters size plus close_father cluster size is smaller than max file size
+                    divide to clusters(number of files is 1, sons of father and close_father)
+                else
+                    divide to clusters(number of files is 1, sons of father)
+        else if sum of sons clusters is bigger or equal to max file size
+            number of files to divide into = (sum of sons clusters / MAX) + 1
+            divide to clusters(number of clusters to divide into, sons of father)
+
+
+(percent %) of max file size
+
+0%   50%      100%      200%      300%   ...         100n%
+O----O---------O---------O---------O---------O---------O >
+above  1 file    2 files   3 files       ...   n files
