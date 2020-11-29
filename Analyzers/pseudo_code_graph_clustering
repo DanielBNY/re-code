@@ -27,24 +27,25 @@ cluster id
 Find closest fathers of nodes
 -----------------------------
 
-init(first node)
-    returned directed neighbors = tag_sons_of_nodes(first node)
-    depth = 1
-    while returned directed neighbors
-        returned directed neighbors = tag_sons_of_nodes(returned directed neighbors)
-        depth += 1
+init(first node, graph)
+    neighbors_to_revisit = tag_sons_of_nodes(first node, graph)
+    while list of neighbors_to_revisit is not empty
+        neighbors_to_revisit = tag_sons_of_nodes(returned directed neighbors, graph)
 
-tag_sons_with_close_fathers(current_node, directed_neighbors)
-    for node in directed_neighbors
-        if node do not have a close father
-            set node close father to the current node - in collection 2
+tag_sons_with_close_fathers(current_node, directed_neighbors, graph)
+    for neighbor_node in directed_neighbors
+        if neighbor_node do not have a close father
+            set neighbor_node close father to the current node - in collection 2
+            neighbors_to_revisit += neighbor_node
+    return neighbors_to_revisit
 
-tag_sons_of_nodes(nodes)
+tag_sons_of_nodes(nodes, graph)
     for node in nodes
         directed_neighbors = get nodes that current_node point to
-        all nodes directed neighbors += directed_neighbors
-        tag_sons_with_close_fathers(node, directed_neighbors)
-    return all nodes directed neighbors
+        append to the list of neighbors_to_revisit the returned neighbors from function
+                                                                tag_sons_with_close_fathers(node, directed_neighbors)
+
+    return neighbors_to_revisit
 
 
 
