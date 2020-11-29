@@ -23,9 +23,17 @@ cluster id
 
 ------------------------------------------------------------------------------------------------------
 
-Find closest fathers of nodes
------------------------------
+Algorithm 1: Create a tree from functions calls graph
+             -----------------------------------------
 
+Description:
+-----------
+Recursively scans at the same level for nodes and if they do not have a close father they are tagged
+by the first father, edges to already tagged nodes are removed.
+
+
+semi code:
+---------
 init(first node, graph)
     neighbors_to_revisit = tag_sons_of_nodes(first node, graph)
     while list of neighbors_to_revisit is not empty
@@ -33,7 +41,7 @@ init(first node, graph)
 
 tag_sons_with_close_fathers(current_node, directed_neighbors, graph)
     for neighbor_node in directed_neighbors
-        if neighbor_node do not have a close father
+        if neighbor_node does not have a tagged close father
             set neighbor_node close father to the current node - in collection 2
             neighbors_to_revisit += neighbor_node
         else
@@ -45,12 +53,11 @@ tag_sons_of_nodes(nodes, graph)
         directed_neighbors = get nodes that current_node point to
         append to the list of neighbors_to_revisit the returned neighbors from function
                                                                 tag_sons_with_close_fathers(node, directed_neighbors)
-
     return neighbors_to_revisit
 
 
-
 ------------------------------------------------------------------------------------------------------
+
 
 Clustering functions, files and folders
 ---------------------------------------
@@ -61,6 +68,7 @@ Cluster graph
 
 cluster graph(father nodes, graph, max file size, number of max files in folder, cluster files \ cluster functions)
     get average size of all nodes in graph
+    enter each node to a cluster with his size
     if average is bigger than max size
         set max size to the node size average
     if cluster files
