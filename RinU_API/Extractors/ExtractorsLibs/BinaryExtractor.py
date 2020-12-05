@@ -1,11 +1,13 @@
-import r2pipe
 import json
+import requests
+
+URL = 'http://localhost:5000/'
 
 
 class BinaryAnalysis:
     """
     This class consist of functionality and initialization
-    required by any binary analysis
+    required by for binary analysis
     """
 
     def __init__(self, binary_path):
@@ -13,74 +15,59 @@ class BinaryAnalysis:
 
         :param binary_path: string, binary path
         """
-        self.binary_path = binary_path
-        self.command_pipe = r2pipe.open(self.binary_path)  # provide an API to interact with the binary by CLI commands
-        self.command_pipe.cmd('aaaa')  # Analyze the binary to enable further analysis on it
 
-    def jmp_to_address(self, address):
-        self.command_pipe.cmd('s 0x' + hex(address))
+        response = requests.post(URL + "init/", json={'path': binary_path})
+        if response.status_code != 201:
+            raise Exception(response.text)
 
-    def jmp_to_main(self):
-        self.command_pipe.cmd('s main')
+    @staticmethod
+    def jmp_to_address(address):
+        response = requests.post(URL + "command/" + 's 0x' + hex(address))
+        if response.status_code != 200:
+            raise Exception(response.text)
 
-    def get_current_address(self):
-        return int(self.command_pipe.cmd('s'), 16)
+    @staticmethod
+    def jmp_to_main():
+        response = requests.post(URL + "command/" + 's main')
+        if response.status_code != 200:
+            raise Exception(response.text)
+
+    @staticmethod
+    def get_current_address():
+        response = requests.post(URL + "command/" + 's')
+        if response.status_code != 200:
+            raise Exception(response.text)
+        return int(response.text, 16)
 
     def get_main_address(self):
         self.jmp_to_main()
         return self.get_current_address()
 
+    @staticmethod
+    def get_all_functions_info():
+        response = requests.post(URL + "command/" + 'aflj')
+        if response.status_code != 200:
+            raise Exception(response.text)
+        return json.loads(response.text)
 
-class MultipleFunctionExtractor:
-    """
-    the class contain extracted data about functions in the binary
-    """
-
-    def __init__(self, binary_analysis):
-        """
-
-        :param binary_analysis: BinaryAnalysis object
-        """
-        self.binary_analysis = binary_analysis
-        self.all_functions_info = self.get_all_functions_info()
-        self.all_function_addresses = self.get_functions_addresses()
-
-    def get_all_functions_info(self):
-        return json.loads(self.binary_analysis.command_pipe.cmd('aflj'))
-
-    def get_functions_addresses(self):
-        functions_addresses = []
-        for function in self.all_functions_info:
-            functions_addresses.append(function['offset'])
-        return functions_addresses
-
-
-class FunctionExtractor:
-    """
-    The class consist of analysis functionality and data about a function in the binary
-    """
-
-    def __init__(self, function_offset, binary_analysis):
-        """
-        :param function_offset: int
-        :param binary_analysis: BinaryAnalysis object
-        """
-        self.binary_analysis = binary_analysis
-        self.function_offset = function_offset
-
-    def decompile_function(self):
+    def decompile_function(self, function_offset):
         """
         :return: string, c like code in text
         """
-        self.binary_analysis.jmp_to_address(self.function_offset)
-        decompile = self.binary_analysis.command_pipe.cmd('pdc')
-        return decompile
+        self.jmp_to_address(function_offset)
+        response = requests.post(URL + "command/" + 'pdc')
+        if response.status_code != 200:
+            raise Exception(response.text)
+        return response.text
 
-    def disassemble_function(self):
+    def disassemble_function(self, function_offset):
         """
         :return: dictionary, assembly function code
         """
-        self.binary_analysis.jmp_to_address(self.function_offset)
-        disassemble = json.loads(self.binary_analysis.command_pipe.cmd('pdfj'))
+        self.jmp_to_address(function_offset)
+        response = requests.post(URL + "command/" + 'pdfj')
+        if response.status_code != 200:
+            raise Exception(response.text)
+        disassemble = json.loads(response.text)
         # pdj - disassemble to json
         return disassemble
