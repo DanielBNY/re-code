@@ -1,13 +1,20 @@
+from BinaryExtractor import BinaryAnalysis
+from models import FunctionNode, FunctionEdge
+
+
 class FunctionsGraph:
 
-    def __init__(self, all_function_addresses, all_functions_info):
+    def __init__(self, all_functions_info):
         """
         The class contain the connection between functions and the list of functions addresses
-        :param all_function_addresses: dictionary
         :param all_functions_info: list
         """
-        self.all_function_addresses = all_function_addresses
-        self.function_edges = self.get_functions_edges(all_functions_info)
+        self.all_functions_info = all_functions_info
+
+    def save_functions_graph(self):
+        for function in self.all_functions_info:
+            new_function_node = FunctionNode(function['offset'])
+            new_function_node.save()
 
     def get_valid_function_address(self, address):
         """
@@ -16,9 +23,9 @@ class FunctionsGraph:
         :param address: function address
         :return: int or None
         """
-        if address in self.all_function_addresses:
+        if address in FunctionNode:
             return address
-        elif address + 4 in self.all_function_addresses:
+        elif address + 4 in FunctionNode:
             return address + 4
         return None
 
@@ -29,11 +36,16 @@ class FunctionsGraph:
         not all call references are pointing to functions
         :return: list, function edges
         """
-        functions_edges = []
         for function_info in all_functions_info:
             if 'callrefs' in function_info:
                 for call_reference in function_info['callrefs']:
                     function_address = self.get_valid_function_address(call_reference['addr'])
                     if function_address and call_reference['type'] == 'CALL':
-                        functions_edges.append((function_info['offset'], function_address))
-        return functions_edges
+                        function_edge = FunctionEdge(function_info['offset'], function_address)
+                        function_edge.save()
+
+
+bin_analysis = BinaryAnalysis('/bin/ls')
+all_functions_info = bin_analysis.get_all_functions_info()
+function_graph = FunctionsGraph(all_functions_info)
+function_graph.save_functions_graph()

@@ -71,3 +71,7 @@ class BinaryAnalysis:
         disassemble = json.loads(response.text)
         # pdj - disassemble to json
         return disassemble
+
+
+bin_analysis = BinaryAnalysis('/bin/ls')
+all_functions_info = bin_analysis.get_all_functions_info()
