@@ -1,5 +1,5 @@
 from BinaryExtractor import BinaryAnalysis
-from models import FunctionNode, FunctionEdge
+from models import FunctionNode, FunctionEdge, extractor_session
 
 
 class FunctionsGraph:
@@ -12,9 +12,11 @@ class FunctionsGraph:
         self.all_functions_info = all_functions_info
 
     def save_functions_graph(self):
+        current_session = extractor_session()
         for function in self.all_functions_info:
-            new_function_node = FunctionNode(function['offset'])
-            new_function_node.save()
+            new_function_node = FunctionNode(address=function['offset'])
+            current_session.add(new_function_node)
+            current_session.commit()
 
     def get_valid_function_address(self, address):
         """
@@ -29,23 +31,20 @@ class FunctionsGraph:
             return address + 4
         return None
 
-    def get_functions_edges(self, all_functions_info):
+    def save_functions_edges(self):
         """
-        Return the edges between functions
+        save the edges between functions
         Their is a validation for the call references because
         not all call references are pointing to functions
         :return: list, function edges
         """
-        for function_info in all_functions_info:
+        current_session = extractor_session()
+        for function_info in self.all_functions_info:
             if 'callrefs' in function_info:
                 for call_reference in function_info['callrefs']:
                     function_address = self.get_valid_function_address(call_reference['addr'])
                     if function_address and call_reference['type'] == 'CALL':
-                        function_edge = FunctionEdge(function_info['offset'], function_address)
-                        function_edge.save()
-
-
-bin_analysis = BinaryAnalysis('/bin/ls')
-all_functions_info = bin_analysis.get_all_functions_info()
-function_graph = FunctionsGraph(all_functions_info)
-function_graph.save_functions_graph()
+                        function_edge = FunctionEdge(source_function=function_info['offset'],
+                                                     called_function=function_address)
+                        current_session.add(function_edge)
+                        current_session.commit()
