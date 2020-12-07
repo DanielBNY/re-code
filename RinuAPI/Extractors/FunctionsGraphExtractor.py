@@ -18,18 +18,22 @@ class FunctionsGraph:
             current_session.add(new_function_node)
             current_session.commit()
 
-    def get_valid_function_address(self, address):
+    @staticmethod
+    def get_valid_function_address(address):
         """
         Return the valid function address or None if the address is not a function
         The function is used because some function references are 4-bit behind the exact function address
         :param address: function address
         :return: int or None
         """
-        if address in FunctionNode:
-            return address
-        elif address + 4 in FunctionNode:
-            return address + 4
-        return None
+        current_session = extractor_session()
+        function_nodes = current_session.query(FunctionNode).all()
+        for function in function_nodes:
+            if address == function.address:
+                return address
+            elif address + 4 == function.address:
+                return address + 4
+            return None
 
     def save_functions_edges(self):
         """
