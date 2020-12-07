@@ -36,7 +36,7 @@ class FunctionsGraph:
                 return address
             elif address + 4 == function.address:
                 return address + 4
-            return None
+        return None
 
     def save_functions_edges(self):
         """
