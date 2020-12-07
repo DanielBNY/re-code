@@ -20,8 +20,8 @@ class FunctionEdge(Base):
     called_function = Column(ForeignKey('FunctionNode.address'), nullable=False)
 
 
-class FileSections(Base):
-    __tablename__ = 'FileSections'
+class FileSection(Base):
+    __tablename__ = 'FileSection'
     number = Column(Integer, primary_key=True)
     name = Column(String)
     physical_start_address = Column(Integer)
