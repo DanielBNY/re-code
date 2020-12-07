@@ -1,5 +1,6 @@
 from BinaryExtractor import BinaryAnalysis
-from models import FunctionNode, FunctionEdge, extractor_session
+from models import FunctionNode, FunctionEdge, FileSection, extractor_session
+import re
 
 
 class FunctionsGraph:
@@ -54,19 +55,20 @@ class FunctionsGraph:
                         current_session.commit()
 
 
-bin_analysis = BinaryAnalysis('/home/daniel/Desktop/test/Project')
-all_functions_info = bin_analysis.get_all_functions_info()
-function_graph = FunctionsGraph(all_functions_info)
-function_graph.save_functions_graph()
-
-session = extractor_session()
-nodes = session.query(FunctionNode).all()
-print("--------------------")
-for node in nodes:
-    print(node.address)
-
-session = extractor_session()
-edges = session.query(FunctionEdge).all()
-for edge in edges:
-    print(edge.source_function + "    " + edge.called_function)
-# iS
+def save_sections(sections):
+    """
+    The function saves the sections information to the database
+    """
+    current_session = extractor_session()
+    for index, section in enumerate(sections):
+        physical_end_address = section['paddr'] + section['size']
+        virtual_end_address = section['vaddr'] + section['vsize']
+        permission_read = bool(re.search('.*r.*', section['perm']))
+        permission_write = bool(re.search('.*w.*', section['perm']))
+        permission_execute = bool(re.search('.*x.*', section['perm']))
+        file_section = FileSection(number=index, name=section['name'], physical_start_address=section['paddr'],
+                                   physical_end_address=physical_end_address, virtual_start_address=section['vaddr'],
+                                   virtual_end_address=virtual_end_address, permission_read=permission_read,
+                                   permission_write=permission_write, permission_execute=permission_execute)
+        current_session.add(file_section)
+        current_session.commit()
