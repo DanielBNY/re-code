@@ -11,6 +11,7 @@ extractor_session = sessionmaker(bind=extractor_engine)
 class FunctionNode(Base):
     __tablename__ = 'FunctionNode'
     address = Column(Integer, primary_key=True)
+    section = Column(ForeignKey('FileSection.number'))
 
 
 class FunctionEdge(Base):
