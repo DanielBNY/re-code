@@ -72,6 +72,10 @@ class BinaryAnalysis:
         # pdj - disassemble to json
         return disassemble
 
-
-bin_analysis = BinaryAnalysis('/bin/ls')
-all_functions_info = bin_analysis.get_all_functions_info()
+    @staticmethod
+    def get_sections():
+        response = requests.post(URL + "command/" + 'iSj')
+        if response.status_code != 200:
+            raise Exception(response.text)
+        sections = json.loads(response.text)
+        return sections
