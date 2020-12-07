@@ -52,3 +52,21 @@ class FunctionsGraph:
                                                      called_function=function_address)
                         current_session.add(function_edge)
                         current_session.commit()
+
+
+bin_analysis = BinaryAnalysis('/home/daniel/Desktop/test/Project')
+all_functions_info = bin_analysis.get_all_functions_info()
+function_graph = FunctionsGraph(all_functions_info)
+function_graph.save_functions_graph()
+
+session = extractor_session()
+nodes = session.query(FunctionNode).all()
+print("--------------------")
+for node in nodes:
+    print(node.address)
+
+session = extractor_session()
+edges = session.query(FunctionEdge).all()
+for edge in edges:
+    print(edge.source_function + "    " + edge.called_function)
+# iS
