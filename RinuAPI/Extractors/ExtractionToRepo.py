@@ -18,6 +18,7 @@ class FunctionsGraph:
             new_function_node = FunctionNode(address=function['offset'])
             current_session.add(new_function_node)
             current_session.commit()
+        current_session.colse()
 
     @staticmethod
     def get_valid_function_address(address):
@@ -29,6 +30,7 @@ class FunctionsGraph:
         """
         current_session = extractor_session()
         function_nodes = current_session.query(FunctionNode).all()
+        current_session.colse()
         for function in function_nodes:
             if address == function.address:
                 return address
@@ -53,6 +55,7 @@ class FunctionsGraph:
                                                      called_function=function_address)
                         current_session.add(function_edge)
                         current_session.commit()
+        current_session.colse()
 
 
 def save_sections(sections):
@@ -72,3 +75,4 @@ def save_sections(sections):
                                    permission_write=permission_write, permission_execute=permission_execute)
         current_session.add(file_section)
         current_session.commit()
+    current_session.colse()
