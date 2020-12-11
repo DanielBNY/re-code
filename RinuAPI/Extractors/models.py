@@ -1,34 +1,42 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-Base = declarative_base()
-extractor_engine = create_engine('sqlite:///db.Extractor')
-extractor_session = sessionmaker(bind=extractor_engine)
-
-
-class FunctionNode(Base):
-    __tablename__ = 'FunctionNode'
-    address = Column(Integer, primary_key=True)
-    section = Column(ForeignKey('FileSection.number'))
+class FunctionInfo:
+    def __init__(self, size, address):
+        """
+        size: string
+        file_id: string (id to hashes)
+        calls_out_set_id: string (set id)
+        calls_in_set_id: string (set id)
+        """
+        self.size = size
+        self.file_id = f"function:{address}:file_id"
+        self.calls_out_set_id = f"function:{address}:calls_out"
+        self.calls_in_set_id = f"function:{address}:calls_in"
 
 
-class FunctionEdge(Base):
-    __tablename__ = 'FunctionEdge'
-    edge_id = Column(Integer, primary_key=True)
-    source_function = Column(ForeignKey('FunctionNode.address'), nullable=False)
-    called_function = Column(ForeignKey('FunctionNode.address'), nullable=False)
+class FileInfo:
+    def __init__(self, size, file_id):
+        """
+        size: string
+        folder_id: string (id to hashes)
+        contained_functions: string (set id)
+        calls_out_set_id: string (set id)
+        calls_in_set_id: string (set id)
+        """
+        self.size = size
+        self.folder_id = f"file:{file_id}:folder_id:"
+        self.contained_functions_set_id = f"file:{file_id}:contained_functions"
+        self.calls_out_set_id = f"file:{file_id}:calls_out"
+        self.calls_in_set_id = f"file:{file_id}:calls_in"
 
 
-class FileSection(Base):
-    __tablename__ = 'FileSection'
-    number = Column(Integer, primary_key=True)
-    name = Column(String)
-    physical_start_address = Column(Integer)
-    physical_end_address = Column(Integer)
-    virtual_start_address = Column(Integer)
-    virtual_end_address = Column(Integer)
-    permission_read = Column(Boolean)
-    permission_write = Column(Boolean)
-    permission_execute = Column(Boolean)
+class FolderInfo:
+    def __init__(self, size, folder_id):
+        """
+        size: string
+        contained_files: string (id to hashes)
+        calls_out_set_id: string (set id)
+        calls_in_set_id: string (set id)
+        """
+        self.size = size
+        self.contained_files_set_id = f"folder:{folder_id}:contained_files"
+        self.calls_out_set_id = f"folder:{folder_id}:calls_out"
+        self.calls_in_set_id = f"folder:{folder_id}:calls_in"
