@@ -7,7 +7,7 @@ class FunctionInfo:
         calls_in_set_id: string (set id)
         """
         self.size = size
-        self.file_id = f"function:{address}:file_id"
+        self.file_id = f"file:{address}"
         self.calls_out_set_id = f"function:{address}:calls_out"
         self.calls_in_set_id = f"function:{address}:calls_in"
 
@@ -22,7 +22,7 @@ class FileInfo:
         calls_in_set_id: string (set id)
         """
         self.size = size
-        self.folder_id = f"file:{file_id}:folder_id:"
+        self.folder_id = f"folder:{file_id}"
         self.contained_functions_set_id = f"file:{file_id}:contained_functions"
         self.calls_out_set_id = f"file:{file_id}:calls_out"
         self.calls_in_set_id = f"file:{file_id}:calls_in"
