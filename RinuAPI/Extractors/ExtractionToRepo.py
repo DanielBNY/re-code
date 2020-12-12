@@ -1,6 +1,5 @@
 from BinaryExtractor import BinaryAnalysis
 from RepoActions import FunctionRepoActions
-import re
 import redis
 
 REDIS_SERVER_IP = "localhost"
@@ -53,23 +52,3 @@ class FunctionsGraph:
                                                                redis_session=self.redis_session)
                         fnc_repo_actions.add_edge(called_function)
 
-    @staticmethod
-    def save_sections(sections):
-        """
-        The function saves the sections information to the database
-        """
-        current_session = extractor_session()
-        for index, section in enumerate(sections):
-            physical_end_address = section['paddr'] + section['size']
-            virtual_end_address = section['vaddr'] + section['vsize']
-            permission_read = bool(re.search('.*r.*', section['perm']))
-            permission_write = bool(re.search('.*w.*', section['perm']))
-            permission_execute = bool(re.search('.*x.*', section['perm']))
-            file_section = FileSection(number=index, name=section['name'], physical_start_address=section['paddr'],
-                                       physical_end_address=physical_end_address,
-                                       virtual_start_address=section['vaddr'],
-                                       virtual_end_address=virtual_end_address, permission_read=permission_read,
-                                       permission_write=permission_write, permission_execute=permission_execute)
-            current_session.add(file_section)
-            current_session.commit()
-        current_session.close()
