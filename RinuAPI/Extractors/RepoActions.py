@@ -1,41 +1,58 @@
 from models import FunctionInfo, FileInfo, FolderInfo
 
 
-class RepoActions:
-    def __init__(self, redis_session):
+class FolderRepoActions:
+    def __init__(self, size, contained_address, redis_session):
         self.redis_session = redis_session
+        self.folder_info = FolderInfo(size, contained_address)
 
-    def models_initialization(self, size, address):
-        """
-        At the start each function is contained in her file and her folder and in the process of clustering
-        files and folders are joined o create the recovered file structure
-        """
-        fnc_info = FunctionInfo(size, address)
-        file_info = FileInfo(size, address)
-        folder_info = FolderInfo(size, address)
-        self.redis_session.hset(f"function:{address}", "file_id", fnc_info.file_id)
-        self.redis_session.hset(fnc_info.file_id, "contained_functions_set_id", file_info.contained_functions_set_id)
-        self.redis_session.hset(fnc_info.file_id, "folder_id", file_info.folder_id)
-        self.redis_session.hset(file_info.folder_id, "contained_files_set_id", folder_info.contained_files_set_id)
-        self.redis_session.sadd("functions", f"function:{address}")
-        self.redis_session.sadd("files", fnc_info.file_id)
-        self.redis_session.sadd("folders", file_info.folder_id)
-        self.initialize_calls_sets_ids(address)
-        self.initialize_models_size(address, size)
+    def add_init_folder_info(self):
+        self.redis_session.hset(self.folder_info.id, "size", self.folder_info.size)
+        self.redis_session.hset(self.folder_info.id, "calls_out_set_id", self.folder_info.calls_out_set_id)
+        self.redis_session.hset(self.folder_info.id, "calls_in_set_id", self.folder_info.calls_in_set_id)
+        self.redis_session.hset(self.folder_info.id, "contained_files_set_id", self.folder_info.contained_files_set_id)
+        self.redis_session.sadd("folders", self.folder_info.id)
 
-    def initialize_calls_sets_ids(self, address):
-        """
+    def recursion_init(self):
+        self.add_init_folder_info()
 
-        """
-        names = ["function", "file", "folder"]
-        for name in names:
-            self.redis_session.hset(f"{name}:{address}", "calls_out_set_id", f"{name}:{address}:calls_out")
-            self.redis_session.hset(f"{name}:{address}", "calls_in_set_id", f"{name}:{address}:calls_out")
 
-    def initialize_models_size(self, address, size):
-        """
-        Set the function, file and folder size
-        """
-        names = ["function", "file", "folder"]
-        for name in names:
-            self.redis_session.hset(f"{name}:{address}", "size", size)
+class FileRepoActions:
+    def __init__(self, size, contained_address, redis_session):
+        self.redis_session = redis_session
+        self.contained_address = contained_address
+
+        self.file_info = FileInfo(size, contained_address)
+
+    def add_init_file_info(self):
+        self.redis_session.hset(self.file_info.id, "size", self.file_info.size)
+        self.redis_session.hset(self.file_info.id, "calls_out_set_id", self.file_info.calls_out_set_id)
+        self.redis_session.hset(self.file_info.id, "calls_in_set_id", self.file_info.calls_in_set_id)
+        self.redis_session.hset(self.file_info.id, "contained_functions_set_id",
+                                self.file_info.contained_functions_set_id)
+        self.redis_session.hset(self.file_info.id, "folder_id", self.file_info.folder_id)
+        self.redis_session.sadd("files", self.file_info.id)
+
+    def recursion_init(self):
+        self.add_init_file_info()
+        folder_repo_actions = FolderRepoActions(self.file_info.size, self.contained_address, self.redis_session)
+        folder_repo_actions.recursion_init()
+
+
+class FunctionRepoActions:
+    def __init__(self, size, address, redis_session):
+        self.redis_session = redis_session
+        self.function_address = address
+        self.function_info = FunctionInfo(size, address)
+
+    def add_init_function_info(self):
+        self.redis_session.hset(self.function_info.id, "size", self.function_info.size)
+        self.redis_session.hset(self.function_info.id, "calls_out_set_id", self.function_info.calls_out_set_id)
+        self.redis_session.hset(self.function_info.id, "calls_in_set_id", self.function_info.calls_in_set_id)
+        self.redis_session.hset(self.function_info.id, "file_id", self.function_info.file_id)
+        self.redis_session.sadd("functions", self.function_info.id)
+
+    def recursion_init(self):
+        self.add_init_function_info()
+        file_repo_actions = FileRepoActions(self.function_info.size, self.function_address, self.redis_session)
+        file_repo_actions.recursion_init()
