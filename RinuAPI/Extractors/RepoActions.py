@@ -53,3 +53,8 @@ class FunctionRepoActions:
         self.add_init_function_info(size)
         file_repo_actions = FileRepoActions(self.function_info.id, self.redis_session)
         file_repo_actions.recursion_init(size)
+
+    def add_edge(self, called_function_address):
+        called_function_info = FunctionInfo(called_function_address)
+        self.redis_session.sadd(self.function_info.calls_out_set_id, called_function_info.id)
+        self.redis_session.sadd(called_function_info.calls_in_set_id, self.function_info.id)
