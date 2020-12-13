@@ -16,6 +16,11 @@ class FolderRepoActions:
     def recursion_init(self, size):
         self.add_init_folder_info(size)
 
+    def add_edge(self, called_function_address):
+        called_folder_info = FolderInfo(called_function_address)
+        self.redis_session.sadd(self.folder_info.calls_out_set_id, called_folder_info.id)
+        self.redis_session.sadd(called_folder_info.calls_in_set_id, self.folder_info.id)
+
 
 class FileRepoActions:
     def __init__(self, contained_address, redis_session):
@@ -35,6 +40,16 @@ class FileRepoActions:
         self.add_init_file_info(size)
         folder_repo_actions = FolderRepoActions(self.file_info.id, self.redis_session)
         folder_repo_actions.recursion_init(size)
+
+    def add_edge(self, called_function_address):
+        called_file_info = FileInfo(called_function_address)
+        self.redis_session.sadd(self.file_info.calls_out_set_id, called_file_info.id)
+        self.redis_session.sadd(called_file_info.calls_in_set_id, self.file_info.id)
+
+    def recursion_add_edge(self, called_function_address):
+        self.add_edge(called_function_address)
+        file_repo_actions = FileRepoActions(self.file_info.id, self.redis_session)
+        file_repo_actions.add_edge(called_function_address)
 
 
 class FunctionRepoActions:
@@ -58,3 +73,8 @@ class FunctionRepoActions:
         called_function_info = FunctionInfo(called_function_address)
         self.redis_session.sadd(self.function_info.calls_out_set_id, called_function_info.id)
         self.redis_session.sadd(called_function_info.calls_in_set_id, self.function_info.id)
+
+    def recursion_add_edge(self, called_function_address):
+        self.add_edge(called_function_address)
+        file_repo_actions = FileRepoActions(self.function_info.id, self.redis_session)
+        file_repo_actions.recursion_add_edge(called_function_address)
