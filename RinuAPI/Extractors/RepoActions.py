@@ -12,6 +12,8 @@ class FolderRepoActions:
         self.redis_session.hset(self.folder_info.id, "calls_in_set_id", self.folder_info.calls_in_set_id)
         self.redis_session.hset(self.folder_info.id, "contained_files_set_id", self.folder_info.contained_files_set_id)
         self.redis_session.sadd("folders", self.folder_info.id)
+        self.redis_session.sadd(self.folder_info.contained_files_set_id,
+                                FileInfo(self.folder_info.contained_address).id)
 
     def recursion_init(self, size):
         self.add_init_folder_info(size)
@@ -35,6 +37,8 @@ class FileRepoActions:
                                 self.file_info.contained_functions_set_id)
         self.redis_session.hset(self.file_info.id, "folder_id", self.file_info.folder_id)
         self.redis_session.sadd("files", self.file_info.id)
+        self.redis_session.sadd(self.file_info.contained_functions_set_id,
+                                FunctionInfo(self.file_info.contained_address).id)
 
     def recursion_init(self, size):
         self.add_init_file_info(size)
