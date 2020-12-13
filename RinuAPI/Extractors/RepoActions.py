@@ -52,8 +52,8 @@ class FileRepoActions:
 
     def recursion_add_edge(self, called_function_address):
         self.add_edge(called_function_address)
-        file_repo_actions = FileRepoActions(self.file_info.id, self.redis_session)
-        file_repo_actions.add_edge(called_function_address)
+        folder_repo_actions = FolderRepoActions(self.file_info.contained_address, self.redis_session)
+        folder_repo_actions.add_edge(called_function_address)
 
 
 class FunctionRepoActions:
@@ -80,5 +80,5 @@ class FunctionRepoActions:
 
     def recursion_add_edge(self, called_function_address):
         self.add_edge(called_function_address)
-        file_repo_actions = FileRepoActions(self.function_info.id, self.redis_session)
+        file_repo_actions = FileRepoActions(self.function_info.contained_address, self.redis_session)
         file_repo_actions.recursion_add_edge(called_function_address)
