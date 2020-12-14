@@ -77,8 +77,3 @@ class FunctionRepoActions:
         called_function_info = FunctionInfo(called_function_address)
         self.redis_session.sadd(self.function_info.calls_out_set_id, called_function_info.id)
         self.redis_session.sadd(called_function_info.calls_in_set_id, self.function_info.id)
-
-    def recursion_add_edge(self, called_function_address):
-        self.add_edge(called_function_address)
-        file_repo_actions = FileRepoActions(self.function_info.contained_address, self.redis_session)
-        file_repo_actions.recursion_add_edge(called_function_address)
