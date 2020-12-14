@@ -5,7 +5,7 @@ import redis
 REDIS_SERVER_IP = "localhost"
 
 
-class FunctionsGraph:
+class FunctionsGraphExtractor:
 
     def __init__(self, all_functions_info):
         """
