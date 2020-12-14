@@ -1,19 +1,15 @@
-from BinaryExtractor import BinaryAnalysis
 from RepoActions import FunctionRepoActions
-import redis
-
-REDIS_SERVER_IP = "localhost"
 
 
 class FunctionsGraphExtractor:
 
-    def __init__(self, all_functions_info):
+    def __init__(self, all_functions_info, redis_session):
         """
         The class contain the connection between functions and the list of functions addresses
         :param all_functions_info: list
         """
         self.all_functions_info = all_functions_info
-        self.redis_session = redis.Redis(REDIS_SERVER_IP)
+        self.redis_session = redis_session
 
     def save_functions_graph(self):
         for function in self.all_functions_info:
@@ -51,4 +47,3 @@ class FunctionsGraphExtractor:
                         fnc_repo_actions = FunctionRepoActions(address=source_function,
                                                                redis_session=self.redis_session)
                         fnc_repo_actions.add_edge(called_function)
-
