@@ -4,7 +4,7 @@ import requests
 URL = 'http://localhost:5000/'
 
 
-class BinaryAnalysis:
+class BinaryExtractor:
     """
     This class consist of functionality and initialization
     required by for binary analysis
