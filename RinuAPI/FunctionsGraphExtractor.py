@@ -1,15 +1,28 @@
 from RepoActions import FunctionRepoActions
+from BinaryExtractor import BinaryExtractor
 
 
 class FunctionsGraphExtractor:
+    """
+    Functions call graph - functions are nodes and edges are calls to other functions
+    """
 
-    def __init__(self, all_functions_info, redis_session):
+    def __init__(self, binary_path, redis_session):
         """
         The class contain the connection between functions and the list of functions addresses
-        :param all_functions_info: list
+        :param binary_path
+        :param redis_session
         """
-        self.all_functions_info = all_functions_info
+        bin_analysis = BinaryExtractor(binary_path)
+        self.all_functions_info = bin_analysis.get_all_functions_info()
         self.redis_session = redis_session
+
+    def run(self):
+        """
+        Extract the functions call graph to redis, saves the nodes and the edges between them
+        """
+        self.save_functions_graph()
+        self.save_functions_edges()
 
     def save_functions_graph(self):
         for function in self.all_functions_info:
