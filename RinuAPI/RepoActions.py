@@ -82,8 +82,12 @@ class FileModel:
             called_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return called_files_models
 
-    def get_calls_in(self):
-        return self.redis_session.smembers(self.calls_in_set_id)
+    def get_calling_files_models(self):
+        calling_files_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_files_models = []
+        for file_id in calling_files_ids:
+            calling_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
+        return calling_files_models
 
     def get_parent_folder_model(self):
         return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
