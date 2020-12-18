@@ -73,6 +73,9 @@ class FileModel:
     def get_calls_in(self):
         return self.redis_session.smembers(self.calls_in_set_id)
 
+    def get_parent_folder_model(self):
+        return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
+
     def add_init_file_info(self, size):
         """
         Saves to the DB the initialized file metadata: size of the file, the id for the files calls out set,
