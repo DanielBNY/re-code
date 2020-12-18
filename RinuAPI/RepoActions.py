@@ -164,8 +164,12 @@ class FunctionModel:
             called_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
         return called_functions_models
 
-    def get_calls_in(self):
-        return self.redis_session.smembers(self.calls_in_set_id)
+    def get_calling_functions_models(self):
+        calling_functions_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_functions_models = []
+        for function_id in calling_functions_ids:
+            calling_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
+        return calling_functions_models
 
     def get_parent_file_model(self):
         return FileModel(file_id=self.file_id, redis_session=self.redis_session)
