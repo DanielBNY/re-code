@@ -1,4 +1,4 @@
-from RepoActions import FileRepoActions
+from RepoActions import FolderModel, FileModel, FunctionModel
 
 
 class CallTreeExtractor:
@@ -55,17 +55,14 @@ class CallTreeExtractor:
         Attach an edge to nodes that do not have already a parent
         """
         neighbors_to_revisit = []
-        origin_function_info = dict(self.redis_session.hgetall(origin_function_id))
-        calls_out_set_id = origin_function_info[b'calls_out_set_id']
-        functions_calls_out = self.redis_session.smembers(calls_out_set_id)
-        for called_function_id in functions_calls_out:
-            function_info = dict(self.redis_session.hgetall(called_function_id))
-            pointed_file_id = function_info[b'file_id']
-            pointed_file_info = dict(self.redis_session.hgetall(pointed_file_id))
-            file_calls_in_set_id = pointed_file_info[b'calls_in_set_id']
-            if not bool(self.redis_session.smembers(file_calls_in_set_id)):
-                origin_file_repo = FileRepoActions(origin_function_info[b'contained_address'].decode('ascii'),
-                                                   self.redis_session)
-                origin_file_repo.recursion_add_edge(pointed_file_info[b'contained_address'].decode('ascii'))
-                neighbors_to_revisit.append(called_function_id)
+        origin_function_model = FunctionModel(function_id=origin_function_id, redis_session=self.redis_session)
+        functions_calls_out_models = origin_function_model.get_call_out_functions_models()
+        for called_function_model in functions_calls_out_models:
+            called_file_model = called_function_model.get_parent_file_model()
+            file_calls_in_models = called_file_model.get_call_in_files_models()
+            if not bool(file_calls_in_models):
+                origin_file_repo = FileModel(contained_address=origin_function_model.contained_address,
+                                             redis_session=self.redis_session)
+                origin_file_repo.recursion_add_edge(called_file_model.contained_address)
+                neighbors_to_revisit.append(called_function_model.id)
         return neighbors_to_revisit
