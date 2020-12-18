@@ -3,13 +3,13 @@ class FolderModel:
         self.redis_session = redis_session
         if folder_id:
             self.id = folder_id
-            self.contained_address = folder_id.split(":")[1]
+            self.contained_address = folder_id.split(b':')[1]
         elif contained_address:
-            self.id = f"folder:{contained_address}"
+            self.id = b'folder:' + contained_address
             self.contained_address = contained_address
-        self.contained_files_set_id = f"{folder_id}:contained_files"
-        self.calls_out_set_id = f"{folder_id}:calls_out"
-        self.calls_in_set_id = f"{folder_id}:calls_in"
+        self.contained_files_set_id = folder_id + b':contained_files'
+        self.calls_out_set_id = folder_id + b':calls_out'
+        self.calls_in_set_id = folder_id + b':calls_in'
 
     def get_call_out_folders_models(self):
         called_folders_ids = self.redis_session.smembers(self.calls_out_set_id)
@@ -32,12 +32,12 @@ class FolderModel:
         Add the folder id to the set of folders ids.
         Add the first file into the set of contained files in the folder.
         """
-        self.redis_session.hset(self.id, "size", size)
-        self.redis_session.hset(self.id, "calls_out_set_id", self.calls_out_set_id)
-        self.redis_session.hset(self.id, "calls_in_set_id", self.calls_in_set_id)
-        self.redis_session.hset(self.id, "contained_files_set_id", self.contained_files_set_id)
-        self.redis_session.hset(self.id, "contained_address", self.contained_address)
-        self.redis_session.sadd("folders", self.id)
+        self.redis_session.hset(self.id, b'size', size)
+        self.redis_session.hset(self.id, b'calls_out_set_id', self.calls_out_set_id)
+        self.redis_session.hset(self.id, b'calls_in_set_id', self.calls_in_set_id)
+        self.redis_session.hset(self.id, b'contained_files_set_id', self.contained_files_set_id)
+        self.redis_session.hset(self.id, b'contained_address', self.contained_address)
+        self.redis_session.sadd(b'folders', self.id)
         self.redis_session.sadd(self.contained_files_set_id, FileModel(contained_address=self.contained_address).id)
 
     def recursion_init(self, size):
@@ -55,25 +55,17 @@ class FolderModel:
 
 class FileModel:
     def __init__(self, redis_session=None, contained_address=None, file_id=None):
-        """
-        id: string
-        contained_address: string
-        folder_id: string (id to hashes)
-        contained_functions: string (set id)
-        calls_out_set_id: string (set id)
-        calls_in_set_id: string (set id)
-        """
         self.redis_session = redis_session
         if file_id:
             self.id = file_id
-            self.contained_address = file_id.split(":")[1]
+            self.contained_address = file_id.split(b':')[1]
         elif contained_address:
-            self.id = f"file:{contained_address}"
+            self.id = b'file:' + contained_address
             self.contained_address = contained_address
-        self.folder_id = f"folder:{self.contained_address}"
-        self.contained_functions_set_id = f"{self.id}:contained_functions"
-        self.calls_out_set_id = f"{self.id}:calls_out"
-        self.calls_in_set_id = f"{self.id}:calls_in"
+        self.folder_id = b'folder:' + self.contained_address
+        self.contained_functions_set_id = self.id + b':contained_functions'
+        self.calls_out_set_id = self.id + b':calls_out'
+        self.calls_in_set_id = self.id + b':calls_in'
 
     def get_call_out_files_models(self):
         called_files_ids = self.redis_session.smembers(self.calls_out_set_id)
@@ -99,13 +91,13 @@ class FileModel:
         Add the file id to the set of file ids.
         Add the first function into the set of contained functions in the file.
         """
-        self.redis_session.hset(self.id, "size", size)
-        self.redis_session.hset(self.id, "calls_out_set_id", self.calls_out_set_id)
-        self.redis_session.hset(self.id, "calls_in_set_id", self.calls_in_set_id)
-        self.redis_session.hset(self.id, "contained_functions_set_id", self.contained_functions_set_id)
-        self.redis_session.hset(self.id, "contained_address", self.contained_address)
-        self.redis_session.hset(self.id, "folder_id", self.folder_id)
-        self.redis_session.sadd("files", self.id)
+        self.redis_session.hset(self.id, b'size', size)
+        self.redis_session.hset(self.id, b'calls_out_set_id', self.calls_out_set_id)
+        self.redis_session.hset(self.id, b'calls_in_set_id', self.calls_in_set_id)
+        self.redis_session.hset(self.id, b'contained_functions_set_id', self.contained_functions_set_id)
+        self.redis_session.hset(self.id, b'contained_address', self.contained_address)
+        self.redis_session.hset(self.id, b'folder_id', self.folder_id)
+        self.redis_session.sadd(b'files', self.id)
         self.redis_session.sadd(self.contained_functions_set_id, FunctionModel(address=self.contained_address).id)
 
     def recursion_init(self, size):
@@ -147,15 +139,15 @@ class FunctionModel:
         self.redis_session = redis_session
         if function_id:
             self.id = function_id
-            self.contained_address = function_id.split(":")[1]
+            self.contained_address = function_id.split(b':')[1]
         elif address:
-            self.id = f"function:{address}"
+            self.id = b'function:' + address
             self.contained_address = address
 
-        self.file_id = f"file:{self.contained_address}"
-        self.calls_out_set_id = f"{self.id}:calls_out"
-        self.calls_in_set_id = f"{self.id}:calls_in"
-        self.file_id = f"file:{self.contained_address}"
+        self.file_id = b'file:' + self.contained_address
+        self.calls_out_set_id = self.id + b':calls_out'
+        self.calls_in_set_id = self.id + b':calls_in'
+        self.file_id = b'file:' + self.contained_address
 
     def get_call_out_functions_models(self):
         called_functions_ids = self.redis_session.smembers(self.calls_out_set_id)
@@ -180,12 +172,12 @@ class FunctionModel:
         the id for the functions calls in set, file id and contained address.
         Add the function id to the set of functions ids in the DB.
         """
-        self.redis_session.hset(self.id, "size", size)
-        self.redis_session.hset(self.id, "calls_out_set_id", self.calls_out_set_id)
-        self.redis_session.hset(self.id, "calls_in_set_id", self.calls_in_set_id)
-        self.redis_session.hset(self.id, "file_id", self.file_id)
-        self.redis_session.hset(self.id, "contained_address", self.contained_address)
-        self.redis_session.sadd("functions", self.id)
+        self.redis_session.hset(self.id, b'size', size)
+        self.redis_session.hset(self.id, b'calls_out_set_id', self.calls_out_set_id)
+        self.redis_session.hset(self.id, b'calls_in_set_id', self.calls_in_set_id)
+        self.redis_session.hset(self.id, b'file_id', self.file_id)
+        self.redis_session.hset(self.id, b'contained_address', self.contained_address)
+        self.redis_session.sadd(b'functions', self.id)
 
     def recursion_init(self, size):
         """
