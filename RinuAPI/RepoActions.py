@@ -11,8 +11,12 @@ class FolderModel:
         self.calls_out_set_id = f"{folder_id}:calls_out"
         self.calls_in_set_id = f"{folder_id}:calls_in"
 
-    def get_calls_out(self):
-        return self.redis_session.smembers(self.calls_out_set_id)
+    def get_called_folders_models(self):
+        called_folders_ids = self.redis_session.smembers(self.calls_out_set_id)
+        called_folders_models = []
+        for folder_id in called_folders_ids:
+            called_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
+        return called_folders_models
 
     def get_calls_in(self):
         return self.redis_session.smembers(self.calls_in_set_id)
