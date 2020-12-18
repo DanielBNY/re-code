@@ -144,6 +144,9 @@ class FunctionModel:
     def get_calls_in(self):
         return self.redis_session.smembers(self.calls_in_set_id)
 
+    def get_parent_file_model(self):
+        return FileModel(file_id=self.file_id, redis_session=self.redis_session)
+
     def add_init_function_info(self, size):
         """
         Saves to the DB the initialized function metadata: size of the function, the id for the functions calls out set,
