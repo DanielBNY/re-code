@@ -157,8 +157,12 @@ class FunctionModel:
         self.calls_in_set_id = f"{self.id}:calls_in"
         self.file_id = f"file:{self.contained_address}"
 
-    def get_calls_out(self):
-        return self.redis_session.smembers(self.calls_out_set_id)
+    def get_called_functions_models(self):
+        called_functions_ids = self.redis_session.smembers(self.calls_out_set_id)
+        called_functions_models = []
+        for function_id in called_functions_ids:
+            called_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
+        return called_functions_models
 
     def get_calls_in(self):
         return self.redis_session.smembers(self.calls_in_set_id)
