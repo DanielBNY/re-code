@@ -7,9 +7,9 @@ class FolderModel:
         elif contained_address:
             self.id = b'folder:' + contained_address
             self.contained_address = contained_address
-        self.contained_files_set_id = folder_id + b':contained_files'
-        self.calls_out_set_id = folder_id + b':calls_out'
-        self.calls_in_set_id = folder_id + b':calls_in'
+        self.contained_files_set_id = self.id + b':contained_files'
+        self.calls_out_set_id = self.id + b':calls_out'
+        self.calls_in_set_id = self.id + b':calls_in'
 
     def get_call_out_folders_models(self):
         called_folders_ids = self.redis_session.smembers(self.calls_out_set_id)
