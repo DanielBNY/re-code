@@ -9,8 +9,7 @@ class BinaryAnalysis:
         self.command_pipe = None
 
     def set_command_pipe(self, binary_path):
-        if not self.command_pipe:
-            self.command_pipe = r2pipe.open(binary_path)
+        self.command_pipe = r2pipe.open(binary_path)
 
 
 app = Flask(__name__)
