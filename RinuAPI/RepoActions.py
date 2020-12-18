@@ -1,5 +1,5 @@
 class FolderModel:
-    def __init__(self, redis_session=None,contained_address=None, folder_id=None):
+    def __init__(self, redis_session=None, contained_address=None, folder_id=None):
         self.redis_session = redis_session
         if folder_id:
             self.id = folder_id
@@ -10,6 +10,12 @@ class FolderModel:
         self.contained_files_set_id = f"{folder_id}:contained_files"
         self.calls_out_set_id = f"{folder_id}:calls_out"
         self.calls_in_set_id = f"{folder_id}:calls_in"
+
+    def get_calls_out(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
 
     def add_init_folder_info(self, size):
         """
@@ -60,6 +66,12 @@ class FileModel:
         self.contained_functions_set_id = f"{self.id}:contained_functions"
         self.calls_out_set_id = f"{self.id}:calls_out"
         self.calls_in_set_id = f"{self.id}:calls_in"
+
+    def get_calls_out(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
 
     def add_init_file_info(self, size):
         """
@@ -125,6 +137,12 @@ class FunctionModel:
         self.calls_out_set_id = f"{self.id}:calls_out"
         self.calls_in_set_id = f"{self.id}:calls_in"
         self.file_id = f"file:{self.contained_address}"
+
+    def get_calls_out(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
 
     def add_init_function_info(self, size):
         """
