@@ -18,8 +18,12 @@ class FolderModel:
             called_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return called_folders_models
 
-    def get_calls_in(self):
-        return self.redis_session.smembers(self.calls_in_set_id)
+    def get_calling_folders_models(self):
+        calling_folders_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_folders_models = []
+        for folder_id in calling_folders_ids:
+            calling_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
+        return calling_folders_models
 
     def add_init_folder_info(self, size):
         """
