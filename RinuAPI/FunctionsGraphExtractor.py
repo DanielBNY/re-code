@@ -1,4 +1,4 @@
-from RepoActions import FunctionRepoActions
+from RepoActions import FunctionModel
 from BinaryExtractor import BinaryExtractor
 
 
@@ -27,8 +27,8 @@ class FunctionsGraphExtractor:
     def save_functions_graph(self):
         for function in self.all_functions_info:
             fnc_address = function['offset']
-            fnc_repo_actions = FunctionRepoActions(address=fnc_address, redis_session=self.redis_session)
-            fnc_repo_actions.recursion_init(function['realsz'])
+            fnc_repo_actions = FunctionModel(address=str(fnc_address).encode(), redis_session=self.redis_session)
+            fnc_repo_actions.recursion_init(str(function['realsz']).encode())
 
     def get_valid_function_address(self, address):
         """
@@ -57,6 +57,6 @@ class FunctionsGraphExtractor:
                     called_function = self.get_valid_function_address(call_reference['addr'])
                     if called_function and call_reference['type'] == 'CALL':
                         source_function = function_info['offset']
-                        fnc_repo_actions = FunctionRepoActions(address=source_function,
-                                                               redis_session=self.redis_session)
-                        fnc_repo_actions.add_edge(called_function)
+                        fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
+                                                         redis_session=self.redis_session)
+                        fnc_repo_actions.add_edge(str(called_function).encode())
