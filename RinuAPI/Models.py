@@ -88,6 +88,13 @@ class FolderModel:
         Folders(self.redis_session).add_folder_id(self.id)
         self.redis_session.sadd(self.contained_files_set_id, FileModel(contained_address=self.contained_address).id)
 
+    def remove(self):
+        self.redis_session.delete(self.calls_out_set_id)
+        self.redis_session.delete(self.calls_in_set_id)
+        self.redis_session.delete(self.contained_files_set_id)
+        self.redis_session.srem('folders', self.id)
+        self.redis_session.delete(self.id)
+
     def recursion_init(self, size):
         self.add_init_folder_info(size)
 
@@ -173,6 +180,18 @@ class FileModel:
         self.add_edge(called_function_address)
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         folder_model.add_edge(called_function_address=called_function_address)
+
+    def remove(self):
+        self.redis_session.delete(self.calls_out_set_id)
+        self.redis_session.delete(self.calls_in_set_id)
+        self.redis_session.delete(self.contained_functions_set_id)
+        self.redis_session.srem('files', self.id)
+        self.redis_session.delete(self.id)
+
+    def recursion_remove(self):
+        folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
+        folder_model.remove()
+        self.remove()
 
 
 class FunctionModel:
