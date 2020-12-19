@@ -1,3 +1,42 @@
+class Folders:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+        self.key = 'folders'
+
+    def get_folder_models(self):
+        folders_ids = self.redis_session.smembers(self.key)
+        folders_models = []
+        for folder_id in folders_ids:
+            folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
+        return folders_models
+
+
+class Files:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+        self.key = 'files'
+
+    def get_files_models(self):
+        files_ids = self.redis_session.smembers(self.key)
+        files_models = []
+        for file_id in files_ids:
+            files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
+        return files_models
+
+
+class Functions:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+        self.key = 'functions'
+
+    def get_functions_models(self):
+        functions_ids = self.redis_session.smembers(self.key)
+        functions_models = []
+        for function_id in functions_ids:
+            functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
+        return functions_models
+
+
 class FolderModel:
     def __init__(self, redis_session=None, contained_address=None, folder_id=None):
         self.redis_session = redis_session
