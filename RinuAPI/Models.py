@@ -10,6 +10,9 @@ class Folders:
             folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return folders_models
 
+    def add_folder_id(self, folder_id):
+        self.redis_session.sadd(self.key, folder_id)
+
 
 class Files:
     def __init__(self, redis_session):
@@ -23,6 +26,9 @@ class Files:
             files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return files_models
 
+    def add_file_id(self, file_id):
+        self.redis_session.sadd(self.key, file_id)
+
 
 class Functions:
     def __init__(self, redis_session):
@@ -35,6 +41,9 @@ class Functions:
         for function_id in functions_ids:
             functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
         return functions_models
+
+    def add_function_id(self, function_id):
+        self.redis_session.sadd(self.key, function_id)
 
 
 class FolderModel:
