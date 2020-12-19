@@ -1,4 +1,4 @@
-from RepoActions import FolderModel, FileModel, FunctionModel
+from Models import FileModel, FunctionModel, Functions
 
 
 class CallTreeExtractor:
@@ -28,16 +28,15 @@ class CallTreeExtractor:
         saves functions that do not call any functions and are not called (lonely_functions, redis set key).
         Possible entry points are functions that functions do not call it
         """
-        functions_ids = self.redis_session.smembers('functions')
-        for function_id in functions_ids:
-            function_info = dict(self.redis_session.hgetall(function_id))
-            calls_in_set_id = function_info[b'calls_in_set_id']
-            calls_out_set_id = function_info[b'calls_out_set_id']
-            if not bool(self.redis_session.smembers(calls_in_set_id)):
-                if bool(self.redis_session.smembers(calls_out_set_id)):
-                    self.redis_session.sadd('entry_functions', function_id)
+        functions_models = Functions(self.redis_session).get_functions_models()
+        for function_model in functions_models:
+            call_in_functions = function_model.get_call_in_functions_models()
+            call_out_functions = function_model.get_call_out_functions_models()
+            if not bool(call_in_functions):
+                if bool(call_out_functions):
+                    self.redis_session.sadd('entry_functions', function_model.id)
                 else:
-                    self.redis_session.sadd('lonely_functions', function_id)
+                    self.redis_session.sadd('lonely_functions', function_model.id)
 
     def attach_nodes_sons(self, nodes):
         """
