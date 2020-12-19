@@ -26,6 +26,13 @@ class Files:
             files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return files_models
 
+    def get_average_file_size(self):
+        files_models = self.get_files_models()
+        size_sum = 0
+        for file_model in files_models:
+            size_sum += file_model.get_size()
+        return size_sum / float(len(files_models))
+
     def add_file_id(self, file_id):
         self.redis_session.sadd(self.key, file_id)
 
@@ -41,6 +48,13 @@ class Functions:
         for function_id in functions_ids:
             functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
         return functions_models
+
+    def get_average_file_size(self):
+        functions_models = self.get_functions_models()
+        size_sum = 0
+        for function_model in functions_models:
+            size_sum += function_model.get_size()
+        return size_sum / float(len(functions_models))
 
     def add_function_id(self, function_id):
         self.redis_session.sadd(self.key, function_id)
@@ -216,6 +230,22 @@ class FileModel:
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         folder_model.remove()
         self.remove()
+
+    def cluster(self, file_id):
+        file_model_to_cluster = FileModel(file_id=file_id, redis_session=self.redis_session)
+        calls_in_files_ids = file_model_to_cluster.get_calls_in_files_ids()
+        calls_out_files_ids = file_model_to_cluster.get_calls_out_files_ids()
+        add_values_to_set(redis_session=self.redis_session, key=self.calls_in_set_id, values=calls_in_files_ids)
+        add_values_to_set(redis_session=self.redis_session, key=self.calls_out_set_id, values=calls_out_files_ids)
+        self.redis_session.srem(self.calls_in_set_id, self.id)
+        self.redis_session.srem(self.calls_in_set_id, file_model_to_cluster.id)
+        self.redis_session.srem(self.calls_out_set_id, self.id)
+        self.redis_session.srem(self.calls_out_set_id, file_model_to_cluster.id)
+
+        add_values_to_set(redis_session=self.redis_session, key=self.contained_functions_set_id,
+                          values=file_model_to_cluster.get_contained_functions_ids())
+
+        file_model_to_cluster.recursion_remove()
 
 
 class FunctionModel:
