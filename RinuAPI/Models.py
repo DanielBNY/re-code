@@ -59,15 +59,21 @@ class FolderModel:
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
 
+    def get_calls_out_folders_ids(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in_folders_ids(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
+
     def get_call_out_folders_models(self):
-        called_folders_ids = self.redis_session.smembers(self.calls_out_set_id)
+        called_folders_ids = self.get_calls_out_folders_ids()
         called_folders_models = []
         for folder_id in called_folders_ids:
             called_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return called_folders_models
 
     def get_call_in_folders_models(self):
-        calling_folders_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_folders_ids = self.get_calls_in_folders_ids()
         calling_folders_models = []
         for folder_id in calling_folders_ids:
             calling_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
@@ -122,15 +128,21 @@ class FileModel:
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
 
+    def get_calls_out_files_ids(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in_files_ids(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
+
     def get_call_out_files_models(self):
-        called_files_ids = self.redis_session.smembers(self.calls_out_set_id)
+        called_files_ids = self.get_calls_out_files_ids()
         called_files_models = []
         for file_id in called_files_ids:
             called_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return called_files_models
 
     def get_call_in_files_models(self):
-        calling_files_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_files_ids = self.get_calls_in_files_ids()
         calling_files_models = []
         for file_id in calling_files_ids:
             calling_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
@@ -216,15 +228,21 @@ class FunctionModel:
         self.calls_in_set_id = self.id + b':calls_in'
         self.file_id = b'file:' + self.contained_address
 
+    def get_calls_out_functions_ids(self):
+        return self.redis_session.smembers(self.calls_out_set_id)
+
+    def get_calls_in_functions_ids(self):
+        return self.redis_session.smembers(self.calls_in_set_id)
+
     def get_call_out_functions_models(self):
-        called_functions_ids = self.redis_session.smembers(self.calls_out_set_id)
+        called_functions_ids = self.get_calls_out_functions_ids()
         called_functions_models = []
         for function_id in called_functions_ids:
             called_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
         return called_functions_models
 
     def get_call_in_functions_models(self):
-        calling_functions_ids = self.redis_session.smembers(self.calls_in_set_id)
+        calling_functions_ids = self.get_calls_in_functions_ids()
         calling_functions_models = []
         for function_id in calling_functions_ids:
             calling_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
