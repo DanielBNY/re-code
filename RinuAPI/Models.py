@@ -85,7 +85,7 @@ class FolderModel:
         self.redis_session.hset(self.id, b'calls_in_set_id', self.calls_in_set_id)
         self.redis_session.hset(self.id, b'contained_files_set_id', self.contained_files_set_id)
         self.redis_session.hset(self.id, b'contained_address', self.contained_address)
-        self.redis_session.sadd(b'folders', self.id)
+        Folders(self.redis_session).add_folder_id(self.id)
         self.redis_session.sadd(self.contained_files_set_id, FileModel(contained_address=self.contained_address).id)
 
     def recursion_init(self, size):
@@ -145,7 +145,7 @@ class FileModel:
         self.redis_session.hset(self.id, b'contained_functions_set_id', self.contained_functions_set_id)
         self.redis_session.hset(self.id, b'contained_address', self.contained_address)
         self.redis_session.hset(self.id, b'folder_id', self.folder_id)
-        self.redis_session.sadd(b'files', self.id)
+        Files(self.redis_session).add_file_id(self.id)
         self.redis_session.sadd(self.contained_functions_set_id, FunctionModel(address=self.contained_address).id)
 
     def recursion_init(self, size):
@@ -225,7 +225,7 @@ class FunctionModel:
         self.redis_session.hset(self.id, b'calls_in_set_id', self.calls_in_set_id)
         self.redis_session.hset(self.id, b'file_id', self.file_id)
         self.redis_session.hset(self.id, b'contained_address', self.contained_address)
-        self.redis_session.sadd(b'functions', self.id)
+        Functions(self.redis_session).add_function_id(self.id)
 
     def recursion_init(self, size):
         """
