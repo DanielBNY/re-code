@@ -59,6 +59,9 @@ class FolderModel:
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
 
+    def get_size(self):
+        return self.redis_session.hget(self.id, 'size')
+
     def get_contained_files_ids(self):
         return self.redis_session.smembers(self.contained_files_set_id)
 
@@ -130,6 +133,9 @@ class FileModel:
         self.contained_functions_set_id = self.id + b':contained_functions'
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
+
+    def get_size(self):
+        return self.redis_session.hget(self.id, 'size')
 
     def get_contained_functions_ids(self):
         return self.redis_session.smembers(self.contained_functions_set_id)
@@ -233,6 +239,9 @@ class FunctionModel:
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
         self.file_id = b'file:' + self.contained_address
+
+    def get_size(self):
+        return self.redis_session.hget(self.id, 'size')
 
     def get_calls_out_functions_ids(self):
         return self.redis_session.smembers(self.calls_out_set_id)
