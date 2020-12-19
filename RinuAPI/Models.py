@@ -241,7 +241,7 @@ class FileModel:
         self.redis_session.srem(self.calls_in_set_id, file_model_to_cluster.id)
         self.redis_session.srem(self.calls_out_set_id, self.id)
         self.redis_session.srem(self.calls_out_set_id, file_model_to_cluster.id)
-
+        self.redis_session.hset(self.id, b'size', int(self.get_size()) + int(file_model_to_cluster.get_size()))
         add_values_to_set(redis_session=self.redis_session, key=self.contained_functions_set_id,
                           values=file_model_to_cluster.get_contained_functions_ids())
 
