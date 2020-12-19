@@ -280,3 +280,8 @@ class FunctionModel:
         called_function_model = FunctionModel(address=called_function_address)
         self.redis_session.sadd(self.calls_out_set_id, called_function_model.id)
         self.redis_session.sadd(called_function_model.calls_in_set_id, self.id)
+
+
+def add_values_to_set(redis_session, key, values):
+    for value in values:
+        redis_session.sadd(key, value)
