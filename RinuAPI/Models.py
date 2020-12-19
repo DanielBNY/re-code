@@ -59,6 +59,9 @@ class FolderModel:
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
 
+    def get_contained_files_ids(self):
+        return self.redis_session.smembers(self.contained_files_set_id)
+
     def get_calls_out_folders_ids(self):
         return self.redis_session.smembers(self.calls_out_set_id)
 
@@ -127,6 +130,9 @@ class FileModel:
         self.contained_functions_set_id = self.id + b':contained_functions'
         self.calls_out_set_id = self.id + b':calls_out'
         self.calls_in_set_id = self.id + b':calls_in'
+
+    def get_contained_functions_ids(self):
+        return self.redis_session.smembers(self.contained_functions_set_id)
 
     def get_calls_out_files_ids(self):
         return self.redis_session.smembers(self.calls_out_set_id)
