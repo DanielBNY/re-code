@@ -80,7 +80,7 @@ class NodeModel:
         self.redis_session.hset(self.model_id, b'contained_address', self.contained_address)
 
     def get_size(self):
-        return self.redis_session.hget(self.model_id, b'size')
+        return int(self.redis_session.hget(self.model_id, b'size'))
 
     def get_call_out_models_ids(self):
         return self.get_calls_in_or_out_ids(b'out')
@@ -106,7 +106,7 @@ class ClusteredNodes(NodeModel):
         self.redis_session.srem(self.calls_in_set_id, model_to_cluster.model_id)
         self.redis_session.srem(self.calls_out_set_id, self.model_id)
         self.redis_session.srem(self.calls_out_set_id, model_to_cluster.model_id)
-        self.redis_session.hset(self.model_id, b'size', int(self.get_size()) + int(model_to_cluster.get_size()))
+        self.redis_session.hset(self.model_id, b'size', self.get_size() + model_to_cluster.get_size())
 
 
 class FolderModel(ClusteredNodes):
