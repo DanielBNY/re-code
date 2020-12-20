@@ -95,6 +95,10 @@ class ClusteredNodes(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
         NodeModel.__init__(self, model_name, redis_session=redis_session, contained_address=contained_address,
                            model_id=model_id)
+        self.contained_nodes_set_id = self.model_id + b':contained_nodes'
+
+    def get_contained_nodes_ids(self):
+        return self.redis_session.smembers(self.contained_nodes_set_id)
 
     def merge_edges_and_size(self, model_to_cluster: NodeModel):
         calls_in_files_ids = model_to_cluster.get_call_in_models_ids()
@@ -120,7 +124,6 @@ class FolderModel(ClusteredNodes):
         ClusteredNodes.__init__(self, model_name=b'folder', redis_session=redis_session,
                                 contained_address=contained_address,
                                 model_id=folder_id)
-        self.contained_files_set_id = self.model_id + b':contained_files'
 
     def get_call_out_folders_models(self):
         called_folders_ids = self.get_call_out_models_ids()
@@ -144,15 +147,15 @@ class FolderModel(ClusteredNodes):
         Add the first file into the set of contained files in the folder.
         """
         self.basic_init_save(size=size)
-        self.redis_session.hset(self.model_id, b'contained_files_set_id', self.contained_files_set_id)
+        self.redis_session.hset(self.model_id, b'contained_files_set_id', self.contained_nodes_set_id)
         Folders(self.redis_session).add_folder_id(self.model_id)
-        self.redis_session.sadd(self.contained_files_set_id,
+        self.redis_session.sadd(self.contained_nodes_set_id,
                                 FileModel(contained_address=self.contained_address).model_id)
 
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
         self.redis_session.delete(self.calls_in_set_id)
-        self.redis_session.delete(self.contained_files_set_id)
+        self.redis_session.delete(self.contained_nodes_set_id)
         self.redis_session.srem('folders', self.model_id)
         self.redis_session.delete(self.model_id)
 
@@ -175,10 +178,6 @@ class FileModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_address
-        self.contained_functions_set_id = self.model_id + b':contained_functions'
-
-    def get_contained_functions_ids(self):
-        return self.redis_session.smembers(self.contained_functions_set_id)
 
     def get_call_out_files_models(self):
         called_files_ids = self.get_call_out_models_ids()
@@ -205,10 +204,10 @@ class FileModel(ClusteredNodes):
         Add the first function into the set of contained functions in the file.
         """
         self.basic_init_save(size=size)
-        self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_functions_set_id)
+        self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_nodes_set_id)
         self.redis_session.hset(self.model_id, b'folder_id', self.folder_id)
         Files(self.redis_session).add_file_id(self.model_id)
-        self.redis_session.sadd(self.contained_functions_set_id, FunctionModel(address=self.contained_address).model_id)
+        self.redis_session.sadd(self.contained_nodes_set_id, FunctionModel(address=self.contained_address).model_id)
 
     def recursion_init(self, size):
         """
@@ -239,7 +238,7 @@ class FileModel(ClusteredNodes):
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
         self.redis_session.delete(self.calls_in_set_id)
-        self.redis_session.delete(self.contained_functions_set_id)
+        self.redis_session.delete(self.contained_nodes_set_id)
         self.redis_session.srem('files', self.model_id)
         self.redis_session.delete(self.model_id)
 
@@ -250,7 +249,7 @@ class FileModel(ClusteredNodes):
 
     def cluster(self, file_model_to_cluster):
         self.merge_edges_and_size(file_model_to_cluster)
-        add_values_to_set(redis_session=self.redis_session, key=self.contained_functions_set_id,
+        add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
                           values=file_model_to_cluster.get_contained_functions_ids())
         file_model_to_cluster.recursion_remove()
 
