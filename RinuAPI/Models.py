@@ -107,6 +107,13 @@ class ClusteredNodes(NodeModel):
         self.redis_session.srem(self.calls_out_set_id, model_to_cluster.model_id)
         self.redis_session.hset(self.model_id, b'size', self.get_size() + model_to_cluster.get_size())
 
+    def get_sum_of_sons(self):
+        call_out_models_ids = self.get_call_out_models_ids()
+        size_sum = 0
+        for model_id in call_out_models_ids:
+            size_sum += NodeModel(redis_session=self.redis_session, model_id=model_id).get_size()
+        return size_sum
+
 
 class FolderModel(ClusteredNodes):
     def __init__(self, redis_session=None, contained_address=None, folder_id=None):
