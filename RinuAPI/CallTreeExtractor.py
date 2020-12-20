@@ -34,9 +34,9 @@ class CallTreeExtractor:
             call_out_functions = function_model.get_call_out_functions_models()
             if not bool(call_in_functions):
                 if bool(call_out_functions):
-                    self.redis_session.sadd('entry_functions', function_model.id)
+                    self.redis_session.sadd('entry_functions', function_model.model_id)
                 else:
-                    self.redis_session.sadd('lonely_functions', function_model.id)
+                    self.redis_session.sadd('lonely_functions', function_model.model_id)
 
     def attach_nodes_sons(self, nodes):
         """
@@ -63,5 +63,5 @@ class CallTreeExtractor:
                 origin_file_repo = FileModel(contained_address=origin_function_model.contained_address,
                                              redis_session=self.redis_session)
                 origin_file_repo.recursion_add_edge(called_file_model.contained_address)
-                neighbors_to_revisit.append(called_function_model.id)
+                neighbors_to_revisit.append(called_function_model.model_id)
         return neighbors_to_revisit
