@@ -319,7 +319,8 @@ class LonelyModels:
         self.redis_session.sadd('lonely:addresses', address)
 
     def get_models(self, model_name):
-        return get_models_by_addresses('lonely:addresses', self.redis_session, model_name)
+        addresses = self.redis_session.smembers('lonely:addresses')
+        return get_models_by_addresses(addresses, self.redis_session, model_name)
 
 
 class EntryModels:
@@ -330,16 +331,16 @@ class EntryModels:
         self.redis_session.sadd('entry:addresses', address)
 
     def get_models(self, model_name):
-        return get_models_by_addresses('entry:addresses', self.redis_session, model_name)
+        addresses = self.redis_session.smembers('entry:addresses')
+        return get_models_by_addresses(addresses, self.redis_session, model_name)
 
 
-def get_models_by_addresses(key, redis_session, model_name):
+def get_models_by_addresses(addresses, redis_session, model_name):
     """
-    key: redis key for addresses set
+    addresses: a set of addresses
     redis_session: redis session
     model_name: function / file / folder
     """
-    addresses = redis_session.smembers(key)
     models = []
     for address in addresses:
         if model_name == 'function':
