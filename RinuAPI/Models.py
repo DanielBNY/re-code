@@ -295,3 +295,43 @@ class FunctionModel(NodeModel):
 def add_values_to_set(redis_session, key, values):
     for value in values:
         redis_session.sadd(key, value)
+
+
+class LonelyModels:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+
+    def add_address(self, address):
+        self.redis_session.sadd('lonely:addresses', address)
+
+    def get_models(self, model_name):
+        return get_models_by_key_ids('lonely:addresses', self.redis_session, model_name)
+
+
+class EntryModels:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+
+    def add_address(self, address):
+        self.redis_session.sadd('entry:addresses', address)
+
+    def get_models(self, model_name):
+        return get_models_by_key_ids('entry:addresses', self.redis_session, model_name)
+
+
+def get_models_by_key_ids(key, redis_session, model_name):
+    """
+    key: redis key
+    redis_session: redis session
+    model_name: function / file / folder
+    """
+    addresses = redis_session.smembers(key)
+    models = []
+    for address in addresses:
+        if model_name == 'function':
+            models.append(FunctionModel(address=address, redis_session=redis_session))
+        elif model_name == 'file':
+            models.append(FileModel(contained_address=address, redis_session=redis_session))
+        elif model_name == 'folder':
+            models.append(FolderModel(contained_address=address, redis_session=redis_session))
+    return models
