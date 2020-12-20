@@ -92,10 +92,28 @@ class NodeModel:
         return self.redis_session.smembers(self.model_id + b':calls_' + in_or_out)
 
 
-class FolderModel(NodeModel):
+class ClusteredNodes(NodeModel):
+    def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
+        NodeModel.__init__(self, model_name, redis_session=redis_session, contained_address=contained_address,
+                           model_id=model_id)
+
+    def merge_edges_and_size(self, model_to_cluster: NodeModel):
+        calls_in_files_ids = model_to_cluster.get_call_in_models_ids()
+        calls_out_files_ids = model_to_cluster.get_call_out_models_ids()
+        add_values_to_set(redis_session=self.redis_session, key=self.calls_in_set_id, values=calls_in_files_ids)
+        add_values_to_set(redis_session=self.redis_session, key=self.calls_out_set_id, values=calls_out_files_ids)
+        self.redis_session.srem(self.calls_in_set_id, self.model_id)
+        self.redis_session.srem(self.calls_in_set_id, model_to_cluster.model_id)
+        self.redis_session.srem(self.calls_out_set_id, self.model_id)
+        self.redis_session.srem(self.calls_out_set_id, model_to_cluster.model_id)
+        self.redis_session.hset(self.model_id, b'size', int(self.get_size()) + int(model_to_cluster.get_size()))
+
+
+class FolderModel(ClusteredNodes):
     def __init__(self, redis_session=None, contained_address=None, folder_id=None):
-        NodeModel.__init__(self, model_name=b'folder', redis_session=redis_session, contained_address=contained_address,
-                           model_id=folder_id)
+        ClusteredNodes.__init__(self, model_name=b'folder', redis_session=redis_session,
+                                contained_address=contained_address,
+                                model_id=folder_id)
         self.contained_files_set_id = self.model_id + b':contained_files'
 
     def get_call_out_folders_models(self):
@@ -145,10 +163,11 @@ class FolderModel(NodeModel):
         self.redis_session.sadd(called_folder_model.calls_in_set_id, self.model_id)
 
 
-class FileModel(NodeModel):
+class FileModel(ClusteredNodes):
     def __init__(self, redis_session=None, contained_address=None, file_id=None):
-        NodeModel.__init__(self, model_name=b'file', redis_session=redis_session, contained_address=contained_address,
-                           model_id=file_id)
+        ClusteredNodes.__init__(self, model_name=b'file', redis_session=redis_session,
+                                contained_address=contained_address,
+                                model_id=file_id)
         self.folder_id = b'folder:' + self.contained_address
         self.contained_functions_set_id = self.model_id + b':contained_functions'
 
@@ -223,20 +242,10 @@ class FileModel(NodeModel):
         folder_model.remove()
         self.remove()
 
-    def cluster(self, file_id):
-        file_model_to_cluster = FileModel(file_id=file_id, redis_session=self.redis_session)
-        calls_in_files_ids = file_model_to_cluster.get_call_in_models_ids()
-        calls_out_files_ids = file_model_to_cluster.get_call_out_models_ids()
-        add_values_to_set(redis_session=self.redis_session, key=self.calls_in_set_id, values=calls_in_files_ids)
-        add_values_to_set(redis_session=self.redis_session, key=self.calls_out_set_id, values=calls_out_files_ids)
-        self.redis_session.srem(self.calls_in_set_id, self.model_id)
-        self.redis_session.srem(self.calls_in_set_id, file_model_to_cluster.model_id)
-        self.redis_session.srem(self.calls_out_set_id, self.model_id)
-        self.redis_session.srem(self.calls_out_set_id, file_model_to_cluster.model_id)
-        self.redis_session.hset(self.model_id, b'size', int(self.get_size()) + int(file_model_to_cluster.get_size()))
+    def cluster(self, file_model_to_cluster):
+        self.merge_edges_and_size(file_model_to_cluster)
         add_values_to_set(redis_session=self.redis_session, key=self.contained_functions_set_id,
                           values=file_model_to_cluster.get_contained_functions_ids())
-
         file_model_to_cluster.recursion_remove()
 
 
