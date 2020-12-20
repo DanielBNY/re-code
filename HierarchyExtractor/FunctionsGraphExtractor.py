@@ -1,4 +1,4 @@
-from RepoActions import FunctionModel
+from Models import FunctionModel
 from BinaryExtractor import BinaryExtractor
 
 
