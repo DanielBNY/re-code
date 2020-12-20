@@ -61,14 +61,13 @@ class Functions:
 
 
 class NodeModel:
-    def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
+    def __init__(self, model_name=None, redis_session=None, contained_address=None, model_id=None):
         self.redis_session = redis_session
-        self.model_name = model_name
         if model_id:
             self.model_id = model_id
             self.contained_address = model_id.split(b':')[1]
-        elif contained_address:
-            self.model_id = self.model_name + b':' + contained_address
+        elif contained_address and model_name:
+            self.model_id = model_name + b':' + contained_address
             self.contained_address = contained_address
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
