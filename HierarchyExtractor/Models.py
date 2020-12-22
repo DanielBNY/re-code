@@ -90,17 +90,17 @@ class NodeModel:
     def get_calls_in_or_out_ids(self, in_or_out):
         return self.redis_session.smembers(self.model_id + b':calls_' + in_or_out)
 
-    def add_edge(self, target_node_id):
-        self.redis_session.sadd(self.calls_out_set_id, target_node_id.model_id)
-        self.redis_session.sadd(target_node_id.calls_in_set_id, self.model_id)
+    def add_edge(self, target_node):
+        self.redis_session.sadd(self.calls_out_set_id, target_node.model_id)
+        self.redis_session.sadd(target_node.calls_in_set_id, self.model_id)
 
-    def remove_edge(self, target_node_id):
-        self.redis_session.srem(self.calls_out_set_id, target_node_id.model_id)
-        self.redis_session.srem(target_node_id.calls_in_set_id, self.model_id)
+    def remove_edge(self, target_node_model):
+        self.redis_session.srem(self.calls_out_set_id, target_node_model.model_id)
+        self.redis_session.srem(target_node_model.calls_in_set_id, self.model_id)
 
-    def change_edge_target(self, last_target_node_id, new_target_node_id):
-        self.remove_edge(last_target_node_id)
-        self.add_edge(new_target_node_id)
+    def change_edge_target(self, last_target_node, new_target_node):
+        self.remove_edge(last_target_node)
+        self.add_edge(new_target_node)
 
 
 class ClusteredNodes(NodeModel):
@@ -312,7 +312,7 @@ class FunctionModel(NodeModel):
         Add to the calls in set of the called function the calling function id.
         """
         called_function_model = FunctionModel(address=called_function_address)
-        self.add_edge(target_node_id=called_function_model)
+        self.add_edge(target_node=called_function_model)
 
 
 def add_values_to_set(redis_session, key, values):
