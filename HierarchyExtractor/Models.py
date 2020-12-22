@@ -352,18 +352,17 @@ def get_models_by_addresses(addresses, redis_session, model_name):
     return models
 
 
-def get_models_by_ids(redis_session, model_name, model_ids):
+def get_models_by_ids(redis_session, model_ids):
     """
     redis_session: redis session
-    model_name: function / file / folder
     model_ids: model ids
     """
     models = []
     for model_id in model_ids:
-        if model_name == 'function':
+        if b'function' in model_id:
             models.append(FunctionModel(function_id=model_id, redis_session=redis_session))
-        elif model_name == 'file':
+        elif b'file' in model_id:
             models.append(FileModel(file_id=model_id, redis_session=redis_session))
-        elif model_name == 'folder':
+        elif b'folder' in model_id:
             models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
     return models
