@@ -90,6 +90,10 @@ class NodeModel:
     def get_calls_in_or_out_ids(self, in_or_out):
         return self.redis_session.smembers(self.model_id + b':calls_' + in_or_out)
 
+    def add_edge(self, target_node_id):
+        self.redis_session.sadd(self.calls_out_set_id, target_node_id.model_id)
+        self.redis_session.sadd(target_node_id.calls_in_set_id, self.model_id)
+
 
 class ClusteredNodes(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
@@ -296,14 +300,13 @@ class FunctionModel(NodeModel):
         file_repo_actions = FileModel(file_id=self.file_id, redis_session=self.redis_session)
         file_repo_actions.recursion_init(size)
 
-    def add_edge(self, called_function_address):
+    def add_function_edge(self, called_function_address):
         """
         Add to the calls out set the called function id,
         Add to the calls in set of the called function the calling function id.
         """
         called_function_model = FunctionModel(address=called_function_address)
-        self.redis_session.sadd(self.calls_out_set_id, called_function_model.model_id)
-        self.redis_session.sadd(called_function_model.calls_in_set_id, self.model_id)
+        self.add_edge(target_node_id=called_function_model)
 
 
 def add_values_to_set(redis_session, key, values):
