@@ -94,6 +94,10 @@ class NodeModel:
         self.redis_session.sadd(self.calls_out_set_id, target_node_id.model_id)
         self.redis_session.sadd(target_node_id.calls_in_set_id, self.model_id)
 
+    def remove_edge(self, target_node_id):
+        self.redis_session.srem(self.calls_out_set_id, target_node_id.model_id)
+        self.redis_session.srem(target_node_id.calls_in_set_id, self.model_id)
+
 
 class ClusteredNodes(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
