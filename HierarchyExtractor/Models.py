@@ -180,14 +180,13 @@ class FolderModel(ClusteredNodes):
     def recursion_init(self, size):
         self.add_init_folder_info(size)
 
-    def add_edge(self, called_function_address):
+    def add_folder_edge(self, called_function_address):
         """
         Add to the calls out set the called folder id,
         Add to the calls in set of the called folder the calling folder id.
         """
         called_folder_model = FolderModel(contained_address=called_function_address)
-        self.redis_session.sadd(self.calls_out_set_id, called_folder_model.model_id)
-        self.redis_session.sadd(called_folder_model.calls_in_set_id, self.model_id)
+        self.add_edge(called_folder_model)
 
 
 class FileModel(ClusteredNodes):
@@ -235,23 +234,22 @@ class FileModel(ClusteredNodes):
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         folder_model.recursion_init(size)
 
-    def add_edge(self, called_function_address):
+    def add_file_edge(self, called_function_address):
         """
         Add to the calls out set the called file id,
         Add to the calls in set of the called file the calling file id.
         """
         called_file_model = FileModel(contained_address=called_function_address)
-        self.redis_session.sadd(self.calls_out_set_id, called_file_model.model_id)
-        self.redis_session.sadd(called_file_model.calls_in_set_id, self.model_id)
+        self.add_edge(called_file_model)
 
     def recursion_add_edge(self, called_function_address):
         """
         Add edge to the called file and call add edge for folder
         The edged contained in the files relations need to exist inside the folder relations
         """
-        self.add_edge(called_function_address)
+        self.add_file_edge(called_function_address)
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
-        folder_model.add_edge(called_function_address=called_function_address)
+        folder_model.add_folder_edge(called_function_address=called_function_address)
 
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
