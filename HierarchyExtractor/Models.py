@@ -118,6 +118,12 @@ class ClusteredNodes(NodeModel):
             size_sum += NodeModel(redis_session=self.redis_session, model_id=model_id).get_size()
         return size_sum
 
+    def cluster(self, file_model_to_cluster):
+        self.merge_edges_and_size(file_model_to_cluster)
+        add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
+                          values=file_model_to_cluster.get_contained_nodes_ids())
+        file_model_to_cluster.recursion_remove()
+
 
 class FolderModel(ClusteredNodes):
     def __init__(self, redis_session=None, contained_address=None, folder_id=None):
@@ -246,12 +252,6 @@ class FileModel(ClusteredNodes):
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         folder_model.remove()
         self.remove()
-
-    def cluster(self, file_model_to_cluster):
-        self.merge_edges_and_size(file_model_to_cluster)
-        add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
-                          values=file_model_to_cluster.get_contained_functions_ids())
-        file_model_to_cluster.recursion_remove()
 
 
 class FunctionModel(NodeModel):
