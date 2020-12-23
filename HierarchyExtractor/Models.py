@@ -134,7 +134,23 @@ class ClusteredNodes(NodeModel):
         self.merge_edges_and_size(file_model_to_cluster)
         add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
                           values=file_model_to_cluster.get_contained_nodes_ids())
+        self.switch_edge_references(file_model_to_cluster)
         file_model_to_cluster.recursion_remove()
+
+    def switch_edge_references(self, merging_node):
+        """
+        removing references to the old node and replacing them with references to the new node
+        """
+        call_out_models_ids = self.get_call_out_models_ids()
+        call_out_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_out_models_ids)
+        for call_out_model in call_out_models:
+            merging_node.remove_edge(call_out_model)
+            self.add_edge(call_out_model)
+
+        call_in_models_ids = self.get_call_in_models_ids()
+        call_in_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_in_models_ids)
+        for call_in_model in call_in_models:
+            call_in_model.change_edge_target(last_target_node=merging_node, new_target_node=self)
 
 
 class FolderModel(ClusteredNodes):
