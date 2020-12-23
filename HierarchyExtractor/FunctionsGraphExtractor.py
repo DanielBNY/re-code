@@ -59,4 +59,4 @@ class FunctionsGraphExtractor:
                         source_function = function_info['offset']
                         fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
                                                          redis_session=self.redis_session)
-                        fnc_repo_actions.add_edge(str(called_function).encode())
+                        fnc_repo_actions.add_function_edge(str(called_function).encode())
