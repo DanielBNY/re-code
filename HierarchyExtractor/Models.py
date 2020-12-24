@@ -130,12 +130,12 @@ class ClusteredNodes(NodeModel):
             size_sum += NodeModel(redis_session=self.redis_session, model_id=model_id).get_size()
         return size_sum
 
-    def cluster(self, file_model_to_cluster):
-        self.merge_edges_and_size(file_model_to_cluster)
+    def cluster(self, model_to_cluster):
+        self.merge_edges_and_size(model_to_cluster)
         add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
-                          values=file_model_to_cluster.get_contained_nodes_ids())
-        self.switch_edge_references(file_model_to_cluster)
-        file_model_to_cluster.recursion_remove()
+                          values=model_to_cluster.get_contained_nodes_ids())
+        self.switch_edge_references(model_to_cluster)
+        model_to_cluster.recursion_remove()
 
     def switch_edge_references(self, merging_node):
         """
