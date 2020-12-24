@@ -135,7 +135,7 @@ class ClusteredNodes(NodeModel):
         add_values_to_set(redis_session=self.redis_session, key=self.contained_nodes_set_id,
                           values=model_to_cluster.get_contained_nodes_ids())
         self.switch_edge_references(model_to_cluster)
-        model_to_cluster.recursion_remove()
+        model_to_cluster.remove()
 
     def switch_edge_references(self, merging_node):
         """
