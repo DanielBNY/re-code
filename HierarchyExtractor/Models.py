@@ -274,6 +274,13 @@ class FileModel(ClusteredNodes):
         self.redis_session.srem('files', self.model_id)
         self.redis_session.delete(self.model_id)
 
+    def recursion_cluster(self, model_to_cluster):
+        folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
+        folder_to_cluster = FolderModel(contained_address=model_to_cluster.contained_address,
+                                        redis_session=self.redis_session)
+        folder_model.cluster(folder_to_cluster)
+        self.cluster(model_to_cluster)
+
 
 class FunctionModel(NodeModel):
     def __init__(self, redis_session=None, address=None, function_id=None):
