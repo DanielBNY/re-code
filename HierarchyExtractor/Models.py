@@ -274,11 +274,6 @@ class FileModel(ClusteredNodes):
         self.redis_session.srem('files', self.model_id)
         self.redis_session.delete(self.model_id)
 
-    def recursion_remove(self):
-        folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
-        folder_model.remove()
-        self.remove()
-
 
 class FunctionModel(NodeModel):
     def __init__(self, redis_session=None, address=None, function_id=None):
