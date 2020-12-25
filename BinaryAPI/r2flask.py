@@ -35,5 +35,11 @@ def pipe_command(command):
     return BIN_ANALYSIS.command_pipe.cmd(command)
 
 
+@app.route('/decompile_function/<offset>', methods=['GET'])
+def decompile_function(offset):
+    code = BIN_ANALYSIS.command_pipe.cmd(f"s {offset}; #!pipe r2retdec")
+    return code
+
+
 if __name__ == '__main__':
     app.run(host=LOCAL_URL['host'], port=LOCAL_URL['port'])

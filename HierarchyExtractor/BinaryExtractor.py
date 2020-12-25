@@ -50,15 +50,15 @@ class BinaryExtractor:
             raise Exception(response.text)
         return json.loads(response.text)
 
-    def decompile_function(self, function_offset):
+    @staticmethod
+    def decompile_function(function_offset):
         """
         :return: string, c like code in text
         """
-        self.jmp_to_address(function_offset)
-        response = requests.post(URL + "command/" + 'pdc')
+        response = requests.get(URL + "decompile_function/" + function_offset)
         if response.status_code != 200:
             raise Exception(response.text)
-        return response.text
+        return response.text.split('\n')[6:-7]
 
     def disassemble_function(self, function_offset):
         """
