@@ -12,15 +12,15 @@ class ClusterFilesAndFolders:
         average_file_size = files.get_average_file_size()
         if average_file_size > self.max_function_size:
             self.max_function_size = average_file_size
+        self.cluster_models(model_name='file',
+                            max_node_size=self.max_function_size)
+        self.cluster_models(model_name='folder',
+                            max_node_size=self.max_function_size * self.max_number_of_max_files_in_folder)
 
-        files_entry_models = EntryModels(self.redis_session).get_models(model_name='file')
-        for entry_file_model in files_entry_models:
-            self.cluster_sons_of_entry_point([entry_file_model], self.max_function_size)
-
-        folders_entry_models = EntryModels(self.redis_session).get_models(model_name='folder')
+    def cluster_models(self, model_name, max_node_size):
+        folders_entry_models = EntryModels(self.redis_session).get_models(model_name=model_name)
         for entry_folder_model in folders_entry_models:
-            self.cluster_sons_of_entry_point([entry_folder_model],
-                                             self.max_function_size * self.max_number_of_max_files_in_folder)
+            self.cluster_sons_of_entry_point([entry_folder_model], max_node_size)
 
     def cluster_sons_of_entry_point(self, entry_node_model, max_node_size):
         neighbors_to_revisit = self.cluster_multiple_nodes(entry_node_model, max_node_size)
