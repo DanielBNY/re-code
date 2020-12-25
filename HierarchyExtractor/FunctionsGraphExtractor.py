@@ -7,14 +7,13 @@ class FunctionsGraphExtractor:
     Functions call graph - functions are nodes and edges are calls to other functions
     """
 
-    def __init__(self, binary_path, redis_session):
+    def __init__(self, binary_extractor_session: BinaryExtractor, redis_session):
         """
         The class contain the connection between functions and the list of functions addresses
-        :param binary_path
+        :param binary_extractor_session
         :param redis_session
         """
-        bin_analysis = BinaryExtractor(binary_path)
-        self.all_functions_info = bin_analysis.get_all_functions_info()
+        self.all_functions_info = binary_extractor_session.get_all_functions_info()
         self.redis_session = redis_session
 
     def run(self):
