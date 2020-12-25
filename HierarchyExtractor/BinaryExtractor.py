@@ -48,7 +48,7 @@ class BinaryExtractor:
         response = requests.post(URL + "command/" + 'aflj')
         if response.status_code != 200:
             raise Exception(response.text)
-        return json.loads(response.text)
+        return response.text[:-1]  # remove \n at the end of the string
 
     @staticmethod
     def decompile_function(function_offset):
