@@ -1,4 +1,5 @@
-from Models import Files, EntryModels, get_models_by_ids, NodeModel
+from Models import Files, EntryModels, get_models_by_ids, ClusteredNodes
+from collections.abc import Sequence
 
 
 class ClusterFilesAndFolders:
@@ -27,7 +28,7 @@ class ClusterFilesAndFolders:
         while neighbors_to_revisit:
             neighbors_to_revisit = self.cluster_multiple_nodes(neighbors_to_revisit, max_node_size)
 
-    def cluster_multiple_nodes(self, nodes, max_node_size):
+    def cluster_multiple_nodes(self, nodes: Sequence[ClusteredNodes], max_node_size):
         neighbors_to_revisit = []
         for node in nodes:
             returned_merged_nodes = self.get_merged_nodes(node, max_node_size)
@@ -35,7 +36,7 @@ class ClusterFilesAndFolders:
                 neighbors_to_revisit += returned_merged_nodes
         return neighbors_to_revisit
 
-    def get_merged_nodes(self, father_node, max_node_size):
+    def get_merged_nodes(self, father_node: ClusteredNodes, max_node_size):
         model_ids = father_node.get_call_out_models_ids()
         sons_models = get_models_by_ids(model_ids=model_ids, redis_session=self.redis_session)
         sum_of_sons = father_node.get_sum_of_sons()
