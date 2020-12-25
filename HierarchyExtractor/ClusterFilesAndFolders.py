@@ -2,20 +2,20 @@ from Models import Files, EntryModels, get_models_by_ids, NodeModel
 
 
 class ClusterFilesAndFolders:
-    def __init__(self, redis_session, max_function_size, max_number_of_max_files_in_folder):
-        self.max_function_size = max_function_size
+    def __init__(self, redis_session, max_file_size, max_number_of_max_files_in_folder):
+        self.max_file_size = max_file_size
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
         self.redis_session = redis_session
 
     def run(self):
         files = Files(redis_session=self.redis_session)
         average_file_size = files.get_average_file_size()
-        if average_file_size > self.max_function_size:
-            self.max_function_size = average_file_size
+        if average_file_size > self.max_file_size:
+            self.max_file_size = average_file_size
         self.cluster_models(model_name='file',
-                            max_node_size=self.max_function_size)
+                            max_node_size=self.max_file_size)
         self.cluster_models(model_name='folder',
-                            max_node_size=self.max_function_size * self.max_number_of_max_files_in_folder)
+                            max_node_size=self.max_file_size * self.max_number_of_max_files_in_folder)
 
     def cluster_models(self, model_name, max_node_size):
         folders_entry_models = EntryModels(self.redis_session).get_models(model_name=model_name)
