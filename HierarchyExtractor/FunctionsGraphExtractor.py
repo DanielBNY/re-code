@@ -1,5 +1,5 @@
 from Models import FunctionModel
-from BinaryExtractor import BinaryExtractor
+from pymongo import MongoClient
 
 
 class FunctionsGraphExtractor:
@@ -7,14 +7,17 @@ class FunctionsGraphExtractor:
     Functions call graph - functions are nodes and edges are calls to other functions
     """
 
-    def __init__(self, binary_extractor_session: BinaryExtractor, redis_session):
+    def __init__(self, redis_session, mongodb_client: MongoClient):
         """
         The class contain the connection between functions and the list of functions addresses
-        :param binary_extractor_session
         :param redis_session
+        :param mongodb_client
         """
-        self.all_functions_info = binary_extractor_session.get_all_functions_info()
+        self.mongodb_client = mongodb_client
         self.redis_session = redis_session
+        db = self.mongodb_client.Rinu
+        self.functions_info_collection = db['FunctionsInfo']
+        self.functions_info_ids = self.functions_info_collection.distinct("_id")
 
     def run(self):
         """
@@ -24,10 +27,11 @@ class FunctionsGraphExtractor:
         self.save_functions_edges()
 
     def save_functions_graph(self):
-        for function in self.all_functions_info:
-            fnc_address = function['offset']
+        for function_info_id in self.functions_info_ids:
+            function_info = self.functions_info_collection.find({"_id": function_info_id}).next()
+            fnc_address = function_info['offset']
             fnc_repo_actions = FunctionModel(address=str(fnc_address).encode(), redis_session=self.redis_session)
-            fnc_repo_actions.recursion_init(str(function['realsz']).encode())
+            fnc_repo_actions.recursion_init(str(function_info['realsz']).encode())
 
     def get_valid_function_address(self, address):
         """
@@ -50,7 +54,8 @@ class FunctionsGraphExtractor:
         not all call references are pointing to functions
         :return: list, function edges
         """
-        for function_info in self.all_functions_info:
+        for function_info_id in self.functions_info_ids:
+            function_info = self.functions_info_collection.find({"_id": function_info_id}).next()
             if 'callrefs' in function_info:
                 for call_reference in function_info['callrefs']:
                     called_function = self.get_valid_function_address(call_reference['addr'])
