@@ -204,6 +204,9 @@ class FolderModel(ClusteredNodes):
         called_folder_model = FolderModel(contained_address=called_function_address)
         self.add_edge(called_folder_model)
 
+    def recursion_cluster(self, model_to_cluster):
+        self.cluster(model_to_cluster)
+
 
 class FileModel(ClusteredNodes):
     def __init__(self, redis_session=None, contained_address=None, file_id=None):
