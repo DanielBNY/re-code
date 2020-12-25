@@ -70,7 +70,8 @@ class ClusterFilesAndFolders:
                 elif smaller_node and smaller_node.get_size() > max_node_size * (2 / 3):
                     clustered_nodes.append(smaller_node)
                     smaller_node = None
-            clustered_nodes.append(smaller_node)
+            if smaller_node:
+                clustered_nodes.append(smaller_node)
             return clustered_nodes
         else:
             return nodes_to_cluster
