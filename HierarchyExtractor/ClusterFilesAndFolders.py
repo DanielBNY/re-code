@@ -40,8 +40,8 @@ class ClusterFilesAndFolders:
                 return self.merge_multiple_nodes(sons_models)
             else:
                 if father_node.get_size() + sum_of_sons < self.max_node_size:
-                    [father_node].append(sons_models)
-                    return self.merge_multiple_nodes(sons_models)
+                    father_and_sons = [father_node] + sons_models
+                    return self.merge_multiple_nodes(father_and_sons)
                 else:
                     return self.merge_multiple_nodes(sons_models)
         else:
