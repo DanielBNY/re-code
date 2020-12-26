@@ -14,6 +14,7 @@ def visualize_graph(graph_name):
     redis_session = redis.Redis(REDIS_SERVER_IP)
     model_names = redis_session.smembers(graph_name)
     for model_name in model_names:
+        graph.add_node(str(model_name))
         model_info = dict(redis_session.hgetall(model_name))
         calls_out_set_id = model_info[b'calls_out_set_id']
         calls_out = redis_session.smembers(calls_out_set_id)
