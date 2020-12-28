@@ -28,7 +28,7 @@ class ClusterFilesAndFolders:
         while neighbors_to_revisit:
             neighbors_to_revisit = self.cluster_multiple_nodes(neighbors_to_revisit, max_node_size)
 
-    def cluster_multiple_nodes(self, nodes: Sequence[ClusteredNodes], max_node_size):
+    def cluster_multiple_nodes(self, nodes, max_node_size):
         neighbors_to_revisit = []
         for node in nodes:
             returned_merged_nodes = self.get_merged_nodes(node, max_node_size)
