@@ -41,5 +41,11 @@ def decompile_function(offset):
     return code
 
 
+@app.route('/functions_info_extractor/<target_file>', methods=['GET'])
+def functions_info_extractor(target_file):
+    BIN_ANALYSIS.command_pipe.cmd(f"aflj > /tmp/{target_file}")
+    return Response(status=200)
+
+
 if __name__ == '__main__':
     app.run(host=LOCAL_URL['host'], port=LOCAL_URL['port'])

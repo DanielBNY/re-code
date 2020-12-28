@@ -9,10 +9,9 @@ class FunctionsInfoExtractor:
         self.db_name = db_name
 
     def run(self):
-        all_functions_info = self.binary_extractor_session.get_all_functions_info()
-        file_path = '/tmp/all_functions_info.json'
-        with open(file_path, 'w') as file:
-            file.write(all_functions_info)
+        file_name = 'all_functions_info.json'
+        file_path = f"/tmp/{file_name}"
+        self.binary_extractor_session.get_all_functions_info(file_name)
         stream = os.popen(
             f"mongoimport --db {self.db_name} --collection {self.collection_name} --file {file_path} --jsonArray")
         output = stream.read()

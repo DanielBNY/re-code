@@ -44,8 +44,8 @@ class BinaryExtractor:
         return self.get_current_address()
 
     @staticmethod
-    def get_all_functions_info():
-        response = requests.post(URL + "command/" + 'aflj')
+    def get_all_functions_info(target_file):
+        response = requests.get(URL + "functions_info_extractor/" + target_file)
         if response.status_code != 200:
             raise Exception(response.text)
         return response.text[:-1]  # remove \n at the end of the string
