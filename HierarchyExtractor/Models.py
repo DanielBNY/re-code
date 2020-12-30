@@ -109,6 +109,12 @@ class ClusteredNodes(NodeModel):
                            model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
+    def set_folders_path(self, folders_path):
+        self.redis_session.hset(self.model_id, b'folders_path', folders_path)
+
+    def get_folders_path(self):
+        return self.redis_session.hget(self.model_id, b'folders_path')
+
     def get_contained_nodes_ids(self):
         return self.redis_session.smembers(self.contained_nodes_set_id)
 
@@ -291,6 +297,12 @@ class FunctionModel(NodeModel):
                            contained_address=address,
                            model_id=function_id)
         self.file_id = b'file:' + self.contained_address
+
+    def set_function_code(self, decompiled_code):
+        self.redis_session.hset(self.model_id, b'decompiled_code', decompiled_code)
+
+    def get_function_code(self):
+        return self.redis_session.hget(self.model_id, b'decompiled_code')
 
     def get_call_out_functions_models(self):
         called_functions_ids = self.get_call_out_models_ids()
