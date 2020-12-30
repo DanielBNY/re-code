@@ -179,6 +179,9 @@ class FolderModel(ClusteredNodes):
             called_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return called_folders_models
 
+    def remove_contained_file(self, model_id):
+        self.redis_session.srem(self.contained_nodes_set_id, model_id)
+
     def get_call_in_folders_models(self):
         calling_folders_ids = self.get_call_in_models_ids()
         calling_folders_models = []
