@@ -165,6 +165,13 @@ class FolderModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=folder_id)
 
+    def get_sons_models(self):
+        call_out_models_ids = self.get_call_out_models_ids()
+        node_model = []
+        for model_id in call_out_models_ids:
+            node_model += [FolderModel(redis_session=self.redis_session, folder_id=model_id)]
+        return node_model
+
     def get_call_out_folders_models(self):
         called_folders_ids = self.get_call_out_models_ids()
         called_folders_models = []
