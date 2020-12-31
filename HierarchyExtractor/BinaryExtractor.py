@@ -58,7 +58,13 @@ class BinaryExtractor:
         response = requests.get(URL + "decompile_function/" + function_offset)
         if response.status_code != 200:
             raise Exception(response.text)
-        return response.text.split('\n')[6:-7]
+        decompiled_function_lines = response.text.split('\n')
+        decompiled_text = ""
+        for line in decompiled_function_lines:
+            if line:
+                if "/" != line[0] and "#" != line[0] and "\n" != line[0]:
+                    decompiled_text += line + "\n"
+        return decompiled_text
 
     def disassemble_function(self, function_offset):
         """
