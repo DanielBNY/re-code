@@ -297,8 +297,8 @@ class FileModel(ClusteredNodes):
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         folder_to_cluster = FolderModel(contained_address=model_to_cluster.contained_address,
                                         redis_session=self.redis_session)
-        folder_model.cluster(folder_to_cluster)
         self.cluster(model_to_cluster)
+        folder_model.cluster(folder_to_cluster)
 
 
 class FunctionModel(NodeModel):
