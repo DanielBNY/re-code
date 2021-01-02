@@ -29,15 +29,18 @@ class Files:
         self.redis_session = redis_session
         self.key = 'files'
 
+    def get_files_ids(self):
+        return self.redis_session.smembers(self.key)
+
     def get_files_models(self):
-        files_ids = self.redis_session.smembers(self.key)
+        files_ids = self.get_files_ids()
         files_models = []
         for file_id in files_ids:
             files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return files_models
 
     def get_non_lonely_files_models(self):
-        all_files = self.redis_session.smembers(self.key)
+        all_files = self.get_files_ids()
         lonely_files_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
         lonely_files = get_model_id_set_by_addresses(addresses=lonely_files_addresses, model_name=b'file')
         non_lonely_files = all_files - lonely_files
