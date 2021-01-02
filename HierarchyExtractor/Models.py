@@ -68,8 +68,11 @@ class Functions:
         self.redis_session = redis_session
         self.key = 'functions'
 
+    def get_functions_ids(self):
+        return self.redis_session.smembers(self.key)
+
     def get_functions_models(self):
-        functions_ids = self.redis_session.smembers(self.key)
+        functions_ids = self.get_functions_ids()
         functions_models = []
         for function_id in functions_ids:
             functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
