@@ -387,6 +387,9 @@ class LonelyModels:
     def __init__(self, redis_session):
         self.redis_session = redis_session
 
+    def get_addresses(self):
+        return self.redis_session.smembers('lonely:addresses')
+
     def add_address(self, address):
         self.redis_session.sadd('lonely:addresses', address)
 
@@ -398,6 +401,9 @@ class LonelyModels:
 class EntryModels:
     def __init__(self, redis_session):
         self.redis_session = redis_session
+
+    def get_addresses(self):
+        return self.redis_session.smembers('entry:addresses')
 
     def add_address(self, address):
         self.redis_session.sadd('entry:addresses', address)
