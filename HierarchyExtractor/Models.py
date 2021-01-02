@@ -424,6 +424,17 @@ def get_models_by_addresses(addresses, redis_session, model_name):
     return models
 
 
+def get_model_id_set_by_addresses(addresses, model_name):
+    """
+    addresses: a set of addresses
+    model_name: function / file / folder
+    """
+    models_ids = set()
+    for address in addresses:
+        models_ids.add(model_name + b':' + address)
+    return models_ids
+
+
 def get_models_by_ids(redis_session, model_ids):
     """
     redis_session: redis session
