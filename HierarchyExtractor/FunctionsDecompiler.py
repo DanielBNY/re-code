@@ -28,7 +28,7 @@ class FunctionsDecompiler:
                     decompiled_function = ""
                     function_model = FunctionModel(redis_session=self.redis_session,
                                                    address=str(self.get_function_address(line) + 1).encode())
-                    print(str(self.get_function_address(line) + 1).encode())
+
                 decompiled_function += line
                 if self.is_end_of_function(line):
                     if function_model:
