@@ -3,15 +3,18 @@ class Folders:
         self.redis_session = redis_session
         self.key = 'folders'
 
+    def get_folder_ids(self):
+        return self.redis_session.smembers(self.key)
+
     def get_folder_models(self):
-        folders_ids = self.redis_session.smembers(self.key)
+        folders_ids = self.get_folder_ids()
         folders_models = []
         for folder_id in folders_ids:
             folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return folders_models
 
     def get_non_lonely_folder_models(self):
-        all_folders = self.redis_session.smembers(self.key)
+        all_folders = self.get_folder_ids()
         lonely_folders_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
         lonely_folders = get_model_id_set_by_addresses(addresses=lonely_folders_addresses, model_name=b'folder')
         non_lonely_folders = all_folders - lonely_folders
