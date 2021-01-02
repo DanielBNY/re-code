@@ -10,6 +10,15 @@ class Folders:
             folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return folders_models
 
+    def get_non_lonely_folder_models(self):
+        all_folders = self.redis_session.smembers(self.key)
+        lonely_folders = LonelyModels(redis_session=self.redis_session).get_models('folder')
+        non_lonely_folders = all_folders - lonely_folders
+        non_lonely_folder_models = []
+        for folder_id in non_lonely_folders:
+            non_lonely_folder_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
+        return non_lonely_folder_models
+
     def add_folder_id(self, folder_id):
         self.redis_session.sadd(self.key, folder_id)
 
@@ -25,6 +34,15 @@ class Files:
         for file_id in files_ids:
             files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return files_models
+
+    def get_non_lonely_files_models(self):
+        all_files = self.redis_session.smembers(self.key)
+        lonely_files = LonelyModels(redis_session=self.redis_session).get_models('file')
+        non_lonely_files = all_files - lonely_files
+        non_lonely_files_models = []
+        for file_id in non_lonely_files:
+            non_lonely_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
+        return non_lonely_files_models
 
     def get_average_file_size(self):
         files_models = self.get_files_models()
