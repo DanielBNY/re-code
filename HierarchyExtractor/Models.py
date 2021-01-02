@@ -12,7 +12,8 @@ class Folders:
 
     def get_non_lonely_folder_models(self):
         all_folders = self.redis_session.smembers(self.key)
-        lonely_folders = LonelyModels(redis_session=self.redis_session).get_models('folder')
+        lonely_folders_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
+        lonely_folders = get_model_id_set_by_addresses(addresses=lonely_folders_addresses, model_name=b'folder')
         non_lonely_folders = all_folders - lonely_folders
         non_lonely_folder_models = []
         for folder_id in non_lonely_folders:
@@ -37,7 +38,8 @@ class Files:
 
     def get_non_lonely_files_models(self):
         all_files = self.redis_session.smembers(self.key)
-        lonely_files = LonelyModels(redis_session=self.redis_session).get_models('file')
+        lonely_files_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
+        lonely_files = get_model_id_set_by_addresses(addresses=lonely_files_addresses, model_name=b'file')
         non_lonely_files = all_files - lonely_files
         non_lonely_files_models = []
         for file_id in non_lonely_files:
