@@ -1,6 +1,6 @@
 import os
 import re
-from Models import FunctionModel
+from Models import FunctionModel, Functions
 
 
 class FunctionsDecompiler:
@@ -26,10 +26,18 @@ class FunctionsDecompiler:
             for line in file:
                 if self.is_start_of_function(line):
                     decompiled_function = ""
-                    function_model = FunctionModel(redis_session=self.redis_session,
-                                                   address=str(self.get_function_address(line) + 1).encode())
-
+                    address_in_line = self.get_function_address(line)
+                    correct_address = None
+                    functions_ids = Functions(redis_session=self.redis_session).get_functions_ids()
+                    if b"function:" + str(address_in_line).encode() in functions_ids:
+                        correct_address = address_in_line
+                    if b"function:" + str(address_in_line + 1).encode() in functions_ids:
+                        correct_address = address_in_line + 1
+                    if correct_address:
+                        function_model = FunctionModel(redis_session=self.redis_session,
+                                                       address=str(correct_address).encode())
                 decompiled_function += line
+
                 if self.is_end_of_function(line):
                     if function_model:
                         function_model.set_function_code(decompiled_function)
@@ -51,5 +59,3 @@ class FunctionsDecompiler:
     @staticmethod
     def get_function_address(line):
         return int(re.search(r'function_([a-f0-9]+)\(', line).group(1), 16)
-
-
