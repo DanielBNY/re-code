@@ -64,7 +64,7 @@ class BuildSampleStructure:
         for function_model in functions_models:
             function_code = function_model.get_function_code()
             if function_code:
-                file_code += function_code
+                file_code += function_code + b'\n'
         if file_code:
             with open(file_path, "wb") as file:
                 file.write(file_code)
