@@ -1,4 +1,4 @@
-from Models import EntryModels, Folders, Files, get_models_by_ids, FileModel
+from Models import EntryModels, Folders, Files, LonelyModels, get_models_by_ids, FileModel
 
 import os
 
@@ -16,6 +16,19 @@ class BuildSampleStructure:
             folders_to_revisit = self.create_folder_for_sons(folders_to_revisit)
         self.set_all_files_paths()
         self.write_functions_to_files()
+        self.create_lonely_functions_file()
+
+    def create_lonely_functions_file(self):
+        lonely_functions_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='function')
+        file_code = b''
+        for function_model in lonely_functions_models:
+            function_code = function_model.get_function_code()
+            if function_code:
+                file_code += function_code
+        file_path = self.destination_sample + b'/lonely_file'
+        if file_code:
+            with open(file_path, "wb") as file:
+                file.write(file_code)
 
     def create_folder_for_sons(self, folders):
         folders_to_revisit = []
