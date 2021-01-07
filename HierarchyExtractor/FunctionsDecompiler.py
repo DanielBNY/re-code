@@ -1,6 +1,6 @@
 import os
 import re
-from Models import FunctionModel, Functions
+from Models import FunctionModel, Functions, LonelyModels
 
 
 class FunctionsDecompiler:
@@ -36,6 +36,10 @@ class FunctionsDecompiler:
                     if correct_address:
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(correct_address).encode())
+                    else:
+                        function_model = FunctionModel(redis_session=self.redis_session,
+                                                       address=str(address_in_line).encode())
+                        LonelyModels(redis_session=self.redis_session).add_address(address_in_line)
                 decompiled_function += line
 
                 if self.is_end_of_function(line):
