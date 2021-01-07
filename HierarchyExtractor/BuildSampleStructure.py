@@ -14,7 +14,7 @@ class BuildSampleStructure:
         folders_to_revisit = entry_folders_models
         while folders_to_revisit:
             folders_to_revisit = self.create_folder_for_sons(folders_to_revisit)
-        self.create_files()
+        self.set_all_files_paths()
         self.write_functions_to_files()
 
     def create_folder_for_sons(self, folders):
@@ -31,22 +31,21 @@ class BuildSampleStructure:
             os.mkdir(path + b'/' + model.model_id)
             model.set_folders_path(path)
 
-    def create_files(self):
-        folder_models = Folders(redis_session=self.redis_session).get_folder_models()
+    def set_all_files_paths(self):
+        folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folder_models()
         for folder in folder_models:
             full_path = folder.get_folders_path() + b'/' + folder.model_id
             contained_files_ids = folder.get_contained_nodes_ids()
             files_models = get_models_by_ids(model_ids=contained_files_ids, redis_session=self.redis_session)
-            self.create_files_in_path(path=full_path, models=files_models)
+            self.set_files_paths(path=full_path, models=files_models)
 
     @staticmethod
-    def create_files_in_path(path, models):
+    def set_files_paths(path, models):
         for model in models:
-            open(path + b'/' + model.model_id, 'a').close()
             model.set_folders_path(path)
 
     def write_functions_to_files(self):
-        files_models = Files(redis_session=self.redis_session).get_files_models()
+        files_models = Files(redis_session=self.redis_session).get_non_lonely_files_models()
         for file_model in files_models:
             file_path = file_model.get_folders_path() + b'/' + file_model.model_id
             with open(file_path, "wb") as file:
