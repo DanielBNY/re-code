@@ -20,15 +20,8 @@ class BuildSampleStructure:
 
     def create_lonely_functions_file(self):
         lonely_functions_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='function')
-        file_code = b''
-        for function_model in lonely_functions_models:
-            function_code = function_model.get_function_code()
-            if function_code:
-                file_code += function_code
-        file_path = self.destination_sample + b'/lonely_file'
-        if file_code:
-            with open(file_path, "wb") as file:
-                file.write(file_code)
+        self.write_function_to_file(functions_models=lonely_functions_models,
+                                    file_path=self.destination_sample + b'/lonely_file')
 
     def create_folder_for_sons(self, folders):
         folders_to_revisit = []
@@ -61,17 +54,17 @@ class BuildSampleStructure:
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files_models()
         for file_model in files_models:
             file_path = file_model.get_folders_path() + b'/' + file_model.model_id
-            file_code = self.get_file_functions_code(file_model)
-            if file_code:
-                with open(file_path, "wb") as file:
-                    file.write(file_code)
+            functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
+                                                 redis_session=self.redis_session)
+            self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 
-    def get_file_functions_code(self, file_model: FileModel):
-        functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
-                                             redis_session=self.redis_session)
+    @staticmethod
+    def write_function_to_file(functions_models, file_path):
         file_code = b''
         for function_model in functions_models:
             function_code = function_model.get_function_code()
             if function_code:
                 file_code += function_code
-        return file_code
+        if file_code:
+            with open(file_path, "wb") as file:
+                file.write(file_code)
