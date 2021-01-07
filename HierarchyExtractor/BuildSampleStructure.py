@@ -1,4 +1,4 @@
-from Models import EntryModels, Folders, Files, get_models_by_ids
+from Models import EntryModels, Folders, Files, get_models_by_ids, FileModel
 
 import os
 
@@ -48,8 +48,17 @@ class BuildSampleStructure:
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files_models()
         for file_model in files_models:
             file_path = file_model.get_folders_path() + b'/' + file_model.model_id
-            with open(file_path, "wb") as file:
-                functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
-                                                     redis_session=self.redis_session)
-                for function_model in functions_models:
-                    file.write(function_model.get_function_code())
+            file_code = self.get_file_functions_code(file_model)
+            if file_code:
+                with open(file_path, "wb") as file:
+                    file.write(file_code)
+
+    def get_file_functions_code(self, file_model: FileModel):
+        functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
+                                             redis_session=self.redis_session)
+        file_code = b''
+        for function_model in functions_models:
+            function_code = function_model.get_function_code()
+            if function_code:
+                file_code += function_code
+        return file_code
