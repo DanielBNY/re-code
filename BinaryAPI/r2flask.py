@@ -47,5 +47,14 @@ def functions_info_extractor(target_file):
     return Response(status=200)
 
 
+@app.route('/functions_addresses/<target_file_path>', methods=['GET'])
+def get_functions_addresses(target_file_path):
+    functions_addresses = BIN_ANALYSIS.command_pipe.cmd(f"s @@ fcn.*")
+    functions_addresses_list = functions_addresses.split('\n')
+    with open(target_file_path, "w") as file:
+        file.write(str(functions_addresses_list))
+    return Response(status=200)
+
+
 if __name__ == '__main__':
     app.run(host=LOCAL_URL['host'], port=LOCAL_URL['port'])
