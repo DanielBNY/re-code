@@ -1,6 +1,7 @@
 import os
 import re
 from Models import FunctionModel, Functions, LonelyModels
+from MongoImport import import_collection_from_json
 import conf
 
 
@@ -13,6 +14,10 @@ class ImportRetdecData:
         stream = os.popen(f"{conf.retdec_decompiler['decompiler_path']} -o {self.decompiled_file_path} {binary_path}")
         output = stream.read()
         return output
+
+    def import_retdec_functions_info(self):
+        import_collection_from_json(collection_name=conf.retdec_decompiler['collection_name'],
+                                    file_path=self.decompiled_file_path + '.config.json')
 
     def import_decompiled_functions(self):
         function_model = None
