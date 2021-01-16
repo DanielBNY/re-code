@@ -1,8 +1,9 @@
 import os
 import re
-from Models import FunctionModel, Functions, LonelyModels
+from Models import FunctionModel, LonelyModels
 from MongoImport import import_collection_from_json
 import conf
+from BinaryExtractor import BinaryExtractor
 
 
 class ImportRetdecData:
@@ -19,8 +20,9 @@ class ImportRetdecData:
         import_collection_from_json(collection_name=conf.retdec_decompiler['collection_name'],
                                     file_path=self.decompiled_file_path + '.config.json')
 
-    def import_decompiled_functions(self):
+    def import_decompiled_functions(self, binary_extractor: BinaryExtractor):
         function_model = None
+        binary_extractor.get_radare_functions_addresses()
         with open(self.decompiled_file_path) as file:
             decompiled_function = ""
             for line in file:
@@ -28,10 +30,9 @@ class ImportRetdecData:
                     decompiled_function = ""
                     address_in_line = self.get_function_address(line)
                     correct_address = None
-                    functions_ids = Functions(redis_session=self.redis_session).get_functions_ids()
-                    if b"function:" + str(address_in_line).encode() in functions_ids:
+                    if self.redis_session.sismember('r2_functions_addresses', address_in_line):
                         correct_address = address_in_line
-                    if b"function:" + str(address_in_line + 1).encode() in functions_ids:
+                    if self.redis_session.sismember('r2_functions_addresses', address_in_line + 1):
                         correct_address = address_in_line + 1
                     if correct_address:
                         function_model = FunctionModel(redis_session=self.redis_session,
