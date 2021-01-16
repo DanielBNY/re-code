@@ -11,6 +11,11 @@ class ImportRetdecData:
         self.redis_session = redis_session
         self.decompiled_file_path = decompiled_file_path
 
+    def run(self, binary_path, binary_extractor: BinaryExtractor):
+        self.export_retdec_data(binary_path)
+        self.import_retdec_functions_info()
+        self.import_decompiled_functions(binary_extractor)
+
     def export_retdec_data(self, binary_path):
         stream = os.popen(f"{conf.retdec_decompiler['decompiler_path']} -o {self.decompiled_file_path} {binary_path}")
         output = stream.read()
