@@ -1,5 +1,6 @@
 from flask import Flask, request, Response
 import r2pipe
+import redis
 
 LOCAL_URL = {'host': 'localhost', 'port': 5000}
 
@@ -7,6 +8,7 @@ LOCAL_URL = {'host': 'localhost', 'port': 5000}
 class BinaryAnalysis:
     def __init__(self):
         self.command_pipe = None
+        self.redis_session = redis.Redis('localhost')
 
     def set_command_pipe(self, binary_path):
         self.command_pipe = r2pipe.open(binary_path)
@@ -48,12 +50,12 @@ def functions_info_extractor():
     return Response(status=200)
 
 
-@app.route('/functions_addresses/<target_file_path>', methods=['GET'])
-def get_functions_addresses(target_file_path):
+@app.route('/functions_addresses/', methods=['GET'])
+def get_functions_addresses():
     functions_addresses = BIN_ANALYSIS.command_pipe.cmd(f"s @@ fcn.*")
     functions_addresses_list = functions_addresses.split('\n')
-    with open(target_file_path, "w") as file:
-        file.write(str(functions_addresses_list))
+    for address in functions_addresses_list:
+        BIN_ANALYSIS.redis_session.sadd('r2_functions_addresses', int(address, 16))
     return Response(status=200)
 
 
