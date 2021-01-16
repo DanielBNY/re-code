@@ -96,7 +96,7 @@ class BinaryExtractor:
         return sections
 
     @staticmethod
-    def analyze_function_address():
-        response = requests.post(URL + 'analyze_function_address/')
+    def analyze_function_in_address(address):
+        response = requests.post(URL + f"analyze_function_address/{address}")
         if response.status_code != 200:
             raise Exception(response.text)

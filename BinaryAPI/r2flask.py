@@ -60,7 +60,7 @@ def get_functions_addresses():
     return Response(status=200)
 
 
-@app.route('/analyze_function_address/', methods=['POST'])
+@app.route('/analyze_function_address/<address>', methods=['POST'])
 def analyze_function_address(address):
     BIN_ANALYSIS.command_pipe.cmd(f"s {address}; af")
     return Response(status=200)
