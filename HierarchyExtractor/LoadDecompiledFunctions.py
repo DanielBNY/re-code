@@ -1,27 +1,18 @@
-import os
 import re
 from Models import FunctionModel, Functions, LonelyModels
 
 
-class FunctionsDecompiler:
-    def __init__(self, redis_session, tmp_file_path, binary_path, decompiler_path):
+class LoadDecompiledFunctions:
+    def __init__(self, redis_session, decompiled_file_path):
         self.redis_session = redis_session
-        self.tmp_file_path = tmp_file_path
-        self.binary_path = binary_path
-        self.decompiler_path = decompiler_path
+        self.decompiled_file_path = decompiled_file_path
 
     def run(self):
-        self.decompile_to_tmp_file()
         self.load_decompiled_functions()
-
-    def decompile_to_tmp_file(self):
-        stream = os.popen(f"{self.decompiler_path} --cleanup -o {self.tmp_file_path} {self.binary_path}")
-        output = stream.read()
-        return output
 
     def load_decompiled_functions(self):
         function_model = None
-        with open(self.tmp_file_path) as file:
+        with open(self.decompiled_file_path) as file:
             decompiled_function = ""
             for line in file:
                 if self.is_start_of_function(line):
