@@ -25,9 +25,11 @@ class ImportRetdecData:
         binary_extractor.get_radare_functions_addresses()
         with open(self.decompiled_file_path) as file:
             decompiled_function = ""
+            functions_lines = 0
             for line in file:
                 if self.is_start_of_function(line):
                     decompiled_function = ""
+                    functions_lines = 0
                     address_in_line = self.get_function_address(line)
                     correct_address = None
                     if self.redis_session.sismember('r2_functions_addresses', address_in_line):
@@ -42,12 +44,13 @@ class ImportRetdecData:
                                                        address=str(address_in_line).encode())
                         LonelyModels(redis_session=self.redis_session).add_address(address_in_line)
                 decompiled_function += line
-
+                functions_lines += 1
                 if self.is_end_of_function(line):
                     if function_model:
                         function_model.set_function_code(decompiled_function)
                         decompiled_function = ""
                         function_model = None
+                        functions_lines = 0
 
     @staticmethod
     def is_start_of_function(line):
