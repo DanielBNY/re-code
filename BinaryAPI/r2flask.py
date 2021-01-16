@@ -59,5 +59,11 @@ def get_functions_addresses():
     return Response(status=200)
 
 
+@app.route('/analyze_function_address/', methods=['POST'])
+def analyze_function_address(address):
+    BIN_ANALYSIS.command_pipe.cmd(f"s {address}; af")
+    return Response(status=200)
+
+
 if __name__ == '__main__':
     app.run(host=LOCAL_URL['host'], port=LOCAL_URL['port'])

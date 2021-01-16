@@ -94,3 +94,9 @@ class BinaryExtractor:
             raise Exception(response.text)
         sections = json.loads(response.text)
         return sections
+
+    @staticmethod
+    def analyze_function_address():
+        response = requests.post(URL + 'analyze_function_address/')
+        if response.status_code != 200:
+            raise Exception(response.text)
