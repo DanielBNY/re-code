@@ -21,6 +21,15 @@ class BinaryExtractor:
             raise Exception(response.text)
 
     @staticmethod
+    def get_radare_functions_addresses():
+        """
+        Set the redis set with id 'r2_functions_addresses' to the radare2 detected functions addresses
+        """
+        response = requests.get(URL + "r2_functions_addresses/")
+        if response.status_code != 200:
+            raise Exception(response.text)
+
+    @staticmethod
     def jmp_to_address(address):
         response = requests.post(URL + "command/" + 's 0x' + hex(address))
         if response.status_code != 200:

@@ -50,7 +50,7 @@ def functions_info_extractor():
     return Response(status=200)
 
 
-@app.route('/functions_addresses/', methods=['GET'])
+@app.route('/r2_functions_addresses/', methods=['GET'])
 def get_functions_addresses():
     functions_addresses = BIN_ANALYSIS.command_pipe.cmd(f"s @@ fcn.*")
     functions_addresses_list = functions_addresses.split('\n')
