@@ -4,10 +4,9 @@ from MongoImport import import_collection_from_json_array
 
 
 class FunctionsInfoExtractor:
-    def __init__(self, binary_extractor_session: BinaryExtractor, db_name: str):
+    def __init__(self, binary_extractor_session: BinaryExtractor):
         self.binary_extractor_session = binary_extractor_session
         self.collection_name = "FunctionsInfo"
-        self.db_name = db_name
 
     def run(self):
         file_path = f"/tmp/all_functions_info.json"
