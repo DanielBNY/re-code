@@ -45,7 +45,7 @@ class BinaryExtractor:
 
     @staticmethod
     def get_all_functions_info(target_file):
-        response = requests.get(URL + "functions_info_extractor/" + target_file)
+        response = requests.get(URL + "functions_info_extractor/", json={'path': target_file})
         if response.status_code != 200:
             raise Exception(response.text)
         return response.text[:-1]  # remove \n at the end of the string

@@ -41,9 +41,10 @@ def decompile_function(offset):
     return code
 
 
-@app.route('/functions_info_extractor/<target_file>', methods=['GET'])
-def functions_info_extractor(target_file):
-    BIN_ANALYSIS.command_pipe.cmd(f"aflj > /tmp/{target_file}")
+@app.route('/functions_info_extractor/', methods=['GET'])
+def functions_info_extractor():
+    data = request.json
+    BIN_ANALYSIS.command_pipe.cmd(f"aflj > {data['path']}")
     return Response(status=200)
 
 
