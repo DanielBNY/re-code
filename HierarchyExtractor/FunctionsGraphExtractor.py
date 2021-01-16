@@ -1,5 +1,6 @@
 from Models import FunctionModel
 from pymongo import MongoClient
+import conf
 
 
 class FunctionsGraphExtractor:
@@ -15,7 +16,7 @@ class FunctionsGraphExtractor:
         """
         self.mongodb_client = mongodb_client
         self.redis_session = redis_session
-        db = self.mongodb_client.Rinu
+        db = self.mongodb_client[conf.mongo_db['db_name']]
         self.functions_info_collection = db['FunctionsInfo']
         self.functions_info_ids = self.functions_info_collection.distinct("_id")
 
