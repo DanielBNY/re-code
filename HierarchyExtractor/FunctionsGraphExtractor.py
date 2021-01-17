@@ -64,6 +64,7 @@ class FunctionsGraphExtractor:
                     if called_function and call_reference['type'] == 'CALL':
                         source_function = function_info['offset']
                         if source_function != called_function:
-                            fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
-                                                             redis_session=self.redis_session)
-                            fnc_repo_actions.add_function_edge(str(called_function).encode())
+                            if self.redis_session.sismember('r2_functions_addresses', called_function):
+                                fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
+                                                                 redis_session=self.redis_session)
+                                fnc_repo_actions.add_function_edge(str(called_function).encode())
