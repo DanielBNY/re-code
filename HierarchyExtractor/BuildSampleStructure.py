@@ -19,9 +19,9 @@ class BuildSampleStructure:
         self.create_lonely_functions_file()
 
     def create_lonely_functions_file(self):
-        lonely_functions_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='function')
-        self.write_function_to_file(functions_models=lonely_functions_models,
-                                    file_path=self.destination_sample + b'/lonely_file')
+        lonely_files_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='file')
+        self.write_files_to_file(files_models=lonely_files_models,
+                                 file_path=self.destination_sample + b'/lonely_file')
 
     def create_folder_for_sons(self, folders):
         folders_to_revisit = []
@@ -65,6 +65,19 @@ class BuildSampleStructure:
             function_code = function_model.get_function_code()
             if function_code:
                 file_code += function_code + b'\n'
+        if file_code:
+            with open(file_path, "wb") as file:
+                file.write(file_code)
+
+    def write_files_to_file(self, files_models, file_path):
+        file_code = b''
+        for file_model in files_models:
+            functions_models = get_models_by_ids(redis_session=self.redis_session,
+                                                 model_ids=file_model.get_contained_nodes_ids())
+            for function in functions_models:
+                function_code = function.get_function_code()
+                if function_code:
+                    file_code += function_code + b'\n'
         if file_code:
             with open(file_path, "wb") as file:
                 file.write(file_code)
