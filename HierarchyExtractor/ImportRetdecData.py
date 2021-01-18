@@ -17,9 +17,9 @@ class ImportRetdecData:
 
     def run(self, binary_path, binary_extractor: BinaryExtractor):
         binary_extractor.get_radare_functions_addresses()
-        self.set_retdec_functions_address_set()
         self.export_retdec_data(binary_path)
         self.import_retdec_functions_info()
+        self.set_retdec_functions_address_set()
         self.import_decompiled_functions()
 
     def export_retdec_data(self, binary_path):
