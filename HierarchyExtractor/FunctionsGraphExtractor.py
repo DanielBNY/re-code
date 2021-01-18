@@ -24,6 +24,7 @@ class FunctionsGraphExtractor:
         """
         Extract the functions call graph to redis, saves the nodes and the edges between them
         """
+        self.save_functions_graph()
         self.save_functions_edges()
 
     def save_functions_graph(self):
@@ -68,8 +69,8 @@ class FunctionsGraphExtractor:
                     called_function = self.get_valid_function_address(call_reference['addr'])
                     if called_function and call_reference['type'] == 'CALL':
                         source_function = function_info['offset']
-                        if self.redis_session.exists(f"function:{source_function}") and \
-                                self.redis_session.exists(f"function:{called_function}"):
+                        if self.redis_session.sismember("functions", f"function:{source_function}") and \
+                                self.redis_session.sismember("functions", f"function:{called_function}"):
                             if source_function != called_function:
                                 fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
                                                                  redis_session=self.redis_session)
