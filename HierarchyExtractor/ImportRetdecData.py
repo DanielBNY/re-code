@@ -1,6 +1,6 @@
 import os
 import re
-from Models import FunctionModel, LonelyModels
+from Models import FunctionModel
 from MongoImport import import_collection_from_json
 import conf
 from BinaryExtractor import BinaryExtractor
@@ -62,10 +62,6 @@ class ImportRetdecData:
                             self.binary_extractor.analyze_function_in_address(address_in_line)
                             function_model = FunctionModel(redis_session=self.redis_session,
                                                            address=str(address_in_line).encode())
-                        else:
-                            function_model = FunctionModel(redis_session=self.redis_session,
-                                                           address=str(address_in_line).encode())
-                            LonelyModels(redis_session=self.redis_session).add_address(address_in_line)
                 decompiled_function += line
                 functions_lines += 1
                 if self.is_end_of_function(line):
