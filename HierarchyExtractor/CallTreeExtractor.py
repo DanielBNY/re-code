@@ -80,13 +80,9 @@ class CallTreeExtractor:
             if first_relative_distance > second_relative_distance:
                 first_tree_head.recursion_add_edge(second_tree_head.contained_address)
                 self.redis_session.srem('entry:addresses', second_tree_head.contained_address)
-                print(
-                    "first_tree_head " + str(first_tree_head.contained_address) + " points to " + str(second_tree_head.contained_address))
             else:
                 second_tree_head.recursion_add_edge(first_tree_head.contained_address)
                 self.redis_session.srem('entry:addresses', first_tree_head.contained_address)
-                print(
-                    "second_tree_head " + str(second_tree_head.contained_address) + " points to " + str(first_tree_head.contained_address))
 
     @staticmethod
     def get_head_and_relative_distance(file_model: FileModel):
