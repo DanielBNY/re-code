@@ -66,7 +66,6 @@ class ImportRetdecData:
                 functions_lines += 1
                 if self.is_end_of_function(line):
                     if function_model:
-                        function_model.recursion_init(str(functions_lines).encode())
                         function_model.set_function_code(decompiled_function)
                         decompiled_function = ""
                         function_model = None

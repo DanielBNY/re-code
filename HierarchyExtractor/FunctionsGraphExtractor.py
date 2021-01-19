@@ -24,7 +24,17 @@ class FunctionsGraphExtractor:
         """
         Extract the functions call graph to redis, saves the nodes and the edges between them
         """
+        self.save_functions_graph()
         self.save_functions_edges()
+
+    def save_functions_graph(self):
+        for function_info_id in self.functions_info_ids:
+            function_info = self.functions_info_collection.find({"_id": function_info_id}).next()
+            if function_info["type"] == "fcn":
+                fcn_address = function_info['offset']
+                if self.redis_session.sismember('retdec_functions_addresses', fcn_address):
+                    fcn_model = FunctionModel(address=str(fcn_address).encode(), redis_session=self.redis_session)
+                    fcn_model.recursion_init(str(function_info['realsz']).encode())
 
     def get_valid_function_address(self, address):
         """
