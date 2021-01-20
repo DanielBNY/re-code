@@ -32,7 +32,8 @@ class FunctionsGraphExtractor:
             function_info = self.functions_info_collection.find({"_id": function_info_id}).next()
             if function_info["type"] == "fcn":
                 fcn_address = function_info['offset']
-                if self.redis_session.sismember('retdec_functions_addresses', fcn_address):
+                if self.redis_session.sismember('retdec_functions_addresses', fcn_address) or \
+                        self.redis_session.sismember('retdec_functions_addresses', fcn_address - 1):
                     fcn_model = FunctionModel(address=str(fcn_address).encode(), redis_session=self.redis_session)
                     fcn_model.recursion_init(str(function_info['realsz']).encode())
 
