@@ -10,7 +10,7 @@ class ApiWrappers:
         return self.redis_session.smembers(self.key)
 
     def is_api_wrapper(self, model_id):
-        self.redis_session.sismeber(self.key, model_id)
+        self.redis_session.sismember(self.key, model_id)
 
 
 class Folders:
