@@ -354,6 +354,9 @@ class FunctionModel(NodeModel):
                            model_id=function_id)
         self.file_id = b'file:' + self.contained_address
 
+    def is_api_wrapper(self):
+        return bool(APIWrapperModel(self).get_api_name())
+
     def set_function_code(self, decompiled_code):
         self.redis_session.hset(self.model_id, b'decompiled_code', decompiled_code)
 
@@ -402,6 +405,17 @@ class FunctionModel(NodeModel):
         """
         called_function_model = FunctionModel(address=called_function_address)
         self.add_edge(target_node=called_function_model)
+
+
+class APIWrapperModel(FunctionModel):
+    def __init__(self, redis_session=None, address=None, function_id=None):
+        FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
+
+    def set_api_name(self, api_name):
+        self.redis_session.hset(self.model_id, b'api_name', api_name)
+
+    def get_api_name(self):
+        return self.redis_session.hget(self.model_id, b'api_name')
 
 
 def add_values_to_set(redis_session, key, values):
