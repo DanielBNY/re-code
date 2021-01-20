@@ -1,3 +1,18 @@
+class ApiWrappers:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+        self.key = 'api-wrappers'
+
+    def add_function(self, model_id):
+        self.redis_session.sadd(self.key, model_id)
+
+    def get_api_wrappers(self):
+        return self.redis_session.smembers(self.key)
+
+    def is_api_wrapper(self, model_id):
+        self.redis_session.sismeber(self.key, model_id)
+
+
 class Folders:
     def __init__(self, redis_session):
         self.redis_session = redis_session
