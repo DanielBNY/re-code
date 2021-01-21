@@ -1,4 +1,4 @@
-from Models import FunctionModel
+from Models import FunctionModel, ApiWrappers
 from pymongo import MongoClient
 import conf
 
@@ -71,9 +71,12 @@ class FunctionsGraphExtractor:
                     called_function = self.get_valid_function_address(call_reference['addr'])
                     if called_function and call_reference['type'] == 'CALL':
                         source_function = function_info['offset']
-                        if self.redis_session.sismember("functions", f"function:{source_function}") and \
-                                self.redis_session.sismember("functions", f"function:{called_function}"):
-                            if source_function != called_function:
-                                fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
-                                                                 redis_session=self.redis_session)
-                                fnc_repo_actions.add_function_edge(str(called_function).encode())
+                        fnc_repo_actions = FunctionModel(address=str(source_function).encode(),
+                                                         redis_session=self.redis_session)
+                        if source_function != called_function:
+                            if ApiWrappers(self.redis_session).is_api_wrapper('function:' + str(called_function)):
+                                fnc_repo_actions.set_called_function_wrapper(called_function)
+                            else:
+                                if self.redis_session.sismember("functions", f"function:{source_function}") and \
+                                        self.redis_session.sismember("functions", f"function:{called_function}"):
+                                    fnc_repo_actions.add_function_edge(str(called_function).encode())
