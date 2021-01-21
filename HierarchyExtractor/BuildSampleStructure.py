@@ -1,4 +1,5 @@
-from Models import EntryModels, Folders, Files, LonelyModels, get_models_by_ids, FileModel
+from Models import EntryModels, Folders, Files, LonelyModels, get_models_by_ids, FileModel, FunctionModel, ApiWrappers, \
+    APIWrapperModel
 
 import os
 
@@ -58,10 +59,10 @@ class BuildSampleStructure:
                                                  redis_session=self.redis_session)
             self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 
-    @staticmethod
-    def write_function_to_file(functions_models, file_path):
+    def write_function_to_file(self, functions_models, file_path):
         file_code = b''
         for function_model in functions_models:
+            self.replace_wrapped_functions(function_model)
             function_code = function_model.get_function_code()
             if function_code:
                 file_code += function_code + b'\n'
@@ -81,3 +82,18 @@ class BuildSampleStructure:
         if file_code:
             with open(file_path, "wb") as file:
                 file.write(file_code)
+
+    def replace_wrapped_functions(self, function_model: FunctionModel):
+        called_wrapper_functions = function_model.get_called_functions_wrapper()
+        function_code = function_model.get_function_code()
+        if called_wrapper_functions:
+            if function_code:
+                for wrapper_function in called_wrapper_functions:
+                    wrapped_function_name = APIWrapperModel(redis_session=self.redis_session,
+                                                            function_id=wrapper_function.model_id).get_api_name()
+                    function_address = FunctionModel(redis_session=self.redis_session,
+                                                     function_id=wrapper_function.model_id).contained_address
+                    hex_address = hex(int(function_address.decode())).split('x')[1]
+                    function_code = function_code.replace(b'function_' + str(hex_address).encode(),
+                                                          wrapped_function_name)
+                function_model.set_function_code(function_code)
