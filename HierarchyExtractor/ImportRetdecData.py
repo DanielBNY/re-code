@@ -66,12 +66,18 @@ class ImportRetdecData:
                 functions_lines += 1
                 if self.is_end_of_function(line):
                     if function_model:
-                        function_model.set_function_code(decompiled_function)
                         if self.is_wrapper(functions_lines):
+                            contained_address_minus_three = str(int(function_model.contained_address) - 3).encode()
+                            wrapper_function_model = FunctionModel(redis_session=self.redis_session,
+                                                                   address=contained_address_minus_three)
+                            wrapper_function_model.set_function_code(decompiled_function)
                             wrapped_api_name = self.get_wrapped_function_name(decompiled_function)
                             APIWrapperModel(redis_session=self.redis_session,
-                                            function_id=function_model.model_id).set_api_name(wrapped_api_name)
-                            ApiWrappers(redis_session=self.redis_session).add_function(model_id=function_model.model_id)
+                                            function_id=wrapper_function_model.model_id).set_api_name(wrapped_api_name)
+                            ApiWrappers(redis_session=self.redis_session).add_function(
+                                model_id=wrapper_function_model.model_id)
+                        else:
+                            function_model.set_function_code(decompiled_function)
                         decompiled_function = ""
                         function_model = None
                         functions_lines = 0
