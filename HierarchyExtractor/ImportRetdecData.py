@@ -18,26 +18,12 @@ class ImportRetdecData:
     def run(self, binary_path, binary_extractor: BinaryExtractor):
         binary_extractor.get_radare_functions_addresses()
         self.export_retdec_data(binary_path)
-        self.import_retdec_functions_info()
-        self.set_retdec_functions_address_set()
         self.import_decompiled_functions()
 
     def export_retdec_data(self, binary_path):
         stream = os.popen(f"{conf.retdec_decompiler['decompiler_path']} -o {self.decompiled_file_path} {binary_path}")
         output = stream.read()
         return output
-
-    def import_retdec_functions_info(self):
-        import_collection_from_json(collection_name=conf.retdec_decompiler['collection_name'],
-                                    file_path=self.decompiled_file_path + '.config.json')
-
-    def set_retdec_functions_address_set(self):
-        db = self.mongodb_client[conf.mongo_db['db_name']]
-        functions_retdec_info_collection = db['retdec_info']
-        functions_retdec_info = functions_retdec_info_collection.distinct("functions")
-        for function_info in functions_retdec_info:
-            if function_info['fncType'] == 'decompilerDefined':
-                self.redis_session.sadd('retdec_functions_addresses', int(function_info['startAddr'], 16))
 
     def import_decompiled_functions(self):
         function_model = None
@@ -49,6 +35,7 @@ class ImportRetdecData:
                     decompiled_function = ""
                     functions_lines = 0
                     address_in_line = self.get_function_address(line)
+                    self.redis_session.sadd('retdec_functions_addresses', address_in_line)
                     correct_address = None
                     if self.redis_session.sismember('r2_functions_addresses', address_in_line):
                         correct_address = address_in_line
@@ -58,10 +45,9 @@ class ImportRetdecData:
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(correct_address).encode())
                     else:
-                        if self.redis_session.sismember('retdec_functions_addresses', address_in_line):
-                            self.binary_extractor.analyze_function_in_address(address_in_line)
-                            function_model = FunctionModel(redis_session=self.redis_session,
-                                                           address=str(address_in_line).encode())
+                        self.binary_extractor.analyze_function_in_address(address_in_line)
+                        function_model = FunctionModel(redis_session=self.redis_session,
+                                                       address=str(address_in_line).encode())
                 decompiled_function += line
                 functions_lines += 1
                 if self.is_end_of_function(line):
