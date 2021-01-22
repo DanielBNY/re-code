@@ -77,6 +77,11 @@ class FunctionsGraphExtractor:
                             if ApiWrappers(self.redis_session).is_api_wrapper('function:' + str(called_function)):
                                 fnc_repo_actions.set_called_function_wrapper(called_function)
                             else:
-                                if self.redis_session.sismember("functions", f"function:{source_function}") and \
-                                        self.redis_session.sismember("functions", f"function:{called_function}"):
-                                    fnc_repo_actions.add_function_edge(str(called_function).encode())
+                                if self.redis_session.sismember("functions", f"function:{source_function}"):
+                                    if self.redis_session.sismember("functions", f"function:{called_function}"):
+                                        fnc_repo_actions.add_function_edge(str(called_function).encode())
+                                    elif self.redis_session.sismember("functions", f"function:{called_function + 3}"):
+                                        # Some detected called functions addresses are to an address lower by 3 from
+                                        # the real function address. So this validate if
+                                        # a function in the address +3 exists
+                                        fnc_repo_actions.add_function_edge(str(called_function + 3).encode())
