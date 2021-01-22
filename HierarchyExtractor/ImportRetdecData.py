@@ -66,14 +66,15 @@ class ImportRetdecData:
                 functions_lines += 1
                 if self.is_end_of_function(line):
                     if function_model:
-                        if self.is_wrapper(functions_lines):
+                        wrapped_function_name = self.get_wrapped_function_name(decompiled_function)
+                        if wrapped_function_name:
                             contained_address_minus_three = str(int(function_model.contained_address) - 3).encode()
                             wrapper_function_model = FunctionModel(redis_session=self.redis_session,
                                                                    address=contained_address_minus_three)
                             wrapper_function_model.set_function_code(decompiled_function)
-                            wrapped_api_name = self.get_wrapped_function_name(decompiled_function)
                             APIWrapperModel(redis_session=self.redis_session,
-                                            function_id=wrapper_function_model.model_id).set_api_name(wrapped_api_name)
+                                            function_id=wrapper_function_model.model_id).set_api_name(
+                                wrapped_function_name)
                             ApiWrappers(redis_session=self.redis_session).add_function(
                                 model_id=wrapper_function_model.model_id)
                         else:
@@ -83,25 +84,17 @@ class ImportRetdecData:
                         functions_lines = 0
 
     @staticmethod
-    def is_wrapper(number_of_lines: int):
-        """
-        Example for a wrapper function with 4 lines:
-        int64_t function_13cc(void) {
-            // 0x13cc
-            return function_1190(g17);
-        }
-        """
-        return number_of_lines == 4
-
-    @staticmethod
     def get_wrapped_function_name(function_code):
         function_line_list = function_code.split('\n')
         last_line = None
-        for function_line in reversed(function_line_list):
-            if last_line == '}':
-                return re.search(r'(\w+)\(', function_line).group(1)
-            last_line = function_line
-        return "unknown_wrapped_function"
+        if len(function_line_list) <= 5:
+            for function_line in reversed(function_line_list):
+                if last_line == '}':
+                    regex_match = re.search(r'(\w+)\(', function_line)
+                    if regex_match:
+                        wrapped_function_name = regex_match.group(1)
+                        return wrapped_function_name
+                last_line = function_line
 
     @staticmethod
     def is_start_of_function(line):
