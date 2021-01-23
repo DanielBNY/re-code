@@ -1,33 +1,35 @@
+import shutil, os.path
 import os
 import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers
-from MongoImport import import_collection_from_json
 import conf
 from BinaryExtractor import BinaryExtractor
 from pymongo import MongoClient
+from os import listdir
+from os.path import isfile, join
+
+JUMPS = 1024000
 
 
 class ImportRetdecData:
     def __init__(self, redis_session, decompiled_file_path, mongodb_client: MongoClient,
-                 binary_extractor: BinaryExtractor):
+                 binary_extractor: BinaryExtractor, analyzed_file):
+        self.analyzed_file = analyzed_file
         self.redis_session = redis_session
         self.decompiled_file_path = decompiled_file_path
         self.mongodb_client = mongodb_client
         self.binary_extractor = binary_extractor
 
-    def run(self, binary_path, binary_extractor: BinaryExtractor):
+    def run(self, binary_extractor: BinaryExtractor):
         binary_extractor.get_radare_functions_addresses()
-        self.export_retdec_data(binary_path)
-        self.import_decompiled_functions()
+        self.decompile_to_multiple_files()
+        decompiled_files = [f for f in listdir(self.decompiled_file_path) if isfile(join(self.decompiled_file_path, f))]
+        for file in decompiled_files:
+            self.import_decompiled_functions(file_name=file)
 
-    def export_retdec_data(self, binary_path):
-        stream = os.popen(f"{conf.retdec_decompiler['decompiler_path']} -o {self.decompiled_file_path} {binary_path}")
-        output = stream.read()
-        return output
-
-    def import_decompiled_functions(self):
+    def import_decompiled_functions(self, file_name):
         function_model = None
-        with open(self.decompiled_file_path) as file:
+        with open(self.decompiled_file_path + '/' + file_name) as file:
             decompiled_function = ""
             functions_lines = 0
             for line in file:
@@ -97,3 +99,26 @@ class ImportRetdecData:
     @staticmethod
     def get_function_address(line):
         return int(re.search(r'function_([a-f0-9]+)\(', line).group(1), 16)
+
+    def decompile_to_multiple_files(self):
+        tmp_decompiled_output = self.decompiled_file_path + '/tmp'
+        if os.path.exists(self.decompiled_file_path):
+            shutil.rmtree(self.decompiled_file_path)
+        os.mkdir(self.decompiled_file_path)
+        if os.path.exists(tmp_decompiled_output):
+            shutil.rmtree(tmp_decompiled_output)
+        os.mkdir(tmp_decompiled_output)
+
+        file_size = os.stat(self.analyzed_file).st_size
+        max_address = file_size
+        for start_address in range(0, max_address, JUMPS):
+            command = f"{conf.retdec_decompiler['decompiler_path']}  --select-ranges {hex(start_address)}-{hex(start_address + JUMPS)} -o {tmp_decompiled_output + '/file' + str(start_address)} {self.analyzed_file} --cleanup --select-decode-only"
+            stream = os.popen(command)
+            output = stream.read()
+            print(output)
+            with open(self.decompiled_file_path + '/file' + str(start_address), 'wb') as outfile:
+                with open(tmp_decompiled_output + '/file' + str(start_address), "rb") as infile:
+                    shutil.copyfileobj(infile, outfile, 1024 * 1024 * 10)
+            shutil.rmtree(tmp_decompiled_output)
+            os.mkdir(tmp_decompiled_output)
+        shutil.rmtree(tmp_decompiled_output)
