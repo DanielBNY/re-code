@@ -12,11 +12,10 @@ JUMPS = 1024000
 
 
 class ImportRetdecData:
-    def __init__(self, redis_session, decompiled_file_path, mongodb_client: MongoClient,
-                 binary_extractor: BinaryExtractor, analyzed_file):
+    def __init__(self, redis_session, mongodb_client: MongoClient, binary_extractor: BinaryExtractor, analyzed_file):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
-        self.decompiled_file_path = decompiled_file_path
+        self.decompiled_file_path = conf.retdec_decompiler["decompiled_file_path"]
         self.mongodb_client = mongodb_client
         self.binary_extractor = binary_extractor
 
