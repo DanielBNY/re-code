@@ -32,6 +32,20 @@ class ImportRetdecData:
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
+                    self.redis_session.sadd('retdec_functions_addresses', function_detector.function_address)
+                    correct_address = None
+                    if self.redis_session.sismember('r2_functions_addresses', function_detector.function_address):
+                        correct_address = function_detector.function_address
+                    if self.redis_session.sismember('r2_functions_addresses',
+                                                    function_detector.function_address + 1):
+                        correct_address = function_detector.function_address + 1
+                    if correct_address:
+                        function_model = FunctionModel(redis_session=self.redis_session,
+                                                       address=str(correct_address).encode())
+                    else:
+                        self.binary_extractor.analyze_function_in_address(function_detector.function_address)
+                        function_model = FunctionModel(redis_session=self.redis_session,
+                                                       address=str(function_detector.function_address).encode())
                     wrapped_function_name = get_wrapped_function_name(function_detector.function_code)
                     if wrapped_function_name:
                         contained_address_minus_three = str(int(function_model.contained_address) - 3).encode()
@@ -44,21 +58,6 @@ class ImportRetdecData:
                         ApiWrappers(redis_session=self.redis_session).add_function(
                             model_id=wrapper_function_model.model_id)
                     else:
-                        self.redis_session.sadd('retdec_functions_addresses', function_detector.function_address)
-                        correct_address = None
-                        if self.redis_session.sismember('r2_functions_addresses', function_detector.function_address):
-                            correct_address = function_detector.function_address
-                        if self.redis_session.sismember('r2_functions_addresses',
-                                                        function_detector.function_address + 1):
-                            correct_address = function_detector.function_address + 1
-                        if correct_address:
-                            function_model = FunctionModel(redis_session=self.redis_session,
-                                                           address=str(correct_address).encode())
-                        else:
-                            self.binary_extractor.analyze_function_in_address(function_detector.function_address)
-                            function_model = FunctionModel(redis_session=self.redis_session,
-                                                           address=str(function_detector.function_address).encode())
-
                         function_model.set_function_code(function_detector.function_code)
 
     def decompile_to_multiple_files(self):
