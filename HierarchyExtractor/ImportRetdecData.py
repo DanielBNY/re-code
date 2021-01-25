@@ -73,12 +73,11 @@ class ImportRetdecData:
         max_address = file_size
         for start_address in range(0, max_address, JUMPS):
             command = f"{conf.retdec_decompiler['decompiler_path']}  --select-ranges {hex(start_address)}-{hex(start_address + JUMPS)} -o {tmp_decompiled_output + '/file' + str(start_address)} {self.analyzed_file} --cleanup --select-decode-only"
-            stream = os.popen(command)
-            output = stream.read()
-            print(output)
-            with open(self.decompiled_file_path + '/file' + str(start_address), 'wb') as outfile:
-                with open(tmp_decompiled_output + '/file' + str(start_address), "rb") as infile:
-                    shutil.copyfileobj(infile, outfile, 1024 * 1024 * 10)
+            exit_code = os.system(command)
+            if exit_code == 0:  # 0 == success
+                with open(self.decompiled_file_path + '/file' + str(start_address), 'wb') as outfile:
+                    with open(tmp_decompiled_output + '/file' + str(start_address), "rb") as infile:
+                        shutil.copyfileobj(infile, outfile, 1024 * 1024 * 10)
             shutil.rmtree(tmp_decompiled_output)
             os.mkdir(tmp_decompiled_output)
         shutil.rmtree(tmp_decompiled_output)
