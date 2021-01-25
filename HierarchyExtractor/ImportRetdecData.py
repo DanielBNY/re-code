@@ -28,7 +28,7 @@ class ImportRetdecData:
 
     def import_decompiled_functions(self, file_name):
         with open(self.decompiled_file_path + '/' + file_name) as file:
-            function_detector = FunctionsDetector(redis_session=self.redis_session)
+            function_detector = FunctionDetector(redis_session=self.redis_session)
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
@@ -46,15 +46,14 @@ class ImportRetdecData:
                         self.binary_extractor.analyze_function_in_address(function_detector.function_address)
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(function_detector.function_address).encode())
-                    wrapped_function_name = get_wrapped_function_name(function_detector.function_code)
-                    if wrapped_function_name:
+                    if function_detector.wrapped_function_name:
                         contained_address_minus_three = str(int(function_model.contained_address) - 3).encode()
                         wrapper_function_model = FunctionModel(redis_session=self.redis_session,
                                                                address=contained_address_minus_three)
                         wrapper_function_model.set_function_code(function_detector.function_code)
                         APIWrapperModel(redis_session=self.redis_session,
                                         function_id=wrapper_function_model.model_id).set_api_name(
-                            wrapped_function_name)
+                            function_detector.wrapped_function_name)
                         ApiWrappers(redis_session=self.redis_session).add_function(
                             model_id=wrapper_function_model.model_id)
                     else:
@@ -84,7 +83,7 @@ class ImportRetdecData:
         shutil.rmtree(tmp_decompiled_output)
 
 
-class FunctionsDetector:
+class FunctionDetector:
     def __init__(self, redis_session):
         self.function_code = ""
         self.functions_lines = 0
@@ -92,12 +91,18 @@ class FunctionsDetector:
         self.function_address = None
         self.currently_analyzing_function = False
         self.finished_analyzing_function = False
+        self.wrapped_function_name = None
+
+    def reset_values(self):
+        self.function_code = ""
+        self.functions_lines = 0
+        self.function_address = None
+        self.wrapped_function_name = None
 
     def analyze_code_line(self, code_line):
-        if is_start_of_function(code_line):
-            self.function_code = ""
-            self.functions_lines = 0
-            self.function_address = get_function_address(code_line)
+        if self.is_start_of_function(code_line):
+            self.reset_values()
+            self.function_address = self.get_function_address(code_line)
             self.currently_analyzing_function = True
             self.finished_analyzing_function = False
 
@@ -105,39 +110,39 @@ class FunctionsDetector:
             self.functions_lines += 1
             self.function_code += code_line
 
-        if is_end_of_function(code_line):
+        if self.is_end_of_function(code_line):
             self.currently_analyzing_function = False
             self.finished_analyzing_function = True
+            self.set_wrapped_function_name()
 
     def is_function_detected(self):
         if self.finished_analyzing_function and self.function_code:
             return self
 
+    def set_wrapped_function_name(self):
+        function_line_list = self.function_code.split('\n')
+        last_line = None
+        if len(function_line_list) <= 5:
+            for function_line in reversed(function_line_list):
+                if last_line == '}':
+                    regex_match = re.search(r'(\w+)\(', function_line)
+                    if regex_match:
+                        wrapped_function_name = regex_match.group(1)
+                        self.wrapped_function_name = wrapped_function_name
+                last_line = function_line
 
-def get_wrapped_function_name(function_code):
-    function_line_list = function_code.split('\n')
-    last_line = None
-    if len(function_line_list) <= 5:
-        for function_line in reversed(function_line_list):
-            if last_line == '}':
-                regex_match = re.search(r'(\w+)\(', function_line)
-                if regex_match:
-                    wrapped_function_name = regex_match.group(1)
-                    return wrapped_function_name
-            last_line = function_line
+    @staticmethod
+    def is_start_of_function(line):
+        if line[0] != ' ' and line[0] != '\n' and line[0] != '/' and line[0] != '#' and line[0] != '}' and \
+                line[-2] == '{':
+            if "function" in line:
+                return True
+        return False
 
+    @staticmethod
+    def is_end_of_function(line):
+        return line[0] == '}'
 
-def is_start_of_function(line):
-    if line[0] != ' ' and line[0] != '\n' and line[0] != '/' and line[0] != '#' and line[0] != '}' and \
-            line[-2] == '{':
-        if "function" in line:
-            return True
-    return False
-
-
-def is_end_of_function(line):
-    return line[0] == '}'
-
-
-def get_function_address(line):
-    return int(re.search(r'function_([a-f0-9]+)\(', line).group(1), 16)
+    @staticmethod
+    def get_function_address(line):
+        return int(re.search(r'function_([a-f0-9]+)\(', line).group(1), 16)
