@@ -33,17 +33,16 @@ class ImportRetdecData:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
                     self.redis_session.sadd('retdec_functions_addresses', function_detector.function_address)
-                    correct_address = None
+                    radare_detected_address = None
                     if self.redis_session.sismember('r2_functions_addresses', function_detector.function_address):
-                        correct_address = function_detector.function_address
+                        radare_detected_address = function_detector.function_address
                     if self.redis_session.sismember('r2_functions_addresses',
                                                     function_detector.function_address + 1):
-                        correct_address = function_detector.function_address + 1
-                    if correct_address:
+                        radare_detected_address = function_detector.function_address + 1
+                    if radare_detected_address:
                         function_model = FunctionModel(redis_session=self.redis_session,
-                                                       address=str(correct_address).encode())
+                                                       address=str(radare_detected_address).encode())
                     else:
-                        self.binary_extractor.analyze_function_in_address(function_detector.function_address)
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(function_detector.function_address).encode())
                     if function_detector.wrapped_function_name:
@@ -58,6 +57,8 @@ class ImportRetdecData:
                             model_id=wrapper_function_model.model_id)
                     else:
                         function_model.set_function_code(function_detector.function_code)
+                        if not radare_detected_address:
+                            self.binary_extractor.analyze_function_in_address(function_detector.function_address)
 
     def decompile_to_multiple_files(self):
         tmp_decompiled_output = self.decompiled_file_path + '/tmp'
