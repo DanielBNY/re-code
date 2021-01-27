@@ -9,8 +9,6 @@ from os import listdir
 from os.path import isfile, join
 import subprocess
 
-JUMPS = 1024000
-
 
 class ImportRetdecData:
     def __init__(self, redis_session, mongodb_client: MongoClient, binary_extractor: BinaryExtractor, analyzed_file,
@@ -72,9 +70,11 @@ class ImportRetdecData:
         file_size = os.stat(self.analyzed_file).st_size
         max_address = file_size
         decompilers_processes = []
-        for start_address in range(0, max_address, JUMPS):
+        analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
+        for start_address in range(0, max_address, analyzed_chunks_size):
             decompiler_process = subprocess.Popen([conf.retdec_decompiler['decompiler_path'], "--select-ranges",
-                                                   f"{hex(start_address)}-{hex(start_address + JUMPS)}", "-o",
+                                                   f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
+                                                   "-o",
                                                    f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
                                                    self.analyzed_file,
                                                    "--cleanup", "--select-decode-only"])
@@ -85,6 +85,9 @@ class ImportRetdecData:
 
         for last_decompiler_process in decompilers_processes:
             last_decompiler_process.communicate()
+
+    def calculate_analyzed_chunks_size(self, file_size):
+        return int(file_size / (4 * self.number_of_processes))
 
 
 class FunctionDetector:
