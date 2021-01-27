@@ -22,7 +22,7 @@ BIN_ANALYSIS = BinaryAnalysis()
 def init():
     data = request.json
     BIN_ANALYSIS.set_command_pipe(data['path'])
-    BIN_ANALYSIS.command_pipe.cmd('aaaa')
+    BIN_ANALYSIS.command_pipe.cmd('aac')  # analyze function calls
     return Response(status=201)
 
 
