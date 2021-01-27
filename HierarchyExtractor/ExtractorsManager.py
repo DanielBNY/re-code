@@ -24,12 +24,13 @@ class ExtractorsManager:
         self.redis_session.flushdb()
         self.mongo_client.drop_database(conf.mongo_db["db_name"])
 
-    def flow(self, file_path_to_analyze, max_number_of_max_files_in_folder, max_file_size):
+    def flow(self, file_path_to_analyze, max_number_of_max_files_in_folder, max_file_size, number_of_processes):
         self.cleanup()
         bin_ex = BinaryExtractor(file_path_to_analyze)
         import_retdec_data = ImportRetdecData(redis_session=self.redis_session,
                                               mongodb_client=self.mongo_client,
-                                              binary_extractor=bin_ex, analyzed_file=file_path_to_analyze)
+                                              binary_extractor=bin_ex, analyzed_file=file_path_to_analyze,
+                                              number_of_processes=number_of_processes)
         import_retdec_data.run(binary_extractor=bin_ex)
         FunctionsInfoExtractor(bin_ex).run()
         FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()

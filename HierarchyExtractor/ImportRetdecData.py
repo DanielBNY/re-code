@@ -7,22 +7,26 @@ from BinaryExtractor import BinaryExtractor
 from pymongo import MongoClient
 from os import listdir
 from os.path import isfile, join
+import subprocess
 
 JUMPS = 1024000
 
 
 class ImportRetdecData:
-    def __init__(self, redis_session, mongodb_client: MongoClient, binary_extractor: BinaryExtractor, analyzed_file):
+    def __init__(self, redis_session, mongodb_client: MongoClient, binary_extractor: BinaryExtractor, analyzed_file,
+                 number_of_processes):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
         self.decompiled_file_path = conf.retdec_decompiler["decompiled_file_path"]
         self.mongodb_client = mongodb_client
         self.binary_extractor = binary_extractor
+        self.number_of_processes = number_of_processes
 
     def run(self, binary_extractor: BinaryExtractor):
         binary_extractor.get_radare_functions_addresses()
         self.decompile_to_multiple_files()
-        decompiled_files = [f for f in listdir(self.decompiled_file_path) if isfile(join(self.decompiled_file_path, f))]
+        decompiled_files = [file for file in listdir(self.decompiled_file_path) if
+                            isfile(join(self.decompiled_file_path, file)) and file.endswith(".c")]
         for file in decompiled_files:
             self.import_decompiled_functions(file_name=file)
 
@@ -61,26 +65,26 @@ class ImportRetdecData:
                             self.binary_extractor.analyze_function_in_address(function_detector.function_address)
 
     def decompile_to_multiple_files(self):
-        tmp_decompiled_output = self.decompiled_file_path + '/tmp'
         if os.path.exists(self.decompiled_file_path):
             shutil.rmtree(self.decompiled_file_path)
         os.mkdir(self.decompiled_file_path)
-        if os.path.exists(tmp_decompiled_output):
-            shutil.rmtree(tmp_decompiled_output)
-        os.mkdir(tmp_decompiled_output)
 
         file_size = os.stat(self.analyzed_file).st_size
         max_address = file_size
+        decompilers_processes = []
         for start_address in range(0, max_address, JUMPS):
-            command = f"{conf.retdec_decompiler['decompiler_path']}  --select-ranges {hex(start_address)}-{hex(start_address + JUMPS)} -o {tmp_decompiled_output + '/file' + str(start_address)} {self.analyzed_file} --cleanup --select-decode-only"
-            exit_code = os.system(command)
-            if exit_code == 0:  # 0 == success
-                with open(self.decompiled_file_path + '/file' + str(start_address), 'wb') as outfile:
-                    with open(tmp_decompiled_output + '/file' + str(start_address), "rb") as infile:
-                        shutil.copyfileobj(infile, outfile, 1024 * 1024 * 10)
-            shutil.rmtree(tmp_decompiled_output)
-            os.mkdir(tmp_decompiled_output)
-        shutil.rmtree(tmp_decompiled_output)
+            decompiler_process = subprocess.Popen([conf.retdec_decompiler['decompiler_path'], "--select-ranges",
+                                                   f"{hex(start_address)}-{hex(start_address + JUMPS)}", "-o",
+                                                   f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
+                                                   self.analyzed_file,
+                                                   "--cleanup", "--select-decode-only"])
+            decompilers_processes.append(decompiler_process)
+            if len(decompilers_processes) == self.number_of_processes:
+                decompilers_processes[0].communicate()
+                del decompilers_processes[0]
+
+        for last_decompiler_process in decompilers_processes:
+            last_decompiler_process.communicate()
 
 
 class FunctionDetector:
