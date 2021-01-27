@@ -59,7 +59,7 @@ class ImportRetdecData:
                             model_id=wrapper_function_model.model_id)
                     else:
                         function_model.set_function_code(function_detector.function_code)
-                        if not radare_detected_address:
+                        if not radare_detected_address and not function_detector.empty_function:
                             self.binary_extractor.analyze_function_in_address(function_detector.function_address)
 
     def decompile_to_multiple_files(self):
@@ -99,6 +99,7 @@ class FunctionDetector:
         self.currently_analyzing_function = False
         self.finished_analyzing_function = False
         self.wrapped_function_name = None
+        self.empty_function = False
 
     def reset_values(self):
         self.function_code = ""
@@ -121,6 +122,7 @@ class FunctionDetector:
             self.currently_analyzing_function = False
             self.finished_analyzing_function = True
             self.set_wrapped_function_name()
+            self.empty_function = self.is_empty_function()
 
     def is_function_detected(self):
         if self.finished_analyzing_function and self.function_code:
@@ -137,6 +139,31 @@ class FunctionDetector:
                         wrapped_function_name = regex_match.group(1)
                         self.wrapped_function_name = wrapped_function_name
                 last_line = function_line
+
+    def is_empty_function(self):
+        """
+        Example of an empty function:
+
+        int64_t function_1d1f0(void) {
+            // 0x1d1f0
+            int64_t result; // 0x1d1f0
+            return result;
+        }
+        """
+        function_line_list = self.function_code.split('\n')
+        if len(function_line_list) < 7:
+            last_line = ""
+            for function_line in reversed(function_line_list):
+                if last_line == '}':
+                    if "return result;" not in function_line:
+                        return False
+                if "return result;" in last_line:
+                    if "int64_t result;" not in function_line:
+                        return False
+                last_line = function_line
+            return True
+        else:
+            return False
 
     @staticmethod
     def is_start_of_function(line):
