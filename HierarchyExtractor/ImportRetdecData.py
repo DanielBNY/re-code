@@ -108,6 +108,10 @@ class FunctionDetector:
         self.wrapped_function_name = None
 
     def analyze_code_line(self, code_line):
+        if self.finished_analyzing_function:
+            # If finished to analyze a function and analyzing a new line reset the values of the last function
+            self.reset_values()
+
         if self.is_start_of_function(code_line):
             self.reset_values()
             self.function_address = self.get_function_address(code_line)
