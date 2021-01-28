@@ -74,7 +74,7 @@ class ImportRetdecData:
                                                    "-o",
                                                    f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
                                                    self.analyzed_file,
-                                                   "--cleanup", "--select-decode-only"])
+                                                   "--cleanup"])
             decompilers_processes.append(decompiler_process)
             if len(decompilers_processes) == self.number_of_processes:
                 decompilers_processes[0].communicate()
