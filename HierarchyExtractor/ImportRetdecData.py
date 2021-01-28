@@ -4,19 +4,16 @@ import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers
 import conf
 from BinaryExtractor import BinaryExtractor
-from pymongo import MongoClient
 from os import listdir
 from os.path import isfile, join
 import subprocess
 
 
 class ImportRetdecData:
-    def __init__(self, redis_session, mongodb_client: MongoClient, binary_extractor: BinaryExtractor, analyzed_file,
-                 number_of_processes):
+    def __init__(self, redis_session, binary_extractor: BinaryExtractor, analyzed_file, number_of_processes):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
         self.decompiled_file_path = conf.retdec_decompiler["decompiled_file_path"]
-        self.mongodb_client = mongodb_client
         self.binary_extractor = binary_extractor
         self.number_of_processes = number_of_processes
 
