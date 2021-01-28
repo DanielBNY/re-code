@@ -3,7 +3,6 @@ from FunctionsGraphExtractor import FunctionsGraphExtractor
 from CallTreeExtractor import CallTreeExtractor
 from ClusterFilesAndFolders import ClusterFilesAndFolders
 from BinaryExtractor import BinaryExtractor
-from FunctionsInfoExtractor import FunctionsInfoExtractor
 from pymongo import MongoClient
 from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
@@ -26,13 +25,13 @@ class ExtractorsManager:
 
     def flow(self, file_path_to_analyze, max_number_of_max_files_in_folder, max_file_size, number_of_processes):
         self.cleanup()
-        bin_ex = BinaryExtractor(file_path_to_analyze)
+        bin_ex = BinaryExtractor(file_path_to_analyze, self.redis_session)
+        bin_ex.analyze_all_functions_calls()
         import_retdec_data = ImportRetdecData(redis_session=self.redis_session,
-                                              mongodb_client=self.mongo_client,
                                               binary_extractor=bin_ex, analyzed_file=file_path_to_analyze,
                                               number_of_processes=number_of_processes)
-        import_retdec_data.run(binary_extractor=bin_ex)
-        FunctionsInfoExtractor(bin_ex).run()
+        import_retdec_data.run()
+        bin_ex.extract_functions_info('/tmp/analyzed', imported_collection_name="FunctionsInfo")
         FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()
         CallTreeExtractor(self.redis_session).run()
         ClusterFilesAndFolders(redis_session=redis.Redis('localhost'), max_file_size=max_file_size,

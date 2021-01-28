@@ -17,8 +17,8 @@ class ImportRetdecData:
         self.binary_extractor = binary_extractor
         self.number_of_processes = number_of_processes
 
-    def run(self, binary_extractor: BinaryExtractor):
-        binary_extractor.get_radare_functions_addresses()
+    def run(self):
+        self.binary_extractor.export_functions_addresses()
         self.decompile_to_multiple_files()
         decompiled_files = [file for file in listdir(self.decompiled_file_path) if
                             isfile(join(self.decompiled_file_path, file)) and file.endswith(".c")]
@@ -57,7 +57,7 @@ class ImportRetdecData:
                     else:
                         function_model.set_function_code(function_detector.function_code)
                         if not radare_detected_address and not function_detector.empty_function:
-                            self.binary_extractor.analyze_function_in_address(function_detector.function_address)
+                            self.binary_extractor.analyze_function_at_address(address=function_detector.function_address)
 
     def decompile_to_multiple_files(self):
         if os.path.exists(self.decompiled_file_path):
