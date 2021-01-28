@@ -84,7 +84,7 @@ class ImportRetdecData:
             last_decompiler_process.communicate()
 
     def calculate_analyzed_chunks_size(self, file_size):
-        return int(file_size / (4 * self.number_of_processes))
+        return int(file_size / self.number_of_processes)
 
 
 class FunctionDetector:
