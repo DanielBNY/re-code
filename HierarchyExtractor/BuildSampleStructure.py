@@ -41,10 +41,11 @@ class BuildSampleStructure:
     def set_all_files_paths(self):
         folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folder_models()
         for folder in folder_models:
-            full_path = folder.get_folders_path() + b'/' + folder.model_id
-            contained_files_ids = folder.get_contained_nodes_ids()
-            files_models = get_models_by_ids(model_ids=contained_files_ids, redis_session=self.redis_session)
-            self.set_files_paths(path=full_path, models=files_models)
+            if folder.get_folders_path():
+                full_path = folder.get_folders_path() + b'/' + folder.model_id
+                contained_files_ids = folder.get_contained_nodes_ids()
+                files_models = get_models_by_ids(model_ids=contained_files_ids, redis_session=self.redis_session)
+                self.set_files_paths(path=full_path, models=files_models)
 
     @staticmethod
     def set_files_paths(path, models):
@@ -54,10 +55,11 @@ class BuildSampleStructure:
     def write_functions_to_files(self):
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files_models()
         for file_model in files_models:
-            file_path = file_model.get_folders_path() + b'/' + file_model.model_id
-            functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
-                                                 redis_session=self.redis_session)
-            self.write_function_to_file(functions_models=functions_models, file_path=file_path)
+            if file_model.get_folders_path():
+                file_path = file_model.get_folders_path() + b'/' + file_model.model_id
+                functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
+                                                     redis_session=self.redis_session)
+                self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 
     def write_function_to_file(self, functions_models, file_path):
         file_code = b''
