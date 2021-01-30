@@ -460,11 +460,6 @@ class EntryModels(SpecialModels):
         SpecialModels.__init__(self, key_name='entry:addresses', redis_session=redis_session)
 
 
-class LeafModels(SpecialModels):
-    def __init__(self, redis_session):
-        SpecialModels.__init__(self, key_name='leaf:addresses', redis_session=redis_session)
-
-
 def get_models_by_addresses(addresses, redis_session, model_name):
     """
     addresses: a set of addresses
