@@ -434,34 +434,35 @@ def add_values_to_set(redis_session, key, values):
         redis_session.sadd(key, value)
 
 
-class LonelyModels:
-    def __init__(self, redis_session):
+class SpecialModels:
+    def __init__(self, key_name, redis_session):
+        self.key_name = key_name
         self.redis_session = redis_session
 
     def get_addresses(self):
-        return self.redis_session.smembers('lonely:addresses')
+        return self.redis_session.smembers(self.key_name)
 
     def add_address(self, address):
-        self.redis_session.sadd('lonely:addresses', address)
+        self.redis_session.sadd(self.key_name, address)
 
     def get_models(self, model_name):
-        addresses = self.redis_session.smembers('lonely:addresses')
+        addresses = self.redis_session.smembers(self.key_name)
         return get_models_by_addresses(addresses, self.redis_session, model_name)
 
 
-class EntryModels:
+class LonelyModels(SpecialModels):
     def __init__(self, redis_session):
-        self.redis_session = redis_session
+        SpecialModels.__init__(self, key_name='lonely:addresses', redis_session=redis_session)
 
-    def get_addresses(self):
-        return self.redis_session.smembers('entry:addresses')
 
-    def add_address(self, address):
-        self.redis_session.sadd('entry:addresses', address)
+class EntryModels(SpecialModels):
+    def __init__(self, redis_session):
+        SpecialModels.__init__(self, key_name='entry:addresses', redis_session=redis_session)
 
-    def get_models(self, model_name):
-        addresses = self.redis_session.smembers('entry:addresses')
-        return get_models_by_addresses(addresses, self.redis_session, model_name)
+
+class LeafModels(SpecialModels):
+    def __init__(self, redis_session):
+        SpecialModels.__init__(self, key_name='leaf:addresses', redis_session=redis_session)
 
 
 def get_models_by_addresses(addresses, redis_session, model_name):
