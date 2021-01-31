@@ -445,6 +445,9 @@ class SpecialModels:
     def add_address(self, address):
         self.redis_session.sadd(self.key_name, address)
 
+    def remove_address(self, address):
+        self.redis_session.srem(self.key_name, address)
+
     def get_models(self, model_name):
         addresses = self.redis_session.smembers(self.key_name)
         return get_models_by_addresses(addresses, self.redis_session, model_name)
