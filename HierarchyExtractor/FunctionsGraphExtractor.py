@@ -77,12 +77,16 @@ class FunctionsGraphExtractor:
                         called_function_model = FunctionModel(address=str(called_function_address).encode(),
                                                               redis_session=self.redis_session)
                         if source_function_address != called_function_address:
-                            if ApiWrappers(self.redis_session).is_api_wrapper(called_function_model.model_id):
-                                source_function_model.set_called_function_wrapper(called_function_model.model_id)
-                            else:
-                                if self.redis_session.sismember("functions", source_function_model.model_id):
-                                    if self.redis_session.sismember("functions", called_function_model.model_id):
-                                        source_function_model.add_function_edge(called_function_model)
+                            self.set_edge(source_function_model=source_function_model,
+                                          called_function_model=called_function_model)
+
+    def set_edge(self, source_function_model: FunctionModel, called_function_model: FunctionModel):
+        if ApiWrappers(self.redis_session).is_api_wrapper(called_function_model.model_id):
+            source_function_model.set_called_function_wrapper(called_function_model.model_id)
+        else:
+            if self.redis_session.sismember("functions", source_function_model.model_id):
+                if self.redis_session.sismember("functions", called_function_model.model_id):
+                    source_function_model.add_function_edge(called_function_model)
 
     def set_entry_and_lonely_models(self):
         """
