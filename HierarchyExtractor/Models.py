@@ -360,8 +360,8 @@ class FunctionModel(NodeModel):
     def set_function_code(self, decompiled_code):
         self.redis_session.hset(self.model_id, b'decompiled_code', decompiled_code)
 
-    def set_called_function_wrapper(self, function_address: int):
-        self.redis_session.sadd(self.model_id + b':called_function_wrapper', f"function:{function_address}")
+    def set_called_function_wrapper(self, function_model_id: bin):
+        self.redis_session.sadd(self.model_id + b':called_function_wrapper', function_model_id)
 
     def get_called_functions_wrapper(self):
         called_functions_ids = self.redis_session.smembers(self.model_id + b':called_function_wrapper')
