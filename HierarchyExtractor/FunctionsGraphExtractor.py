@@ -44,13 +44,13 @@ class FunctionsGraphExtractor:
         :param address: function address
         :return: int or None
         """
-
+        if self.redis_session.exists(f"function:{int(address) + 3}"):
+            # some functions have an empty function that is detected -3 from the real function address
+            return address + 3
         if self.redis_session.exists(f"function:{address}"):
             return address
         elif self.redis_session.exists(f"function:{int(address) + 4}"):
             return address + 4
-        elif self.redis_session.exists(f"function:{int(address) + 3}"):
-            return address + 3
         elif self.redis_session.exists(f"function:{int(address) + 2}"):
             return address + 2
         elif self.redis_session.exists(f"function:{int(address) + 1}"):
@@ -80,8 +80,3 @@ class FunctionsGraphExtractor:
                                 if self.redis_session.sismember("functions", f"function:{source_function}"):
                                     if self.redis_session.sismember("functions", f"function:{called_function}"):
                                         fnc_repo_actions.add_function_edge(str(called_function).encode())
-                                    elif self.redis_session.sismember("functions", f"function:{called_function + 3}"):
-                                        # Some detected called functions addresses are to an address lower by 3 from
-                                        # the real function address. So this validate if
-                                        # a function in the address +3 exists
-                                        fnc_repo_actions.add_function_edge(str(called_function + 3).encode())
