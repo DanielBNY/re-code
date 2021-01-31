@@ -1,6 +1,7 @@
 from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels
 from pymongo import MongoClient
 import conf
+import re
 
 
 class FunctionsGraphExtractor:
@@ -96,3 +97,21 @@ class FunctionsGraphExtractor:
                     EntryModels(redis_session=self.redis_session).add_address(function_model.contained_address)
                 else:
                     LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_address)
+
+    @staticmethod
+    def import_calls_from_code(function_model: FunctionModel):
+        """
+        functions arrived to lonely functions because no calls out where detected but the
+        functions do have calls to functions. The issue is that radare2 calls detection missed
+        those calls but they exists in the decompiled code. The solution is to parser the functions code and
+        find the called functions addresses.
+        """
+        detected_functions = False
+        function_code = function_model.get_function_code()
+        all_functions_hex_addresses = re.findall(r'function_([a-f0-9]+)\(', function_code)
+        for hex_function_address in all_functions_hex_addresses:
+            decimal_function_address = str(int(hex_function_address, 16)).encode()
+            if decimal_function_address != function_model.contained_address:
+                function_model.add_function_edge(decimal_function_address)
+                detected_functions = True
+        return detected_functions
