@@ -67,18 +67,22 @@ class FunctionsGraphExtractor:
         """
         for function_info_id in self.functions_info_ids:
             function_info = self.functions_info_collection.find({"_id": function_info_id}).next()
+            source_function_address = function_info['offset']
+            source_function_model = FunctionModel(address=str(source_function_address).encode(),
+                                                  redis_session=self.redis_session)
             if 'callrefs' in function_info:
-                for call_reference in function_info['callrefs']:
-                    called_function_address = self.get_valid_function_address(call_reference['addr'])
-                    if called_function_address and call_reference['type'] == 'CALL':
-                        source_function_address = function_info['offset']
-                        source_function_model = FunctionModel(address=str(source_function_address).encode(),
-                                                              redis_session=self.redis_session)
-                        called_function_model = FunctionModel(address=str(called_function_address).encode(),
-                                                              redis_session=self.redis_session)
-                        if source_function_address != called_function_address:
-                            self.set_edge(source_function_model=source_function_model,
-                                          called_function_model=called_function_model)
+                call_references = function_info['callrefs']
+                self.add_calls_references(source_function=source_function_model, call_references=call_references)
+
+    def add_calls_references(self, source_function: FunctionModel, call_references):
+        for call_reference in call_references:
+            called_function_address = self.get_valid_function_address(call_reference['addr'])
+            if called_function_address and call_reference['type'] == 'CALL':
+                called_function_model = FunctionModel(address=str(called_function_address).encode(),
+                                                      redis_session=self.redis_session)
+                if source_function.contained_address != called_function_model.contained_address:
+                    self.set_edge(source_function_model=source_function,
+                                  called_function_model=called_function_model)
 
     def set_edge(self, source_function_model: FunctionModel, called_function_model: FunctionModel):
         if ApiWrappers(self.redis_session).is_api_wrapper(called_function_model.model_id):
