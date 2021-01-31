@@ -82,7 +82,7 @@ class FunctionsGraphExtractor:
                             else:
                                 if self.redis_session.sismember("functions", source_function_model.model_id):
                                     if self.redis_session.sismember("functions", called_function_model.model_id):
-                                        source_function_model.add_function_edge(str(called_function_address).encode())
+                                        source_function_model.add_function_edge(called_function_model)
 
     def set_entry_and_lonely_models(self):
         """

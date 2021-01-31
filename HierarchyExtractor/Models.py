@@ -409,12 +409,11 @@ class FunctionModel(NodeModel):
         file_repo_actions = FileModel(file_id=self.file_id, redis_session=self.redis_session)
         file_repo_actions.recursion_init(size)
 
-    def add_function_edge(self, called_function_address):
+    def add_function_edge(self, called_function_model):
         """
         Add to the calls out set the called function id,
         Add to the calls in set of the called function the calling function id.
         """
-        called_function_model = FunctionModel(address=called_function_address)
         self.add_edge(target_node=called_function_model)
 
 
