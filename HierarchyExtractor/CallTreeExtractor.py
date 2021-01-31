@@ -1,4 +1,4 @@
-from Models import FileModel, FunctionModel, Functions, EntryModels, LonelyModels
+from Models import FileModel, FunctionModel, EntryModels
 
 
 class CallTreeExtractor:
@@ -17,26 +17,9 @@ class CallTreeExtractor:
         and connect to neighbors that do not have a father in the tree.
         At the tree a father to a node is at the highest level in the tree (related to the entry point).
         """
-        self.find_code_entry_points()
         neighbors_to_revisit = self.attach_nodes_sons(EntryModels(self.redis_session).get_models('function'))
         while neighbors_to_revisit:
             neighbors_to_revisit = self.attach_nodes_sons(neighbors_to_revisit)
-
-    def find_code_entry_points(self):
-        """
-        Find and saves the possible entry points (entry_functions, redis set key),
-        saves functions that do not call any functions and are not called (lonely_functions, redis set key).
-        Possible entry points are functions that functions do not call it
-        """
-        functions_models = Functions(self.redis_session).get_functions_models()
-        for function_model in functions_models:
-            call_in_functions = function_model.get_call_in_functions_models()
-            call_out_functions = function_model.get_call_out_functions_models()
-            if not bool(call_in_functions):
-                if bool(call_out_functions):
-                    EntryModels(redis_session=self.redis_session).add_address(function_model.contained_address)
-                else:
-                    LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_address)
 
     def attach_nodes_sons(self, models):
         """

@@ -1,4 +1,4 @@
-from Models import FunctionModel, ApiWrappers
+from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels
 from pymongo import MongoClient
 import conf
 
@@ -26,6 +26,7 @@ class FunctionsGraphExtractor:
         """
         self.save_functions_graph()
         self.save_functions_edges()
+        self.set_entry_and_lonely_models()
 
     def save_functions_graph(self):
         for function_info_id in self.functions_info_ids:
@@ -79,3 +80,19 @@ class FunctionsGraphExtractor:
                                 if self.redis_session.sismember("functions", f"function:{source_function}"):
                                     if self.redis_session.sismember("functions", f"function:{called_function}"):
                                         fnc_repo_actions.add_function_edge(str(called_function).encode())
+
+    def set_entry_and_lonely_models(self):
+        """
+        Find and saves the possible entry points (entry_functions, redis set key),
+        saves functions that do not call any functions and are not called (lonely_functions, redis set key).
+        Possible entry points are functions that functions do not call it
+        """
+        functions_models = Functions(self.redis_session).get_functions_models()
+        for function_model in functions_models:
+            call_in_functions = function_model.get_call_in_functions_models()
+            call_out_functions = function_model.get_call_out_functions_models()
+            if not bool(call_in_functions):
+                if bool(call_out_functions):
+                    EntryModels(redis_session=self.redis_session).add_address(function_model.contained_address)
+                else:
+                    LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_address)
