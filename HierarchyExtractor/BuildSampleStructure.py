@@ -78,6 +78,7 @@ class BuildSampleStructure:
             functions_models = get_models_by_ids(redis_session=self.redis_session,
                                                  model_ids=file_model.get_contained_nodes_ids())
             for function in functions_models:
+                self.replace_wrapped_functions(function)
                 function_code = function.get_function_code()
                 if function_code:
                     file_code += function_code + b'\n'
