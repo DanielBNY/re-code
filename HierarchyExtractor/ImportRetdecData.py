@@ -57,18 +57,18 @@ class ImportRetdecData:
                     else:
                         function_model.set_function_code(function_detector.function_code)
                         if not radare_detected_address and not function_detector.empty_function:
-                            self.binary_extractor.analyze_function_at_address(address=function_detector.function_address)
+                            self.binary_extractor.analyze_function_at_address(
+                                address=function_detector.function_address)
 
     def decompile_to_multiple_files(self):
         if os.path.exists(self.decompiled_file_path):
             shutil.rmtree(self.decompiled_file_path)
         os.mkdir(self.decompiled_file_path)
-
         file_size = os.stat(self.analyzed_file).st_size
-        max_address = file_size
-        decompilers_processes = []
         analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
-        for start_address in range(0, max_address, analyzed_chunks_size):
+        decompilers_processes = []
+        for start_address in range(self.binary_extractor.start_virtual_address,
+                                   self.binary_extractor.end_virtual_address, analyzed_chunks_size):
             decompiler_process = subprocess.Popen([conf.retdec_decompiler['decompiler_path'], "--select-ranges",
                                                    f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
                                                    "-o",
