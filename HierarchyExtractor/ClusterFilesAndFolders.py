@@ -61,14 +61,14 @@ class ClusterFilesAndFolders:
         smaller_node = None
         if len(nodes_to_cluster) >= number_of_clusters:
             for node_to_cluster in nodes_to_cluster:
-                if node_to_cluster.get_size() > max_node_size:
-                    clustered_nodes.append(node_to_cluster)
-                elif node_to_cluster.get_size() < max_node_size / 2:
+                if node_to_cluster.get_size() < max_node_size:
                     if smaller_node:
                         smaller_node.recursion_cluster(node_to_cluster)
                     else:
                         smaller_node = node_to_cluster
-                elif smaller_node and smaller_node.get_size() > max_node_size * (2 / 3):
+                else:
+                    clustered_nodes.append(node_to_cluster)
+                if smaller_node and smaller_node.get_size() >= max_node_size:
                     clustered_nodes.append(smaller_node)
                     smaller_node = None
             if smaller_node:
