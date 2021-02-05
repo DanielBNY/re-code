@@ -108,10 +108,10 @@ class FunctionDetector:
         if self.finished_analyzing_function:
             # If finished to analyze a function and analyzing a new line reset the values of the last function
             self.reset_values()
-
-        if self.is_start_of_function(code_line):
+        function_address = self.get_function_address(line=code_line)
+        if function_address:
             self.reset_values()
-            self.function_address = self.get_function_address(code_line)
+            self.function_address = function_address
             self.currently_analyzing_function = True
             self.finished_analyzing_function = False
 
@@ -132,7 +132,7 @@ class FunctionDetector:
     def set_wrapped_function_name(self):
         function_line_list = self.function_code.split('\n')
         last_line = None
-        if len(function_line_list) <= 5:
+        if len(function_line_list) <= 6:
             for function_line in reversed(function_line_list):
                 if last_line == '}':
                     regex_match = re.search(r'(\w+)\(', function_line)
@@ -152,7 +152,7 @@ class FunctionDetector:
         }
         """
         function_line_list = self.function_code.split('\n')
-        if len(function_line_list) < 7:
+        if len(function_line_list) < 8:
             last_line = ""
             for function_line in reversed(function_line_list):
                 if last_line == '}':
@@ -180,4 +180,6 @@ class FunctionDetector:
 
     @staticmethod
     def get_function_address(line):
-        return int(re.search(r'function_([a-f0-9]+)\(', line).group(1), 16)
+        detected_regex = re.search(r'// Address range: (\S+)', line)
+        if detected_regex:
+            return int(detected_regex.group(1), 16)
