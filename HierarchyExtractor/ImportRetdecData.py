@@ -170,7 +170,7 @@ class FunctionDetector:
     def is_start_of_function(line):
         if line[0] != ' ' and line[0] != '\n' and line[0] != '/' and line[0] != '#' and line[0] != '}' and \
                 line[-2] == '{':
-            if "function" in line:
+            if "function_" in line:
                 return True
         return False
 
