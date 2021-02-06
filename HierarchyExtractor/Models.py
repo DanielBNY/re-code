@@ -19,18 +19,15 @@ class MultipleNodesModels:
         self.multiple_nodes_models_key = multiple_node_models_key
 
     def get_average_model_size(self):
-        nodes_models = self.get_nodes_models()
+        nodes_models = self.get_models()
         size_sum = 0
         for node_model in nodes_models:
             size_sum += node_model.get_size()
         return size_sum / float(len(nodes_models))
 
-    def get_nodes_models(self):
-        nodes_models_list = []
+    def get_models(self):
         model_ids = self.get_model_ids()
-        for model_id in model_ids:
-            node_model = NodeModel(redis_session=self.redis_session, model_id=model_id)
-            nodes_models_list.append(node_model)
+        nodes_models_list = get_models_by_ids(redis_session=self.redis_session, model_ids=model_ids)
         return nodes_models_list
 
     def get_model_ids(self):
