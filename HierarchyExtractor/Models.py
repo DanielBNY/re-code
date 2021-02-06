@@ -50,45 +50,15 @@ class Folders(MultipleNodesModels):
     def __init__(self, redis_session):
         MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folder')
 
-    def get_folder_ids(self):
-        return self.redis_session.smembers(self.multiple_nodes_models_key)
-
-    def get_folder_models(self):
-        folders_ids = self.get_folder_ids()
-        folders_models = []
-        for folder_id in folders_ids:
-            folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
-        return folders_models
-
 
 class Files(MultipleNodesModels):
     def __init__(self, redis_session):
         MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'file')
 
-    def get_files_ids(self):
-        return self.redis_session.smembers(self.multiple_nodes_models_key)
-
-    def get_files_models(self):
-        files_ids = self.get_files_ids()
-        files_models = []
-        for file_id in files_ids:
-            files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
-        return files_models
-
 
 class Functions(MultipleNodesModels):
     def __init__(self, redis_session):
         MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
-
-    def get_functions_ids(self):
-        return self.redis_session.smembers(self.multiple_nodes_models_key)
-
-    def get_functions_models(self):
-        functions_ids = self.get_functions_ids()
-        functions_models = []
-        for function_id in functions_ids:
-            functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
-        return functions_models
 
 
 class NodeModel:
