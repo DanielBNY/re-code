@@ -18,6 +18,9 @@ class MultipleNodesModels:
         self.redis_session = redis_session
         self.multiple_nodes_models_key = multiple_node_models_key
 
+    def is_member(self, model_id):
+        return self.redis_session.sismember(self.multiple_nodes_models_key, model_id)
+
     def get_average_model_size(self):
         nodes_models = self.get_models()
         size_sum = 0
