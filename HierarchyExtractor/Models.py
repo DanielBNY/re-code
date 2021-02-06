@@ -13,13 +13,39 @@ class ApiWrappers:
         return self.redis_session.sismember(self.key, model_id)
 
 
-class Folders:
-    def __init__(self, redis_session):
+class MultipleNodesModels:
+    def __init__(self, redis_session, multiple_node_models_key):
         self.redis_session = redis_session
-        self.key = 'folders'
+        self.multiple_nodes_models_key = multiple_node_models_key
+
+    def get_average_model_size(self):
+        nodes_models = self.get_nodes_models()
+        size_sum = 0
+        for node_model in nodes_models:
+            size_sum += node_model.get_size()
+        return size_sum / float(len(nodes_models))
+
+    def get_nodes_models(self):
+        nodes_models_list = []
+        model_ids = self.get_model_ids()
+        for model_id in model_ids:
+            node_model = NodeModel(redis_session=self.redis_session, model_id=model_id)
+            nodes_models_list.append(node_model)
+        return nodes_models_list
+
+    def get_model_ids(self):
+        return self.redis_session.smembers(self.multiple_nodes_models_key)
+
+    def add_model_id(self, model_id):
+        self.redis_session.sadd(self.multiple_nodes_models_key, model_id)
+
+
+class Folders(MultipleNodesModels):
+    def __init__(self, redis_session):
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folders')
 
     def get_folder_ids(self):
-        return self.redis_session.smembers(self.key)
+        return self.redis_session.smembers(self.multiple_nodes_models_key)
 
     def get_folder_models(self):
         folders_ids = self.get_folder_ids()
@@ -38,17 +64,13 @@ class Folders:
             non_lonely_folder_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return non_lonely_folder_models
 
-    def add_folder_id(self, folder_id):
-        self.redis_session.sadd(self.key, folder_id)
 
-
-class Files:
+class Files(MultipleNodesModels):
     def __init__(self, redis_session):
-        self.redis_session = redis_session
-        self.key = 'files'
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'files')
 
     def get_files_ids(self):
-        return self.redis_session.smembers(self.key)
+        return self.redis_session.smembers(self.multiple_nodes_models_key)
 
     def get_files_models(self):
         files_ids = self.get_files_ids()
@@ -67,24 +89,13 @@ class Files:
             non_lonely_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return non_lonely_files_models
 
-    def get_average_file_size(self):
-        files_models = self.get_files_models()
-        size_sum = 0
-        for file_model in files_models:
-            size_sum += file_model.get_size()
-        return size_sum / float(len(files_models))
 
-    def add_file_id(self, file_id):
-        self.redis_session.sadd(self.key, file_id)
-
-
-class Functions:
+class Functions(MultipleNodesModels):
     def __init__(self, redis_session):
-        self.redis_session = redis_session
-        self.key = 'functions'
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'functions')
 
     def get_functions_ids(self):
-        return self.redis_session.smembers(self.key)
+        return self.redis_session.smembers(self.multiple_nodes_models_key)
 
     def get_functions_models(self):
         functions_ids = self.get_functions_ids()
@@ -92,16 +103,6 @@ class Functions:
         for function_id in functions_ids:
             functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
         return functions_models
-
-    def get_average_file_size(self):
-        functions_models = self.get_functions_models()
-        size_sum = 0
-        for function_model in functions_models:
-            size_sum += function_model.get_size()
-        return size_sum / float(len(functions_models))
-
-    def add_function_id(self, function_id):
-        self.redis_session.sadd(self.key, function_id)
 
 
 class NodeModel:
@@ -242,7 +243,7 @@ class FolderModel(ClusteredNodes):
         """
         self.basic_init_save(size=size)
         self.redis_session.hset(self.model_id, b'contained_files_set_id', self.contained_nodes_set_id)
-        Folders(self.redis_session).add_folder_id(self.model_id)
+        Folders(self.redis_session).add_model_id(self.model_id)
         self.redis_session.sadd(self.contained_nodes_set_id,
                                 FileModel(contained_address=self.contained_address).model_id)
 
@@ -302,7 +303,7 @@ class FileModel(ClusteredNodes):
         self.basic_init_save(size=size)
         self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_nodes_set_id)
         self.redis_session.hset(self.model_id, b'folder_id', self.folder_id)
-        Files(self.redis_session).add_file_id(self.model_id)
+        Files(self.redis_session).add_model_id(self.model_id)
         self.redis_session.sadd(self.contained_nodes_set_id, FunctionModel(address=self.contained_address).model_id)
 
     def recursion_init(self, size):
@@ -399,7 +400,7 @@ class FunctionModel(NodeModel):
         """
         self.basic_init_save(size=size)
         self.redis_session.hset(self.model_id, b'file_id', self.file_id)
-        Functions(self.redis_session).add_function_id(self.model_id)
+        Functions(self.redis_session).add_model_id(self.model_id)
 
     def recursion_init(self, size):
         """

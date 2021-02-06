@@ -10,7 +10,7 @@ class ClusterFilesAndFolders:
 
     def run(self):
         files = Files(redis_session=self.redis_session)
-        average_file_size = files.get_average_file_size()
+        average_file_size = files.get_average_model_size()
         if average_file_size > self.max_file_size:
             self.max_file_size = average_file_size
         self.cluster_models(model_name='file',
