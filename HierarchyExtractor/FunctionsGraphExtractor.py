@@ -28,7 +28,6 @@ class FunctionsGraphExtractor:
         self.save_functions_graph()
         self.save_functions_edges()
         self.set_entry_and_lonely_models()
-        self.import_calls_for_lonely_functions()
 
     def save_functions_graph(self):
         for function_info_id in self.functions_info_ids:
