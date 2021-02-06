@@ -1,4 +1,4 @@
-from Models import FileModel, FunctionModel, EntryModels
+from Models import FileModel, FunctionModel, EntryModels, MultipleEntriesModels
 
 
 class CallTreeExtractor:
@@ -17,7 +17,8 @@ class CallTreeExtractor:
         and connect to neighbors that do not have a father in the tree.
         At the tree a father to a node is at the highest level in the tree (related to the entry point).
         """
-        neighbors_to_revisit = self.attach_nodes_sons(EntryModels(self.redis_session).get_models('function'))
+        neighbors_to_revisit = EntryModels(self.redis_session).get_models('function') + \
+                               MultipleEntriesModels(self.redis_session).get_models('function')
         while neighbors_to_revisit:
             neighbors_to_revisit = self.attach_nodes_sons(neighbors_to_revisit)
 
@@ -43,12 +44,10 @@ class CallTreeExtractor:
             file_calls_in_models = called_file_model.get_call_in_models()
             origin_file_repo = FileModel(contained_address=origin_function_model.contained_address,
                                          redis_session=self.redis_session)
-            if not bool(file_calls_in_models):
+            if not bool(file_calls_in_models) and not called_file_model.is_multiple_entries_models():
                 origin_file_repo.recursion_add_edge(called_file_model.contained_address)
                 neighbors_to_revisit.append(FunctionModel(function_id=called_function_model.model_id,
                                                           redis_session=self.redis_session))
-            else:
-                self.connect_two_trees(origin_file_repo, called_file_model)
 
         return neighbors_to_revisit
 

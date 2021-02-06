@@ -82,6 +82,9 @@ class NodeModel:
         self.redis_session.hset(self.model_id, b'calls_in_set_id', self.calls_in_set_id)
         self.redis_session.hset(self.model_id, b'contained_address', self.contained_address)
 
+    def is_multiple_entries_models(self):
+        return MultipleEntriesModels(redis_session=self.redis_session).is_member(self.contained_address)
+
     def get_size(self):
         return int(self.redis_session.hget(self.model_id, b'size'))
 
