@@ -373,7 +373,7 @@ class SpecialModels:
         self.redis_session.sadd(self.key_name, address)
 
     def is_member(self, address):
-        self.redis_session.sismember(self.key_name, address)
+        return self.redis_session.sismember(self.key_name, address)
 
     def remove_address(self, address):
         self.redis_session.srem(self.key_name, address)
@@ -401,6 +401,11 @@ class MultipleEntryModels(SpecialModels):
 class RadareDetectedModels(SpecialModels):
     def __init__(self, redis_session):
         SpecialModels.__init__(self, key_name='radare_detected_models:addresses', redis_session=redis_session)
+
+
+class RetdecDetectedModels(SpecialModels):
+    def __init__(self, redis_session):
+        SpecialModels.__init__(self, key_name='retdec_detected_models:addresses', redis_session=redis_session)
 
 
 def get_models_by_addresses(addresses, redis_session, model_name):

@@ -1,7 +1,7 @@
 import shutil, os.path
 import os
 import re
-from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels
+from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
 import conf
 from BinaryExtractor import BinaryExtractor
 from os import listdir
@@ -31,7 +31,7 @@ class ImportRetdecData:
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
-                    self.redis_session.sadd('retdec_functions_addresses', function_detector.function_address)
+                    RetdecDetectedModels(redis_session=self.redis_session).add_address(function_detector.function_address)
                     radare_detected_address = None
                     radare_detected_models = RadareDetectedModels(self.redis_session)
                     if radare_detected_models.is_member(function_detector.function_address):
