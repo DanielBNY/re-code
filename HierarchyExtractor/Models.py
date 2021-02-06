@@ -372,6 +372,9 @@ class SpecialModels:
     def add_address(self, address):
         self.redis_session.sadd(self.key_name, address)
 
+    def is_member(self, address):
+        self.redis_session.sismember(self.key_name, address)
+
     def remove_address(self, address):
         self.redis_session.srem(self.key_name, address)
 
