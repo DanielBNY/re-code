@@ -36,10 +36,19 @@ class MultipleNodesModels:
     def add_model_id(self, model_id):
         self.redis_session.sadd(self.multiple_nodes_models_key, model_id)
 
+    def get_non_lonely_models(self):
+        model_ids = self.get_model_ids()
+        lonely_models_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
+        lonely_models_ids = get_model_id_set_by_addresses(addresses=lonely_models_addresses,
+                                                          model_name=self.multiple_nodes_models_key)
+        non_lonely_models_ids = model_ids - lonely_models_ids
+        non_lonely_models = get_models_by_ids(redis_session=self.redis_session, model_ids=non_lonely_models_ids)
+        return non_lonely_models
+
 
 class Folders(MultipleNodesModels):
     def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folders')
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folder')
 
     def get_folder_ids(self):
         return self.redis_session.smembers(self.multiple_nodes_models_key)
@@ -51,20 +60,10 @@ class Folders(MultipleNodesModels):
             folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
         return folders_models
 
-    def get_non_lonely_folder_models(self):
-        all_folders = self.get_folder_ids()
-        lonely_folders_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
-        lonely_folders = get_model_id_set_by_addresses(addresses=lonely_folders_addresses, model_name=b'folder')
-        non_lonely_folders = all_folders - lonely_folders
-        non_lonely_folder_models = []
-        for folder_id in non_lonely_folders:
-            non_lonely_folder_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
-        return non_lonely_folder_models
-
 
 class Files(MultipleNodesModels):
     def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'files')
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'file')
 
     def get_files_ids(self):
         return self.redis_session.smembers(self.multiple_nodes_models_key)
@@ -76,20 +75,10 @@ class Files(MultipleNodesModels):
             files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
         return files_models
 
-    def get_non_lonely_files_models(self):
-        all_files = self.get_files_ids()
-        lonely_files_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
-        lonely_files = get_model_id_set_by_addresses(addresses=lonely_files_addresses, model_name=b'file')
-        non_lonely_files = all_files - lonely_files
-        non_lonely_files_models = []
-        for file_id in non_lonely_files:
-            non_lonely_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
-        return non_lonely_files_models
-
 
 class Functions(MultipleNodesModels):
     def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'functions')
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
 
     def get_functions_ids(self):
         return self.redis_session.smembers(self.multiple_nodes_models_key)

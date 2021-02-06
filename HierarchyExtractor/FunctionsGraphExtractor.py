@@ -88,8 +88,8 @@ class FunctionsGraphExtractor:
         if ApiWrappers(self.redis_session).is_api_wrapper(called_function_model.model_id):
             source_function_model.set_called_function_wrapper(called_function_model.model_id)
         else:
-            if self.redis_session.sismember("functions", source_function_model.model_id):
-                if self.redis_session.sismember("functions", called_function_model.model_id):
+            if self.redis_session.sismember("function", source_function_model.model_id):
+                if self.redis_session.sismember("function", called_function_model.model_id):
                     source_function_model.add_function_edge(called_function_model)
 
     def set_entry_and_lonely_models(self):

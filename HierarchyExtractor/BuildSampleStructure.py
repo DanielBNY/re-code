@@ -39,7 +39,7 @@ class BuildSampleStructure:
             model.set_folders_path(path)
 
     def set_all_files_paths(self):
-        folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folder_models()
+        folder_models = Folders(redis_session=self.redis_session).get_non_lonely_models()
         for folder in folder_models:
             if folder.get_folders_path():
                 full_path = folder.get_folders_path() + b'/' + folder.model_id
@@ -53,7 +53,7 @@ class BuildSampleStructure:
             model.set_folders_path(path)
 
     def write_functions_to_files(self):
-        files_models = Files(redis_session=self.redis_session).get_non_lonely_files_models()
+        files_models = Files(redis_session=self.redis_session).get_non_lonely_models()
         for file_model in files_models:
             if file_model.get_folders_path():
                 file_path = file_model.get_folders_path() + b'/' + file_model.model_id
