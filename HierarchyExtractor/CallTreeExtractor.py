@@ -37,10 +37,10 @@ class CallTreeExtractor:
         Attach an edge to nodes that do not have already a parent
         """
         neighbors_to_revisit = []
-        functions_calls_out_models = origin_function_model.get_call_out_functions_models()
+        functions_calls_out_models = origin_function_model.get_call_out_models()
         for called_function_model in functions_calls_out_models:
             called_file_model = called_function_model.get_parent_file_model()
-            file_calls_in_models = called_file_model.get_call_in_files_models()
+            file_calls_in_models = called_file_model.get_call_in_models()
             origin_file_repo = FileModel(contained_address=origin_function_model.contained_address,
                                          redis_session=self.redis_session)
             if not bool(file_calls_in_models):
@@ -70,11 +70,11 @@ class CallTreeExtractor:
     @staticmethod
     def get_head_and_relative_distance(file_model: FileModel):
         relative_distance = 0
-        file_father = file_model.get_call_in_files_models()
+        file_father = file_model.get_call_in_models()
         last_father = file_model
         while file_father:
             relative_distance += 1
             last_father = file_father[0]
-            file_father = file_father[0].get_call_in_files_models()
+            file_father = file_father[0].get_call_in_models()
 
         return {"last_father": last_father, "relative_distance": relative_distance}

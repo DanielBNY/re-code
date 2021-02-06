@@ -106,6 +106,16 @@ class NodeModel:
         self.remove_edge(last_target_node)
         self.add_edge(new_target_node)
 
+    def get_call_out_models(self):
+        called_functions_ids = self.get_call_out_models_ids()
+        called_models = get_models_by_ids(redis_session=self.redis_session, model_ids=called_functions_ids)
+        return called_models
+
+    def get_call_in_models(self):
+        call_in_functions_ids = self.get_call_in_models_ids()
+        call_in_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_in_functions_ids)
+        return call_in_models
+
 
 class ClusteredNodes(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
@@ -176,22 +186,8 @@ class FolderModel(ClusteredNodes):
             node_model += [FolderModel(redis_session=self.redis_session, folder_id=model_id)]
         return node_model
 
-    def get_call_out_folders_models(self):
-        called_folders_ids = self.get_call_out_models_ids()
-        called_folders_models = []
-        for folder_id in called_folders_ids:
-            called_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
-        return called_folders_models
-
     def remove_contained_file(self, model_id):
         self.redis_session.srem(self.contained_nodes_set_id, model_id)
-
-    def get_call_in_folders_models(self):
-        calling_folders_ids = self.get_call_in_models_ids()
-        calling_folders_models = []
-        for folder_id in calling_folders_ids:
-            calling_folders_models.append(FolderModel(folder_id=folder_id, redis_session=self.redis_session))
-        return calling_folders_models
 
     def add_init_folder_info(self, size):
         """
@@ -234,20 +230,6 @@ class FileModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_address
-
-    def get_call_out_files_models(self):
-        called_files_ids = self.get_call_out_models_ids()
-        called_files_models = []
-        for file_id in called_files_ids:
-            called_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
-        return called_files_models
-
-    def get_call_in_files_models(self):
-        calling_files_ids = self.get_call_in_models_ids()
-        calling_files_models = []
-        for file_id in calling_files_ids:
-            calling_files_models.append(FileModel(file_id=file_id, redis_session=self.redis_session))
-        return calling_files_models
 
     def get_parent_folder_model(self):
         return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
@@ -333,20 +315,6 @@ class FunctionModel(NodeModel):
 
     def get_function_code(self):
         return self.redis_session.hget(self.model_id, b'decompiled_code')
-
-    def get_call_out_functions_models(self):
-        called_functions_ids = self.get_call_out_models_ids()
-        called_functions_models = []
-        for function_id in called_functions_ids:
-            called_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
-        return called_functions_models
-
-    def get_call_in_functions_models(self):
-        calling_functions_ids = self.get_call_in_models_ids()
-        calling_functions_models = []
-        for function_id in calling_functions_ids:
-            calling_functions_models.append(FunctionModel(function_id=function_id, redis_session=self.redis_session))
-        return calling_functions_models
 
     def get_parent_file_model(self):
         return FileModel(file_id=self.file_id, redis_session=self.redis_session)

@@ -100,8 +100,8 @@ class FunctionsGraphExtractor:
         """
         functions_models = Functions(self.redis_session).get_models()
         for function_model in functions_models:
-            call_in_functions = function_model.get_call_in_functions_models()
-            call_out_functions = function_model.get_call_out_functions_models()
+            call_in_functions = function_model.get_call_in_models()
+            call_out_functions = function_model.get_call_out_models()
             if not bool(call_in_functions):
                 if bool(call_out_functions):
                     EntryModels(redis_session=self.redis_session).add_address(function_model.contained_address)
