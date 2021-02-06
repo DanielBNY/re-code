@@ -393,7 +393,7 @@ class EntryModels(SpecialModels):
         SpecialModels.__init__(self, key_name='entry:addresses', redis_session=redis_session)
 
 
-class MultipleEntryModels(SpecialModels):
+class MultipleEntriesModels(SpecialModels):
     def __init__(self, redis_session):
         SpecialModels.__init__(self, key_name='multiple_entries:addresses', redis_session=redis_session)
 

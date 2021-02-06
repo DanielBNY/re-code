@@ -1,4 +1,4 @@
-from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, MultipleEntryModels
+from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, MultipleEntriesModels
 from pymongo import MongoClient
 import conf
 import re
@@ -108,7 +108,7 @@ class FunctionsGraphExtractor:
                 else:
                     LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_address)
             elif len(call_in_functions) > 1:
-                MultipleEntryModels(redis_session=self.redis_session).add_address(function_model.contained_address)
+                MultipleEntriesModels(redis_session=self.redis_session).add_address(function_model.contained_address)
 
     def import_calls_for_lonely_functions(self):
         lonely_function_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='function')
