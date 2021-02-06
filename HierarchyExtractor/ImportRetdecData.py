@@ -1,7 +1,7 @@
 import shutil, os.path
 import os
 import re
-from Models import FunctionModel, APIWrapperModel, ApiWrappers
+from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels
 import conf
 from BinaryExtractor import BinaryExtractor
 from os import listdir
@@ -33,10 +33,10 @@ class ImportRetdecData:
                 if function_detector.is_function_detected():
                     self.redis_session.sadd('retdec_functions_addresses', function_detector.function_address)
                     radare_detected_address = None
-                    if self.redis_session.sismember('r2_functions_addresses', function_detector.function_address):
+                    radare_detected_models = RadareDetectedModels(self.redis_session)
+                    if radare_detected_models.is_member(function_detector.function_address):
                         radare_detected_address = function_detector.function_address
-                    if self.redis_session.sismember('r2_functions_addresses',
-                                                    function_detector.function_address + 1):
+                    if radare_detected_models.is_member(function_detector.function_address + 1):
                         radare_detected_address = function_detector.function_address + 1
                     if radare_detected_address:
                         function_model = FunctionModel(redis_session=self.redis_session,

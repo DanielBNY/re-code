@@ -2,7 +2,7 @@ import r2pipe
 import os
 from MongoImport import import_collection_from_json_array
 import json
-
+from Models import RadareDetectedModels
 
 class BinaryExtractor:
     def __init__(self, binary_path, redis_session):
@@ -46,7 +46,7 @@ class BinaryExtractor:
         functions_addresses_list = functions_addresses.split('\n')
         for address in functions_addresses_list:
             if address:
-                self.redis_session.sadd('r2_functions_addresses', int(address, 16))
+                RadareDetectedModels(redis_session=self.redis_session).add_address(int(address, 16))
 
     def extract_functions_info(self, output_path, imported_collection_name):
         self.export_functions_info(output_json_path=output_path)
