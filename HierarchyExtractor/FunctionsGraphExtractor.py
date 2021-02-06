@@ -98,7 +98,7 @@ class FunctionsGraphExtractor:
         saves functions that do not call any functions and are not called (lonely_functions, redis set key).
         Possible entry points are functions that functions do not call it
         """
-        functions_models = Functions(self.redis_session).get_functions_models()
+        functions_models = Functions(self.redis_session).get_models()
         for function_model in functions_models:
             call_in_functions = function_model.get_call_in_functions_models()
             call_out_functions = function_model.get_call_out_functions_models()
