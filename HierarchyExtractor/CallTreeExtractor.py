@@ -1,4 +1,4 @@
-from Models import FileModel, FunctionModel, EntryModels, MultipleEntriesModels
+from Models import FileModel, FunctionModel, EntryModels, MultipleEntriesModels, ClusteredNodes, NodeModel
 
 
 class CallTreeExtractor:
@@ -10,33 +10,23 @@ class CallTreeExtractor:
         self.redis_session = redis_session
 
     def run(self):
-        """
-        Extract a call tree from the functions call graph.
-        The call tree is used for the files and folders hierarchy recovering.
-        Find entry points and start with them the process of recursively scans at the same level for nodes
-        and connect to neighbors that do not have a father in the tree.
-        At the tree a father to a node is at the highest level in the tree (related to the entry point).
-        """
-        neighbors_to_revisit = EntryModels(self.redis_session).get_models('function') + \
+        entries_models = EntryModels(self.redis_session).get_models('function') + \
                                MultipleEntriesModels(self.redis_session).get_models('function')
-        while neighbors_to_revisit:
-            neighbors_to_revisit = self.attach_nodes_sons(neighbors_to_revisit)
+        for entry_model in entries_models:
+            self.extract_tree_from_entry(tree_head_model=entry_model)
 
-    def attach_nodes_sons(self, models):
-        """
-        :param models
-        For each given node attach an edge to nodes that do not have already a parent and return the new attached nodes
-        """
+    def extract_tree_from_entry(self, tree_head_model: NodeModel):
+        neighbors_to_revisit = self.attach_nodes_sons([tree_head_model], tree_head_model=tree_head_model)
+        while neighbors_to_revisit:
+            neighbors_to_revisit = self.attach_nodes_sons(models=neighbors_to_revisit, tree_head_model=tree_head_model)
+
+    def attach_nodes_sons(self, models, tree_head_model: NodeModel):
         neighbors_to_revisit = []
         for model in models:
-            neighbors_to_revisit += self.attach_parent_node_to_sons(model)
+            neighbors_to_revisit += self.attach_parent_node_to_sons(model, tree_head_model)
         return neighbors_to_revisit
 
-    def attach_parent_node_to_sons(self, origin_function_model):
-        """
-        :param origin_function_model
-        Attach an edge to nodes that do not have already a parent
-        """
+    def attach_parent_node_to_sons(self, origin_function_model, tree_head_model: NodeModel):
         neighbors_to_revisit = []
         functions_calls_out_models = origin_function_model.get_call_out_models()
         for called_function_model in functions_calls_out_models:
@@ -46,6 +36,7 @@ class CallTreeExtractor:
                                          redis_session=self.redis_session)
             if not bool(file_calls_in_models) and not called_file_model.is_multiple_entries_models():
                 origin_file_repo.recursion_add_edge(called_file_model.contained_address)
+                called_file_model.set_tree_head_function_model_id(tree_head_model.model_id)
                 neighbors_to_revisit.append(FunctionModel(function_id=called_function_model.model_id,
                                                           redis_session=self.redis_session))
 
