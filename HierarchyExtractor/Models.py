@@ -126,8 +126,8 @@ class ClusteredNodes(NodeModel):
                            model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
-    def set_tree_head(self, tree_head_model_id):
-        self.redis_session.hset(self.model_id, b'tree_head_model_id', tree_head_model_id)
+    def set_tree_head_function_model_id(self, tree_head_model_id):
+        self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
 
     def set_folders_path(self, folders_path):
         self.redis_session.hset(self.model_id, b'folders_path', folders_path)
