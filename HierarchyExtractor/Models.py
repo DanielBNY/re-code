@@ -126,12 +126,6 @@ class ClusteredNodes(NodeModel):
                            model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
-    def set_tree_head_function_model_id(self, tree_head_model_id):
-        self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
-
-    def get_tree_head_function_model_id(self):
-        return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
-
     def set_folders_path(self, folders_path):
         self.redis_session.hset(self.model_id, b'folders_path', folders_path)
 
@@ -239,6 +233,12 @@ class FileModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_address
+
+    def set_tree_head_function_model_id(self, tree_head_model_id):
+        self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
+
+    def get_tree_head_function_model_id(self):
+        return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
     def get_parent_folder_model(self):
         return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
