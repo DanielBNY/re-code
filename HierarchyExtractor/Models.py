@@ -432,7 +432,7 @@ def get_models_by_addresses(addresses, redis_session, model_name):
     """
     addresses: a set of addresses
     redis_session: redis session
-    model_name: function / file / folder
+    model_name: multiple_entries_function / function / file / folder
     """
     models = []
     for address in addresses:
@@ -442,6 +442,8 @@ def get_models_by_addresses(addresses, redis_session, model_name):
             models.append(FileModel(contained_address=address, redis_session=redis_session))
         elif model_name == 'folder':
             models.append(FolderModel(contained_address=address, redis_session=redis_session))
+        elif model_name == 'multiple_entries_function':
+            models.append(MultipleEntriesFunctionNode(address=address, redis_session=redis_session))
     return models
 
 
