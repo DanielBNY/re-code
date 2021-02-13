@@ -365,6 +365,24 @@ class MultipleEntriesFunctionNode(FunctionModel):
         return self.redis_session.scard(self.model_id + b':tree_head_function_models_ids')
 
 
+class MultipleEntriesSortedSet:
+    def __init__(self, redis_session):
+        self.redis_session = redis_session
+        self.key = b'sorted_set_multiple_entries'
+
+    def add_element(self, number_of_calling_in_trees: int, function_model_id):
+        """
+        Add a multiple entry model id with the score (number of calling in trees)
+        """
+        self.redis_session.zadd(self.key, {function_model_id: number_of_calling_in_trees})
+
+    def get_sorted_elements(self):
+        """
+        Get the sorted list of multiple entries by the (number of calling in trees)
+        """
+        return self.redis_session.zrangebyscore(self.key, -1, 'inf')
+
+
 class APIWrapperModel(FunctionModel):
     def __init__(self, redis_session=None, address=None, function_id=None):
         FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
