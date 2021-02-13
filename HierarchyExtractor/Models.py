@@ -382,9 +382,8 @@ class MultipleEntriesSortedSet:
     def get_sorted_elements(self):
         """
         Get the sorted list of multiple entries by the (number of calling in trees)
-        The list is descending
         """
-        return self.redis_session.zrevrangebyscore(self.key, 'inf', -1)
+        return self.redis_session.zrangebyscore(self.key, -1, 'inf')
 
 
 class APIWrapperModel(FunctionModel):
