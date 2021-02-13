@@ -362,7 +362,7 @@ class MultipleEntriesFunctionNode(FunctionModel):
         self.redis_session.sadd(self.model_id + b':tree_head_function_models_ids', tree_head_function_models_id)
 
     def get_number_of_call_in_trees(self):
-        return len(self.redis_session.smembers(self.model_id + b':tree_head_function_models_ids'))
+        return self.redis_session.scard(self.model_id + b':tree_head_function_models_ids')
 
 
 class APIWrapperModel(FunctionModel):
