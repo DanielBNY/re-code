@@ -354,6 +354,17 @@ class FunctionModel(NodeModel):
         self.add_edge(target_node=called_function_model)
 
 
+class MultipleEntriesFunctionNode(FunctionModel):
+    def __init__(self, redis_session=None, address=None, function_id=None):
+        FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
+
+    def add_called_tree_head_function_models_id(self, tree_head_function_models_id):
+        self.redis_session.sadd(self.model_id + b':tree_head_function_models_ids', tree_head_function_models_id)
+
+    def get_number_of_call_in_trees(self):
+        return len(self.redis_session.smembers(self.model_id + b':tree_head_function_models_ids'))
+
+
 class APIWrapperModel(FunctionModel):
     def __init__(self, redis_session=None, address=None, function_id=None):
         FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
