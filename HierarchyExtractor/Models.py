@@ -361,6 +361,9 @@ class MultipleEntriesFunctionNode(FunctionModel):
     def add_called_tree_head_function_models_id(self, tree_head_function_models_id):
         self.redis_session.sadd(self.model_id + b':tree_head_function_models_ids', tree_head_function_models_id)
 
+    def get_call_in_trees_heads_ids(self):
+        return self.redis_session.smembers(self.model_id + b':tree_head_function_models_ids')
+
     def get_number_of_call_in_trees(self):
         return self.redis_session.scard(self.model_id + b':tree_head_function_models_ids')
 
