@@ -234,12 +234,6 @@ class FileModel(ClusteredNodes):
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_address
 
-    def set_tree_head_function_model_id(self, tree_head_model_id):
-        self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
-
-    def get_tree_head_function_model_id(self):
-        return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
-
     def get_parent_folder_model(self):
         return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
 
@@ -304,6 +298,12 @@ class FunctionModel(NodeModel):
                            contained_address=address,
                            model_id=function_id)
         self.file_id = b'file:' + self.contained_address
+
+    def set_tree_head_function_model_id(self, tree_head_model_id):
+        self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
+
+    def get_tree_head_function_model_id(self):
+        return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
     def is_api_wrapper(self):
         return bool(APIWrapperModel(self).get_api_name())
