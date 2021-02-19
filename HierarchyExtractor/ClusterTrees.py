@@ -26,8 +26,8 @@ class ClusterTrees:
             tree_head_function_model_id = call_in_model.get_tree_head_function_model_id()
             tree_head_function_model = FunctionModel(redis_session=self.redis_session,
                                                      function_id=tree_head_function_model_id)
-            if call_in_model.contained_address and not MultipleEntriesModels(
-                    redis_session=self.redis_session).is_member(address=tree_head_function_model.contained_address):
+            if call_in_model.contained_function_address and not MultipleEntriesModels(
+                    redis_session=self.redis_session).is_member(address=tree_head_function_model.contained_function_address):
                 multiple_entries_model.add_called_tree_head_function_models_id(
                     tree_head_function_models_id=tree_head_function_model_id)
 
@@ -53,7 +53,7 @@ class ClusterTrees:
             last_father_file_model = self.get_tree_head(file_model=parent_file_model)
             if multiple_entries_file_model.model_id != last_father_file_model.model_id:
                 last_father_file_model.recursion_add_edge(
-                    called_function_address=multiple_entries_file_model.contained_address)
+                    called_function_address=multiple_entries_file_model.contained_function_address)
 
         else:
             for function_model in function_call_in_trees_heads_models:
@@ -61,7 +61,7 @@ class ClusterTrees:
                 last_father_file_model = self.get_tree_head(file_model=parent_file_model)
                 if multiple_entries_file_model.model_id != last_father_file_model.model_id:
                     multiple_entries_file_model.recursion_add_edge(
-                        called_function_address=last_father_file_model.contained_address)
+                        called_function_address=last_father_file_model.contained_function_address)
 
     @staticmethod
     def get_tree_head(file_model: FileModel):
@@ -82,4 +82,4 @@ class ClusterTrees:
             call_out_files_ids = file_model.get_call_out_models_ids()
             if not bool(call_in_files_ids) and bool(call_out_files_ids):
                 TreesEntriesFunctionsAddresses(redis_session=self.redis_session) \
-                    .add_address(file_model.contained_address)
+                    .add_address(file_model.contained_function_address)

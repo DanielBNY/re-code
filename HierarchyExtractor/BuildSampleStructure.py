@@ -95,7 +95,7 @@ class BuildSampleStructure:
                     wrapped_function_name = APIWrapperModel(redis_session=self.redis_session,
                                                             function_id=wrapper_function.model_id).get_api_name()
                     function_address = FunctionModel(redis_session=self.redis_session,
-                                                     function_id=wrapper_function.model_id).contained_address
+                                                     function_id=wrapper_function.model_id).contained_function_address
                     hex_address = hex(int(function_address.decode())).split('x')[1]
                     function_code = function_code.replace(b'function_' + str(hex_address).encode(),
                                                           wrapped_function_name)

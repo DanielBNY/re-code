@@ -33,10 +33,10 @@ class CallTreeExtractor:
         for called_function_model in functions_calls_out_models:
             called_file_model = called_function_model.get_parent_file_model()
             file_calls_in_models = called_file_model.get_call_in_models()
-            origin_file_repo = FileModel(contained_address=origin_function_model.contained_address,
+            origin_file_repo = FileModel(contained_address=origin_function_model.contained_function_address,
                                          redis_session=self.redis_session)
             if not bool(file_calls_in_models) and not called_file_model.is_multiple_entries_models():
-                origin_file_repo.recursion_add_edge(called_file_model.contained_address)
+                origin_file_repo.recursion_add_edge(called_file_model.contained_function_address)
                 called_function_model.set_tree_head_function_model_id(tree_head_model.model_id)
                 neighbors_to_revisit.append(FunctionModel(function_id=called_function_model.model_id,
                                                           redis_session=self.redis_session))
@@ -50,13 +50,13 @@ class CallTreeExtractor:
         second_relative_distance = second_head_and_relative_distance["relative_distance"]
         first_tree_head = first_head_and_relative_distance["last_father"]
         second_tree_head = second_head_and_relative_distance["last_father"]
-        if first_tree_head.contained_address != second_tree_head.contained_address:
+        if first_tree_head.contained_function_address != second_tree_head.contained_function_address:
             if first_relative_distance > second_relative_distance:
-                first_tree_head.recursion_add_edge(second_tree_head.contained_address)
-                self.redis_session.srem('entry:addresses', second_tree_head.contained_address)
+                first_tree_head.recursion_add_edge(second_tree_head.contained_function_address)
+                self.redis_session.srem('entry:addresses', second_tree_head.contained_function_address)
             else:
-                second_tree_head.recursion_add_edge(first_tree_head.contained_address)
-                self.redis_session.srem('entry:addresses', first_tree_head.contained_address)
+                second_tree_head.recursion_add_edge(first_tree_head.contained_function_address)
+                self.redis_session.srem('entry:addresses', first_tree_head.contained_function_address)
 
     @staticmethod
     def get_head_and_relative_distance(file_model: FileModel):

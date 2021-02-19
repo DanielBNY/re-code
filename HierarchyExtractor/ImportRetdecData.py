@@ -45,7 +45,7 @@ class ImportRetdecData:
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(function_detector.function_address).encode())
                     if function_detector.wrapped_function_name:
-                        contained_address_minus_three = str(int(function_model.contained_address) - 3).encode()
+                        contained_address_minus_three = str(int(function_model.contained_function_address) - 3).encode()
                         wrapper_function_model = FunctionModel(redis_session=self.redis_session,
                                                                address=contained_address_minus_three)
                         wrapper_function_model.set_function_code(function_detector.function_code)

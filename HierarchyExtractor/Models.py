@@ -69,10 +69,10 @@ class NodeModel:
         self.redis_session = redis_session
         if model_id:
             self.model_id = model_id
-            self.contained_address = model_id.split(b':')[1]
+            self.contained_function_address = model_id.split(b':')[1]
         elif contained_address and model_name:
             self.model_id = model_name + b':' + contained_address
-            self.contained_address = contained_address
+            self.contained_function_address = contained_address
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
 
@@ -80,10 +80,10 @@ class NodeModel:
         self.redis_session.hset(self.model_id, b'size', size)
         self.redis_session.hset(self.model_id, b'calls_out_set_id', self.calls_out_set_id)
         self.redis_session.hset(self.model_id, b'calls_in_set_id', self.calls_in_set_id)
-        self.redis_session.hset(self.model_id, b'contained_address', self.contained_address)
+        self.redis_session.hset(self.model_id, b'contained_address', self.contained_function_address)
 
     def is_multiple_entries_models(self):
-        return MultipleEntriesModels(redis_session=self.redis_session).is_member(self.contained_address)
+        return MultipleEntriesModels(redis_session=self.redis_session).is_member(self.contained_function_address)
 
     def get_size(self):
         return int(self.redis_session.hget(self.model_id, b'size'))
@@ -203,7 +203,7 @@ class FolderModel(ClusteredNodes):
         self.redis_session.hset(self.model_id, b'contained_files_set_id', self.contained_nodes_set_id)
         Folders(self.redis_session).add_model_id(self.model_id)
         self.redis_session.sadd(self.contained_nodes_set_id,
-                                FileModel(contained_address=self.contained_address).model_id)
+                                FileModel(contained_address=self.contained_function_address).model_id)
 
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
@@ -232,7 +232,7 @@ class FileModel(ClusteredNodes):
         ClusteredNodes.__init__(self, model_name=b'file', redis_session=redis_session,
                                 contained_address=contained_address,
                                 model_id=file_id)
-        self.folder_id = b'folder:' + self.contained_address
+        self.folder_id = b'folder:' + self.contained_function_address
 
     def get_parent_folder_model(self):
         return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
@@ -248,7 +248,7 @@ class FileModel(ClusteredNodes):
         self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_nodes_set_id)
         self.redis_session.hset(self.model_id, b'folder_id', self.folder_id)
         Files(self.redis_session).add_model_id(self.model_id)
-        self.redis_session.sadd(self.contained_nodes_set_id, FunctionModel(address=self.contained_address).model_id)
+        self.redis_session.sadd(self.contained_nodes_set_id, FunctionModel(address=self.contained_function_address).model_id)
 
     def recursion_init(self, size):
         """
@@ -286,7 +286,7 @@ class FileModel(ClusteredNodes):
 
     def recursion_cluster(self, model_to_cluster):
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
-        folder_to_cluster = FolderModel(contained_address=model_to_cluster.contained_address,
+        folder_to_cluster = FolderModel(contained_address=model_to_cluster.contained_function_address,
                                         redis_session=self.redis_session)
         self.cluster(model_to_cluster)
         folder_model.cluster(folder_to_cluster)
@@ -297,7 +297,7 @@ class FunctionModel(NodeModel):
         NodeModel.__init__(self, model_name=b'function', redis_session=redis_session,
                            contained_address=address,
                            model_id=function_id)
-        self.file_id = b'file:' + self.contained_address
+        self.file_id = b'file:' + self.contained_function_address
 
     def set_tree_head_function_model_id(self, tree_head_model_id):
         self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
