@@ -1,5 +1,5 @@
 from Models import EntryModels, Folders, Files, LonelyModels, get_models_by_ids, FileModel, FunctionModel, ApiWrappers, \
-    APIWrapperModel
+    APIWrapperModel, TreesEntriesFunctionsAddresses
 
 import os
 
@@ -10,7 +10,7 @@ class BuildSampleStructure:
         self.redis_session = redis_session
 
     def run(self):
-        entry_folders_models = EntryModels(redis_session=self.redis_session).get_models('folder')
+        entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_models('folder')
         self.create_folders_in_path(self.destination_sample, entry_folders_models)
         folders_to_revisit = entry_folders_models
         while folders_to_revisit:

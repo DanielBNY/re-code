@@ -1,4 +1,4 @@
-from Models import Files, EntryModels, get_models_by_ids, ClusteredNodes
+from Models import Files, TreesEntriesFunctionsAddresses, get_models_by_ids, ClusteredNodes
 from collections.abc import Sequence
 
 
@@ -19,7 +19,7 @@ class ClusterFilesAndFolders:
                             max_node_size=self.max_file_size * self.max_number_of_max_files_in_folder)
 
     def cluster_models(self, model_name, max_node_size):
-        folders_entry_models = EntryModels(self.redis_session).get_models(model_name=model_name)
+        folders_entry_models = TreesEntriesFunctionsAddresses(self.redis_session).get_models(model_name=model_name)
         for entry_folder_model in folders_entry_models:
             self.cluster_sons_of_entry_point([entry_folder_model], max_node_size)
 
