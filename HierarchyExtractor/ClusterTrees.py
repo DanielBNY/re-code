@@ -1,5 +1,5 @@
 from Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, get_models_by_ids, \
-    FileModel, FunctionModel
+    FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
 
 
 class ClusterTrees:
@@ -9,6 +9,7 @@ class ClusterTrees:
     def run(self):
         self.set_trees_heads_sets_and_sorted_set()
         self.cluster_trees()
+        self.set_trees_entries_points()
 
     def set_trees_heads_sets_and_sorted_set(self):
         multiple_entries_models = MultipleEntriesModels(redis_session=self.redis_session).get_models(
@@ -73,3 +74,12 @@ class ClusterTrees:
             file_father = file_father[0].get_call_in_models()
 
         return last_father
+
+    def set_trees_entries_points(self):
+        files_models = Files(self.redis_session).get_models()
+        for file_model in files_models:
+            call_in_files_ids = file_model.get_call_in_models_ids()
+            call_out_files_ids = file_model.get_call_out_models_ids()
+            if not bool(call_in_files_ids) and bool(call_out_files_ids):
+                TreesEntriesFunctionsAddresses(redis_session=self.redis_session) \
+                    .add_address(file_model.contained_address)
