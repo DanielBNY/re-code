@@ -48,6 +48,9 @@ class MultipleNodesModels:
         non_lonely_models = get_models_by_ids(redis_session=self.redis_session, model_ids=non_lonely_models_ids)
         return non_lonely_models
 
+    def remove_model_id(self, model_id):
+        self.redis_session.srem(self.multiple_nodes_models_key, model_id)
+
 
 class Folders(MultipleNodesModels):
     def __init__(self, redis_session):
@@ -209,7 +212,7 @@ class FolderModel(ClusteredNodes):
         self.redis_session.delete(self.calls_out_set_id)
         self.redis_session.delete(self.calls_in_set_id)
         self.redis_session.delete(self.contained_nodes_set_id)
-        self.redis_session.srem('folders', self.model_id)
+        Folders(redis_session=self.redis_session).remove_model_id(self.model_id)
         self.redis_session.delete(self.model_id)
 
     def recursion_init(self, size):
@@ -248,7 +251,8 @@ class FileModel(ClusteredNodes):
         self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_nodes_set_id)
         self.redis_session.hset(self.model_id, b'folder_id', self.folder_id)
         Files(self.redis_session).add_model_id(self.model_id)
-        self.redis_session.sadd(self.contained_nodes_set_id, FunctionModel(address=self.contained_function_address).model_id)
+        self.redis_session.sadd(self.contained_nodes_set_id,
+                                FunctionModel(address=self.contained_function_address).model_id)
 
     def recursion_init(self, size):
         """
@@ -279,7 +283,7 @@ class FileModel(ClusteredNodes):
         self.redis_session.delete(self.calls_out_set_id)
         self.redis_session.delete(self.calls_in_set_id)
         self.redis_session.delete(self.contained_nodes_set_id)
-        self.redis_session.srem('files', self.model_id)
+        Files(redis_session=self.redis_session).remove_model_id(self.model_id)
         self.redis_session.delete(self.model_id)
         father_folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         father_folder_model.remove_contained_file(self.model_id)
