@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
 from ImportRetdecData import ImportRetdecData
+from ClusterTrees import ClusterTrees
 import conf
 
 
@@ -34,6 +35,7 @@ class ExtractorsManager:
         bin_ex.extract_functions_info('/tmp/analyzed', imported_collection_name="FunctionsInfo")
         FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()
         CallTreeExtractor(self.redis_session).run()
+        ClusterTrees(redis_session=self.redis_session).run()
         ClusterFilesAndFolders(redis_session=redis.Redis('localhost'), max_file_size=max_file_size,
                                max_number_of_max_files_in_folder=max_number_of_max_files_in_folder).run()
         BuildSampleStructure(self.output_directory.encode(), self.redis_session).run()
