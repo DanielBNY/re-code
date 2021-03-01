@@ -102,13 +102,12 @@ class FunctionsGraphExtractor:
         for function_model in functions_models:
             call_in_functions = function_model.get_call_in_models()
             call_out_functions = function_model.get_call_out_models()
-            if bool(call_out_functions):
-                if not bool(call_in_functions):
-                    EntryModels(redis_session=self.redis_session).add_address(function_model.contained_function_address)
-                elif len(call_in_functions) > 1:
-                    MultipleEntriesModels(redis_session=self.redis_session).add_address(
-                        function_model.contained_function_address)
-            elif not bool(call_in_functions):
+            if not bool(call_in_functions):
+                EntryModels(redis_session=self.redis_session).add_address(function_model.contained_function_address)
+            if len(call_in_functions) > 1:
+                MultipleEntriesModels(redis_session=self.redis_session).add_address(
+                    function_model.contained_function_address)
+            if not bool(call_in_functions) and not bool(call_out_functions):
                 LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_function_address)
 
     def import_calls_for_lonely_functions(self):
