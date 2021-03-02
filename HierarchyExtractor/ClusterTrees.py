@@ -27,7 +27,8 @@ class ClusterTrees:
             tree_head_function_model = FunctionModel(redis_session=self.redis_session,
                                                      function_id=tree_head_function_model_id)
             if call_in_model.contained_function_address and not MultipleEntriesModels(
-                    redis_session=self.redis_session).is_member(address=tree_head_function_model.contained_function_address):
+                    redis_session=self.redis_session).is_member(
+                address=tree_head_function_model.contained_function_address):
                 multiple_entries_model.add_called_tree_head_function_models_id(
                     tree_head_function_models_id=tree_head_function_model_id)
 
@@ -49,19 +50,28 @@ class ClusterTrees:
         """
         multiple_entries_file_model = multiple_entries_model.get_parent_file_model()
         if len(function_call_in_trees_heads_models) == 1:
-            parent_file_model = function_call_in_trees_heads_models[0].get_parent_file_model()
+            self.connect_multiple_entries_node_with_single_tree(function_call_in_trees_heads_models,
+                                                                multiple_entries_file_model)
+        else:
+            self.connect_multiple_trees_with_multiple_entries_node(function_call_in_trees_heads_models,
+                                                                   multiple_entries_file_model)
+
+    def connect_multiple_entries_node_with_single_tree(self, function_call_in_trees_heads_models,
+                                                       multiple_entries_file_model: FileModel):
+        parent_file_model = function_call_in_trees_heads_models[0].get_parent_file_model()
+        last_father_file_model = self.get_tree_head(file_model=parent_file_model)
+        if multiple_entries_file_model.model_id != last_father_file_model.model_id:
+            last_father_file_model.recursion_add_edge(
+                called_function_address=multiple_entries_file_model.contained_function_address)
+
+    def connect_multiple_trees_with_multiple_entries_node(self, function_call_in_trees_heads_models,
+                                                          multiple_entries_file_model: FileModel):
+        for function_model in function_call_in_trees_heads_models:
+            parent_file_model = function_model.get_parent_file_model()
             last_father_file_model = self.get_tree_head(file_model=parent_file_model)
             if multiple_entries_file_model.model_id != last_father_file_model.model_id:
-                last_father_file_model.recursion_add_edge(
-                    called_function_address=multiple_entries_file_model.contained_function_address)
-
-        else:
-            for function_model in function_call_in_trees_heads_models:
-                parent_file_model = function_model.get_parent_file_model()
-                last_father_file_model = self.get_tree_head(file_model=parent_file_model)
-                if multiple_entries_file_model.model_id != last_father_file_model.model_id:
-                    multiple_entries_file_model.recursion_add_edge(
-                        called_function_address=last_father_file_model.contained_function_address)
+                multiple_entries_file_model.recursion_add_edge(
+                    called_function_address=last_father_file_model.contained_function_address)
 
     @staticmethod
     def get_tree_head(file_model: FileModel):
