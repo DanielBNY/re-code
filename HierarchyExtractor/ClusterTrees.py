@@ -50,19 +50,19 @@ class ClusterTrees:
         """
         multiple_entries_file_model = multiple_entries_model.get_parent_file_model()
         if len(function_call_in_trees_heads_models) == 1:
-            self.connect_multiple_entries_node_with_single_tree(function_call_in_trees_heads_models,
-                                                                multiple_entries_file_model)
+            self.connect_multiple_entries_node_in_a_tree(multiple_entries_model)
         else:
             self.connect_multiple_trees_with_multiple_entries_node(function_call_in_trees_heads_models,
                                                                    multiple_entries_file_model)
 
-    def connect_multiple_entries_node_with_single_tree(self, function_call_in_trees_heads_models,
-                                                       multiple_entries_file_model: FileModel):
-        parent_file_model = function_call_in_trees_heads_models[0].get_parent_file_model()
-        last_father_file_model = self.get_tree_head(file_model=parent_file_model)
-        if multiple_entries_file_model.model_id != last_father_file_model.model_id:
-            last_father_file_model.recursion_add_edge(
-                called_function_address=multiple_entries_file_model.contained_function_address)
+    @staticmethod
+    def connect_multiple_entries_node_in_a_tree(multiple_entries_model: MultipleEntriesFunctionNode):
+        multiple_entries_file_model = multiple_entries_model.get_parent_file_model()
+        called_function_models = multiple_entries_model.get_call_in_models()
+        first_called_function = called_function_models[0]
+        first_called_file = first_called_function.get_parent_file_model()
+        first_called_file.recursion_add_edge(
+            called_function_address=multiple_entries_file_model.contained_function_address)
 
     def connect_multiple_trees_with_multiple_entries_node(self, function_call_in_trees_heads_models,
                                                           multiple_entries_file_model: FileModel):
