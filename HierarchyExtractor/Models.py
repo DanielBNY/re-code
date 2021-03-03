@@ -393,7 +393,7 @@ class RetdecDetectedModels(SpecialModels):
         SpecialModels.__init__(self, key_name='retdec_detected_models:addresses', redis_session=redis_session)
 
 
-def get_models_by_addresses(addresses, redis_session, model_name):
+def get_models_by_addresses(addresses, redis_session, model_name) -> List[NodeModel]:
     """
     addresses: a set of addresses
     redis_session: redis session
