@@ -342,23 +342,23 @@ def add_values_to_set(redis_session, key, values):
 
 
 class SpecialModels:
-    def __init__(self, key_name, redis_session):
+    def __init__(self, key_name: str, redis_session: redis.Redis):
         self.key_name = key_name
         self.redis_session = redis_session
 
-    def get_addresses(self):
+    def get_addresses(self) -> Set[bin]:
         return self.redis_session.smembers(self.key_name)
 
-    def add_address(self, address):
+    def add_address(self, address: int):
         self.redis_session.sadd(self.key_name, address)
 
-    def is_member(self, address):
+    def is_member(self, address) -> bool:
         return self.redis_session.sismember(self.key_name, address)
 
-    def remove_address(self, address):
+    def remove_address(self, address: int):
         self.redis_session.srem(self.key_name, address)
 
-    def get_models(self, model_name):
+    def get_models(self, model_name: str) -> List[NodeModel]:
         addresses = self.redis_session.smembers(self.key_name)
         return get_models_by_addresses(addresses, self.redis_session, model_name)
 
