@@ -308,17 +308,17 @@ class MultipleEntriesFunctionNode(FunctionModel):
 
 
 class MultipleEntriesSortedSet:
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
         self.key = b'sorted_set_multiple_entries'
 
-    def add_element(self, number_of_calling_in_trees: int, function_model_id):
+    def add_element(self, number_of_calling_in_trees: int, function_model_id: bin):
         """
         Add a multiple entry model id with the score (number of calling in trees)
         """
         self.redis_session.zadd(self.key, {function_model_id: number_of_calling_in_trees})
 
-    def get_sorted_elements(self):
+    def get_sorted_elements(self) -> List[bin]:
         """
         Get the sorted list of multiple entries by the (number of calling in trees)
         """
