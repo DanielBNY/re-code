@@ -1,70 +1,5 @@
-class ApiWrappers:
-    def __init__(self, redis_session):
-        self.redis_session = redis_session
-        self.key = 'api-wrappers'
-
-    def add_function(self, model_id):
-        self.redis_session.sadd(self.key, model_id)
-
-    def get_api_wrappers(self):
-        return self.redis_session.smembers(self.key)
-
-    def is_api_wrapper(self, model_id):
-        return self.redis_session.sismember(self.key, model_id)
-
-
-class MultipleNodesModels:
-    def __init__(self, redis_session, multiple_node_models_key):
-        self.redis_session = redis_session
-        self.multiple_nodes_models_key = multiple_node_models_key
-
-    def is_member(self, model_id):
-        return self.redis_session.sismember(self.multiple_nodes_models_key, model_id)
-
-    def get_average_model_size(self):
-        nodes_models = self.get_models()
-        size_sum = 0
-        for node_model in nodes_models:
-            size_sum += node_model.get_size()
-        return size_sum / float(len(nodes_models))
-
-    def get_models(self):
-        model_ids = self.get_model_ids()
-        nodes_models_list = get_models_by_ids(redis_session=self.redis_session, model_ids=model_ids)
-        return nodes_models_list
-
-    def get_model_ids(self):
-        return self.redis_session.smembers(self.multiple_nodes_models_key)
-
-    def add_model_id(self, model_id):
-        self.redis_session.sadd(self.multiple_nodes_models_key, model_id)
-
-    def get_non_lonely_models(self):
-        model_ids = self.get_model_ids()
-        lonely_models_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
-        lonely_models_ids = get_model_id_set_by_addresses(addresses=lonely_models_addresses,
-                                                          model_name=self.multiple_nodes_models_key)
-        non_lonely_models_ids = model_ids - lonely_models_ids
-        non_lonely_models = get_models_by_ids(redis_session=self.redis_session, model_ids=non_lonely_models_ids)
-        return non_lonely_models
-
-    def remove_model_id(self, model_id):
-        self.redis_session.srem(self.multiple_nodes_models_key, model_id)
-
-
-class Folders(MultipleNodesModels):
-    def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folder')
-
-
-class Files(MultipleNodesModels):
-    def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'file')
-
-
-class Functions(MultipleNodesModels):
-    def __init__(self, redis_session):
-        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
+import redis
+from typing import Set, List
 
 
 class NodeModel:
@@ -488,7 +423,7 @@ def get_model_id_set_by_addresses(addresses, model_name):
     return models_ids
 
 
-def get_models_by_ids(redis_session, model_ids):
+def get_models_by_ids(redis_session, model_ids) -> List[NodeModel]:
     """
     redis_session: redis session
     model_ids: model ids
@@ -502,3 +437,72 @@ def get_models_by_ids(redis_session, model_ids):
         elif b'folder' in model_id:
             models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
     return models
+
+
+class ApiWrappers:
+    def __init__(self, redis_session: redis.Redis):
+        self.redis_session = redis_session
+        self.key = 'api-wrappers'
+
+    def add_function(self, model_id):
+        self.redis_session.sadd(self.key, model_id)
+
+    def get_api_wrappers(self) -> Set[bin]:
+        return self.redis_session.smembers(self.key)
+
+    def is_api_wrapper(self, model_id) -> bool:
+        return self.redis_session.sismember(self.key, model_id)
+
+
+class MultipleNodesModels:
+    def __init__(self, redis_session: redis.Redis, multiple_node_models_key):
+        self.redis_session = redis_session
+        self.multiple_nodes_models_key = multiple_node_models_key
+
+    def is_member(self, model_id) -> bool:
+        return self.redis_session.sismember(self.multiple_nodes_models_key, model_id)
+
+    def get_average_model_size(self) -> float:
+        nodes_models = self.get_models()
+        size_sum = 0
+        for node_model in nodes_models:
+            size_sum += node_model.get_size()
+        return size_sum / float(len(nodes_models))
+
+    def get_models(self) -> List[NodeModel]:
+        model_ids = self.get_model_ids()
+        nodes_models_list = get_models_by_ids(redis_session=self.redis_session, model_ids=model_ids)
+        return nodes_models_list
+
+    def get_model_ids(self) -> Set[bin]:
+        return self.redis_session.smembers(self.multiple_nodes_models_key)
+
+    def add_model_id(self, model_id):
+        self.redis_session.sadd(self.multiple_nodes_models_key, model_id)
+
+    def get_non_lonely_models(self) -> List[NodeModel]:
+        model_ids = self.get_model_ids()
+        lonely_models_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
+        lonely_models_ids = get_model_id_set_by_addresses(addresses=lonely_models_addresses,
+                                                          model_name=self.multiple_nodes_models_key)
+        non_lonely_models_ids = model_ids - lonely_models_ids
+        non_lonely_models = get_models_by_ids(redis_session=self.redis_session, model_ids=non_lonely_models_ids)
+        return non_lonely_models
+
+    def remove_model_id(self, model_id):
+        self.redis_session.srem(self.multiple_nodes_models_key, model_id)
+
+
+class Folders(MultipleNodesModels):
+    def __init__(self, redis_session):
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'folder')
+
+
+class Files(MultipleNodesModels):
+    def __init__(self, redis_session):
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'file')
+
+
+class Functions(MultipleNodesModels):
+    def __init__(self, redis_session):
+        MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
