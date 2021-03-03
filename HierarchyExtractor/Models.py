@@ -364,32 +364,32 @@ class SpecialModels:
 
 
 class LonelyModels(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='lonely:addresses', redis_session=redis_session)
 
 
 class EntryModels(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='entry:addresses', redis_session=redis_session)
 
 
 class TreesEntriesFunctionsAddresses(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='trees_entries_functions:addresses', redis_session=redis_session)
 
 
 class MultipleEntriesModels(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='multiple_entries:addresses', redis_session=redis_session)
 
 
 class RadareDetectedModels(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='radare_detected_models:addresses', redis_session=redis_session)
 
 
 class RetdecDetectedModels(SpecialModels):
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         SpecialModels.__init__(self, key_name='retdec_detected_models:addresses', redis_session=redis_session)
 
 
