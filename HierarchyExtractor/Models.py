@@ -332,7 +332,7 @@ class APIWrapperModel(FunctionModel):
     def set_api_name(self, api_name):
         self.redis_session.hset(self.model_id, b'api_name', api_name)
 
-    def get_api_name(self):
+    def get_api_name(self) -> bin:
         return self.redis_session.hget(self.model_id, b'api_name')
 
 
