@@ -336,7 +336,7 @@ class APIWrapperModel(FunctionModel):
         return self.redis_session.hget(self.model_id, b'api_name')
 
 
-def add_values_to_set(redis_session, key, values):
+def add_values_to_set(redis_session: redis.Redis, key, values):
     for value in values:
         redis_session.sadd(key, value)
 
