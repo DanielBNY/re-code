@@ -423,7 +423,7 @@ def get_model_id_set_by_addresses(addresses, model_name) -> Set[bin]:
     return models_ids
 
 
-def get_models_by_ids(redis_session, model_ids) -> List[NodeModel]:
+def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
     """
     redis_session: redis session
     model_ids: model ids
