@@ -359,7 +359,7 @@ class SpecialModels:
         self.redis_session.srem(self.key_name, address)
 
     def get_models(self, model_name: str) -> List[NodeModel]:
-        addresses = self.redis_session.smembers(self.key_name)
+        addresses = self.get_addresses()
         return get_models_by_addresses(addresses, self.redis_session, model_name)
 
 
