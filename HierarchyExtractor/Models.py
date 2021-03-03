@@ -412,7 +412,7 @@ def get_models_by_addresses(addresses, redis_session, model_name):
     return models
 
 
-def get_model_id_set_by_addresses(addresses, model_name):
+def get_model_id_set_by_addresses(addresses, model_name) -> Set[bin]:
     """
     addresses: a set of addresses
     model_name: function / file / folder
