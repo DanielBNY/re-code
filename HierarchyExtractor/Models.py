@@ -355,7 +355,7 @@ class SpecialModels:
         self.key_name = key_name
         self.redis_session = redis_session
 
-    def get_addresses(self) -> Set[bin]:
+    def get_functions_addresses(self) -> Set[bin]:
         return self.redis_session.smembers(self.key_name)
 
     def add_address(self, address: int):
@@ -367,9 +367,22 @@ class SpecialModels:
     def remove_address(self, address: int):
         self.redis_session.srem(self.key_name, address)
 
-    def get_models(self, model_name: str) -> List[NodeModel]:
-        addresses = self.get_addresses()
-        return get_models_by_addresses(addresses, self.redis_session, model_name)
+    def get_functions_models(self) -> List[FunctionModel]:
+        functions_addresses = self.get_functions_addresses()
+        return get_functions_by_addresses(functions_addresses=functions_addresses, redis_session=self.redis_session)
+
+    def get_files_models(self) -> List[FileModel]:
+        functions_addresses = self.get_functions_addresses()
+        return get_files_by_addresses(functions_addresses=functions_addresses, redis_session=self.redis_session)
+
+    def get_folders_models(self) -> List[FolderModel]:
+        functions_addresses = self.get_functions_addresses()
+        return get_folders_by_addresses(functions_addresses=functions_addresses, redis_session=self.redis_session)
+
+    def get_multiple_entries_functions(self) -> List[MultipleEntriesFunctionNode]:
+        functions_addresses = self.get_functions_addresses()
+        return get_multiple_entries_functions_by_addresses(functions_addresses=functions_addresses,
+                                                           redis_session=self.redis_session)
 
 
 class LonelyModels(SpecialModels):
@@ -402,23 +415,38 @@ class RetdecDetectedModels(SpecialModels):
         SpecialModels.__init__(self, key_name='retdec_detected:functions:addresses', redis_session=redis_session)
 
 
-def get_models_by_addresses(addresses, redis_session, model_name) -> List[NodeModel]:
-    """
-    addresses: a set of addresses
-    redis_session: redis session
-    model_name: multiple_entries_function / function / file / folder
-    """
-    models = []
-    for address in addresses:
-        if model_name == 'function':
-            models.append(FunctionModel(address=address, redis_session=redis_session))
-        elif model_name == 'file':
-            models.append(FileModel(contained_address=address, redis_session=redis_session))
-        elif model_name == 'folder':
-            models.append(FolderModel(contained_address=address, redis_session=redis_session))
-        elif model_name == 'multiple_entries_function':
-            models.append(MultipleEntriesFunctionNode(address=address, redis_session=redis_session))
-    return models
+def get_functions_by_addresses(functions_addresses, redis_session: redis.Redis) -> List[FunctionModel]:
+    functions_models = []
+    for address in functions_addresses:
+        functions_models.append(FunctionModel(address=address, redis_session=redis_session))
+    return functions_models
+
+
+def get_files_by_addresses(functions_addresses, redis_session: redis.Redis) -> List[FileModel]:
+    files_models = []
+    for address in functions_addresses:
+        function_model = FunctionModel(address=address, redis_session=redis_session)
+        file_model = function_model.get_parent_file_model()
+        files_models.append(file_model)
+    return files_models
+
+
+def get_folders_by_addresses(functions_addresses, redis_session: redis.Redis) -> List[FolderModel]:
+    folders_models = []
+    for address in functions_addresses:
+        function_model = FunctionModel(address=address, redis_session=redis_session)
+        folder_model = function_model.get_parent_file_model().get_parent_folder_model()
+        folders_models.append(folder_model)
+    return folders_models
+
+
+def get_multiple_entries_functions_by_addresses(functions_addresses, redis_session: redis.Redis) \
+        -> List[MultipleEntriesFunctionNode]:
+    multiple_entries_functions = []
+    for address in functions_addresses:
+        multiple_entries_function = MultipleEntriesFunctionNode(address=address, redis_session=redis_session)
+        multiple_entries_functions.append(multiple_entries_function)
+    return multiple_entries_functions
 
 
 def get_model_id_set_by_addresses(addresses, model_name) -> Set[bin]:
@@ -491,7 +519,7 @@ class MultipleNodesModels:
 
     def get_non_lonely_models(self) -> List[NodeModel]:
         model_ids = self.get_model_ids()
-        lonely_models_addresses = LonelyModels(redis_session=self.redis_session).get_addresses()
+        lonely_models_addresses = LonelyModels(redis_session=self.redis_session).get_functions_addresses()
         lonely_models_ids = get_model_id_set_by_addresses(addresses=lonely_models_addresses,
                                                           model_name=self.multiple_nodes_models_key)
         non_lonely_models_ids = model_ids - lonely_models_ids
