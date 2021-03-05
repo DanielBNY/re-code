@@ -470,14 +470,12 @@ class MultipleNodesModels:
     def is_member(self, model_id) -> bool:
         return self.redis_session.sismember(self.multiple_nodes_models_key, model_id)
 
-    def get_average_model_size(self) -> float:
-        nodes_models = self.get_models()
-        size_sum = 0
-        for node_model in nodes_models:
-            size_sum += node_model.get_size()
-        return size_sum / float(len(nodes_models))
+    def get_average_model_size(self):
+        nodes_models = self.get_node_models()
+        average_models_size = get_average_models_size(nodes_models)
+        return average_models_size
 
-    def get_models(self) -> List[NodeModel]:
+    def get_node_models(self) -> List[NodeModel]:
         model_ids = self.get_model_ids()
         nodes_models_list = get_models_by_ids(redis_session=self.redis_session, model_ids=model_ids)
         return nodes_models_list
@@ -506,6 +504,12 @@ class Folders(MultipleNodesModels):
                                                       redis_session=self.redis_session)
         return non_lonely_models
 
+    def get_models(self) -> List[FolderModel]:
+        folders_models_ids = self.get_model_ids()
+        folders_models = get_folders_models_by_ids(redis_session=self.redis_session,
+                                                   folders_models_ids=folders_models_ids)
+        return folders_models
+
 
 class Files(MultipleNodesModels):
     def __init__(self, redis_session):
@@ -521,15 +525,33 @@ class Files(MultipleNodesModels):
                                                     redis_session=self.redis_session)
         return non_lonely_models
 
+    def get_models(self) -> List[FileModel]:
+        files_models_ids = self.get_model_ids()
+        files_models = get_files_models_by_ids(files_models_ids=files_models_ids, redis_session=self.redis_session)
+        return files_models
+
 
 class Functions(MultipleNodesModels):
     def __init__(self, redis_session):
         MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
 
+    def get_models(self) -> List[FunctionModel]:
+        functions_models_ids = self.get_model_ids()
+        functions_models = get_functions_models_by_ids(functions_models_ids=functions_models_ids,
+                                                       redis_session=self.redis_session)
+        return functions_models
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 
 # Models Utils:
+
+def get_average_models_size(nodes_models: List[NodeModel]) -> float:
+    size_sum = 0
+    for node_model in nodes_models:
+        size_sum += node_model.get_size()
+    return size_sum / float(len(nodes_models))
+
 
 def get_functions_models_by_ids(functions_models_ids: Set[bin], redis_session: redis.Redis) -> List[FunctionModel]:
     function_models = []
