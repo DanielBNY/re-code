@@ -172,8 +172,11 @@ class FileModel(ClusteredNodes):
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_function_address
 
+    def get_parent_folder_id(self) -> bin:
+        return self.redis_session.hget(self.model_id, b'folder_id')
+
     def get_parent_folder_model(self):
-        return FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
+        return FolderModel(folder_id=self.get_parent_folder_id(), redis_session=self.redis_session)
 
     def add_init_file_info(self, size):
         """
