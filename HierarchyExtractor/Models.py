@@ -422,70 +422,6 @@ class RetdecDetectedModels(SpecialModels):
         SpecialModels.__init__(self, key_name='retdec_detected:functions:addresses', redis_session=redis_session)
 
 
-def get_files_models_by_ids(files_models_ids: Set[bin], redis_session: redis.Redis) -> List[FileModel]:
-    files_models = []
-    for file_id in files_models_ids:
-        files_models.append(FileModel(redis_session=redis_session, file_id=file_id))
-    return files_models
-
-
-def get_folders_models_by_ids(folders_models_ids: Set[bin], redis_session: redis.Redis) -> List[FolderModel]:
-    folders_models = []
-    for folder_id in folders_models_ids:
-        folders_models.append(FolderModel(redis_session=redis_session, folder_id=folder_id))
-    return folders_models
-
-
-def get_functions_by_addresses(functions_addresses, redis_session: redis.Redis) -> List[FunctionModel]:
-    functions_models = []
-    for address in functions_addresses:
-        functions_models.append(FunctionModel(address=address, redis_session=redis_session))
-    return functions_models
-
-
-def get_files_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
-    files_models_ids = set()
-    for address in functions_addresses:
-        function_model = FunctionModel(address=address, redis_session=redis_session)
-        file_model_id = function_model.get_parent_file_model().model_id
-        files_models_ids.add(file_model_id)
-    return files_models_ids
-
-
-def get_folders_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
-    folders_models_ids = set()
-    for address in functions_addresses:
-        function_model = FunctionModel(address=address, redis_session=redis_session)
-        folder_model_id = function_model.get_parent_file_model().get_parent_folder_model().model_id
-        folders_models_ids.add(folder_model_id)
-    return folders_models_ids
-
-
-def get_multiple_entries_functions_by_addresses(functions_addresses, redis_session: redis.Redis) \
-        -> List[MultipleEntriesFunctionNode]:
-    multiple_entries_functions = []
-    for address in functions_addresses:
-        multiple_entries_function = MultipleEntriesFunctionNode(address=address, redis_session=redis_session)
-        multiple_entries_functions.append(multiple_entries_function)
-    return multiple_entries_functions
-
-
-def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
-    """
-    redis_session: redis session
-    model_ids: model ids
-    """
-    models = []
-    for model_id in model_ids:
-        if b'function' in model_id:
-            models.append(FunctionModel(function_id=model_id, redis_session=redis_session))
-        elif b'file' in model_id:
-            models.append(FileModel(file_id=model_id, redis_session=redis_session))
-        elif b'folder' in model_id:
-            models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
-    return models
-
-
 class ApiWrappers:
     def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
@@ -564,3 +500,80 @@ class Files(MultipleNodesModels):
 class Functions(MultipleNodesModels):
     def __init__(self, redis_session):
         MultipleNodesModels.__init__(self, redis_session=redis_session, multiple_node_models_key=b'function')
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+# Models Utils:
+
+def get_functions_models_by_ids(functions_models_ids: Set[bin], redis_session: redis.Redis) -> List[FunctionModel]:
+    function_models = []
+    for function_id in functions_models_ids:
+        function_models.append(FunctionModel(redis_session=redis_session, function_id=function_id))
+    return function_models
+
+
+def get_files_models_by_ids(files_models_ids: Set[bin], redis_session: redis.Redis) -> List[FileModel]:
+    files_models = []
+    for file_id in files_models_ids:
+        files_models.append(FileModel(redis_session=redis_session, file_id=file_id))
+    return files_models
+
+
+def get_folders_models_by_ids(folders_models_ids: Set[bin], redis_session: redis.Redis) -> List[FolderModel]:
+    folders_models = []
+    for folder_id in folders_models_ids:
+        folders_models.append(FolderModel(redis_session=redis_session, folder_id=folder_id))
+    return folders_models
+
+
+def get_functions_by_addresses(functions_addresses, redis_session: redis.Redis) -> List[FunctionModel]:
+    functions_models = []
+    for address in functions_addresses:
+        functions_models.append(FunctionModel(address=address, redis_session=redis_session))
+    return functions_models
+
+
+def get_files_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
+    files_models_ids = set()
+    for address in functions_addresses:
+        function_model = FunctionModel(address=address, redis_session=redis_session)
+        file_model_id = function_model.get_parent_file_model().model_id
+        files_models_ids.add(file_model_id)
+    return files_models_ids
+
+
+def get_folders_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
+    folders_models_ids = set()
+    for address in functions_addresses:
+        function_model = FunctionModel(address=address, redis_session=redis_session)
+        folder_model_id = function_model.get_parent_file_model().get_parent_folder_model().model_id
+        folders_models_ids.add(folder_model_id)
+    return folders_models_ids
+
+
+def get_multiple_entries_functions_by_addresses(functions_addresses, redis_session: redis.Redis) \
+        -> List[MultipleEntriesFunctionNode]:
+    multiple_entries_functions = []
+    for address in functions_addresses:
+        multiple_entries_function = MultipleEntriesFunctionNode(address=address, redis_session=redis_session)
+        multiple_entries_functions.append(multiple_entries_function)
+    return multiple_entries_functions
+
+
+def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
+    """
+    redis_session: redis session
+    model_ids: model ids
+    """
+    models = []
+    for model_id in model_ids:
+        if b'function' in model_id:
+            models.append(FunctionModel(function_id=model_id, redis_session=redis_session))
+        elif b'file' in model_id:
+            models.append(FileModel(file_id=model_id, redis_session=redis_session))
+        elif b'folder' in model_id:
+            models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
+    return models
+
+# ---------------------------------------------------------------------------------------------------------------------
