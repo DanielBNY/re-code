@@ -470,17 +470,6 @@ def get_multiple_entries_functions_by_addresses(functions_addresses, redis_sessi
     return multiple_entries_functions
 
 
-def get_model_id_set_by_addresses(addresses, model_name) -> Set[bin]:
-    """
-    addresses: a set of addresses
-    model_name: function / file / folder
-    """
-    models_ids = set()
-    for address in addresses:
-        models_ids.add(model_name + b':' + address)
-    return models_ids
-
-
 def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
     """
     redis_session: redis session
