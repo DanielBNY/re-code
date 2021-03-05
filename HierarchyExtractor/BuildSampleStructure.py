@@ -10,7 +10,7 @@ class BuildSampleStructure:
         self.redis_session = redis_session
 
     def run(self):
-        entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_models('folder')
+        entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_folders_models()
         self.create_folders_in_path(self.destination_sample, entry_folders_models)
         folders_to_revisit = entry_folders_models
         while folders_to_revisit:
@@ -20,7 +20,7 @@ class BuildSampleStructure:
         self.create_lonely_functions_file()
 
     def create_lonely_functions_file(self):
-        lonely_files_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='file')
+        lonely_files_models = LonelyModels(redis_session=self.redis_session).get_files_models()
         self.write_files_to_file(files_models=lonely_files_models,
                                  file_path=self.destination_sample + b'/lonely_file')
 

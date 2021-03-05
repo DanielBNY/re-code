@@ -10,8 +10,8 @@ class CallTreeExtractor:
         self.redis_session = redis_session
 
     def run(self):
-        function_entries_models = EntryModels(self.redis_session).get_models('function') + \
-                               MultipleEntriesModels(self.redis_session).get_models('function')
+        function_entries_models = EntryModels(self.redis_session).get_functions_models() + \
+                               MultipleEntriesModels(self.redis_session).get_functions_models()
         for function_entry_model in function_entries_models:
             function_entry_model.set_tree_head_function_model_id(function_entry_model.model_id)
             self.extract_tree_from_entry(tree_head_model=function_entry_model)

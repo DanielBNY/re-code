@@ -111,7 +111,7 @@ class FunctionsGraphExtractor:
                 LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_function_address)
 
     def import_calls_for_lonely_functions(self):
-        lonely_function_models = LonelyModels(redis_session=self.redis_session).get_models(model_name='function')
+        lonely_function_models = LonelyModels(redis_session=self.redis_session).get_functions_models()
         for lonely_function in lonely_function_models:
             self.import_calls_from_code(function_model=lonely_function)
 

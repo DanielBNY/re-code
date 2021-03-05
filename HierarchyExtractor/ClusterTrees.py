@@ -12,8 +12,7 @@ class ClusterTrees:
         self.set_trees_entries_points()
 
     def set_trees_heads_sets_and_sorted_set(self):
-        multiple_entries_models = MultipleEntriesModels(redis_session=self.redis_session).get_models(
-            model_name='multiple_entries_function')
+        multiple_entries_models = MultipleEntriesModels(redis_session=self.redis_session).get_multiple_entries_functions()
         for multiple_entries_model in multiple_entries_models:
             self.set_trees_heads_set(multiple_entries_model)
             MultipleEntriesSortedSet(redis_session=self.redis_session). \
