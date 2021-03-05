@@ -264,8 +264,11 @@ class FunctionModel(NodeModel):
     def get_function_code(self):
         return self.redis_session.hget(self.model_id, b'decompiled_code')
 
-    def get_parent_file_model(self):
-        return FileModel(file_id=self.file_id, redis_session=self.redis_session)
+    def get_parent_file_id(self) -> bin:
+        return self.redis_session.hget(self.model_id, b'file_id')
+
+    def get_parent_file_model(self) -> FileModel:
+        return FileModel(file_id=self.get_parent_file_id(), redis_session=self.redis_session)
 
     def add_init_function_info(self, size):
         """
