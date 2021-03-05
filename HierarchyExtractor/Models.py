@@ -123,6 +123,12 @@ class FolderModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=folder_id)
 
+    def get_contained_files_models(self):
+        contained_files_models_ids = self.get_contained_nodes_ids()
+        contained_files_models = get_files_models_by_ids(files_models_ids=contained_files_models_ids,
+                                                         redis_session=self.redis_session)
+        return contained_files_models
+
     def get_sons_models(self):
         call_out_models_ids = self.get_call_out_models_ids()
         node_model = []
@@ -174,6 +180,12 @@ class FileModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_function_address
+
+    def get_contained_functions_models(self):
+        contained_functions_models_ids = self.get_contained_nodes_ids()
+        contained_functions_models = get_functions_models_by_ids(functions_models_ids=contained_functions_models_ids,
+                                                                 redis_session=self.redis_session)
+        return contained_functions_models
 
     def get_parent_folder_id(self) -> bin:
         return self.redis_session.hget(self.model_id, b'folder_id')
