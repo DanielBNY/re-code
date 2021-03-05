@@ -57,6 +57,9 @@ class NodeModel:
         call_in_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_in_functions_ids)
         return call_in_models
 
+    def delete_model(self):
+        self.redis_session.delete(self.model_id)
+
 
 class ClusteredNodes(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
