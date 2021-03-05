@@ -225,9 +225,9 @@ class FileModel(ClusteredNodes):
         self.redis_session.delete(self.calls_in_set_id)
         self.redis_session.delete(self.contained_nodes_set_id)
         Files(redis_session=self.redis_session).remove_model_id(self.model_id)
-        self.delete_model()
         father_folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
         father_folder_model.remove_contained_file(self.model_id)
+        self.delete_model()
 
     def recursion_cluster(self, model_to_cluster):
         folder_model = FolderModel(folder_id=self.folder_id, redis_session=self.redis_session)
