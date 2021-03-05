@@ -43,8 +43,7 @@ class BuildSampleStructure:
         for folder in folder_models:
             if folder.get_folders_path():
                 full_path = folder.get_folders_path() + b'/' + folder.model_id
-                contained_files_ids = folder.get_contained_nodes_ids()
-                files_models = get_models_by_ids(model_ids=contained_files_ids, redis_session=self.redis_session)
+                files_models = folder.get_contained_files_models()
                 self.set_files_paths(path=full_path, models=files_models)
 
     @staticmethod
@@ -57,8 +56,7 @@ class BuildSampleStructure:
         for file_model in files_models:
             if file_model.get_folders_path():
                 file_path = file_model.get_folders_path() + b'/' + file_model.model_id
-                functions_models = get_models_by_ids(model_ids=file_model.get_contained_nodes_ids(),
-                                                     redis_session=self.redis_session)
+                functions_models = file_model.get_contained_functions_models()
                 self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 
     def write_function_to_file(self, functions_models, file_path):
@@ -75,8 +73,7 @@ class BuildSampleStructure:
     def write_files_to_file(self, files_models, file_path):
         file_code = b''
         for file_model in files_models:
-            functions_models = get_models_by_ids(redis_session=self.redis_session,
-                                                 model_ids=file_model.get_contained_nodes_ids())
+            functions_models = file_model.get_contained_functions_models()
             for function in functions_models:
                 self.replace_wrapped_functions(function)
                 function_code = function.get_function_code()
