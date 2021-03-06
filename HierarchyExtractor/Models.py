@@ -268,7 +268,6 @@ class FunctionModel(NodeModel):
         NodeModel.__init__(self, model_name=b'function', redis_session=redis_session,
                            contained_address=address,
                            model_id=function_id)
-        self.file_id = b'file:' + self.contained_function_address
 
     def get_call_in_functions(self):
         call_in_functions_ids = self.get_call_in_models_ids()
@@ -314,22 +313,23 @@ class FunctionModel(NodeModel):
     def get_parent_file_model(self) -> FileModel:
         return FileModel(file_id=self.get_parent_file_id(), redis_session=self.redis_session)
 
-    def add_init_function_info(self, size):
+    def add_init_function_info(self, size, first_file_id):
         """
         Saves to the DB the initialized function metadata: size of the function, the id for the functions calls out set,
         the id for the functions calls in set, file id and contained address.
         Add the function id to the set of functions ids in the DB.
         """
         self.basic_init_save(size=size)
-        self.redis_session.hset(self.model_id, b'file_id', self.file_id)
+        self.redis_session.hset(self.model_id, b'file_id', first_file_id)
         Functions(self.redis_session).add_model_id(self.model_id)
 
     def recursion_init(self, size):
         """
         Init the function metadata and initialize files nodes.
         """
-        self.add_init_function_info(size)
-        file_repo_actions = FileModel(file_id=self.file_id, redis_session=self.redis_session)
+        first_file_id = b'file:' + self.contained_function_address
+        self.add_init_function_info(size, first_file_id)
+        file_repo_actions = FileModel(file_id=first_file_id, redis_session=self.redis_session)
         file_repo_actions.recursion_init(size)
 
     def add_function_edge(self, called_function_model):
