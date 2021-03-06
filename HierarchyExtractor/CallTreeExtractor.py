@@ -1,4 +1,4 @@
-from Models import FileModel, FunctionModel, EntryModels, MultipleEntriesModels, ClusteredNodes, NodeModel
+from Models import FileModel, FunctionModel, EntryModels, MultipleEntriesModels, TreeNodeModel, NodeModel
 
 
 class CallTreeExtractor:

@@ -51,7 +51,7 @@ class NodeModel:
         self.redis_session.delete(self.model_id)
 
 
-class ClusteredNodes(NodeModel):
+class TreeNodeModel(NodeModel):
     def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
         NodeModel.__init__(self, model_name, redis_session=redis_session, contained_address=contained_address,
                            model_id=model_id)
@@ -107,11 +107,11 @@ class ClusteredNodes(NodeModel):
             call_in_model.change_edge_target(last_target_node=merging_node, new_target_node=self)
 
 
-class FolderModel(ClusteredNodes):
+class FolderModel(TreeNodeModel):
     def __init__(self, redis_session=None, contained_address=None, folder_id=None):
-        ClusteredNodes.__init__(self, model_name=b'folder', redis_session=redis_session,
-                                contained_address=contained_address,
-                                model_id=folder_id)
+        TreeNodeModel.__init__(self, model_name=b'folder', redis_session=redis_session,
+                               contained_address=contained_address,
+                               model_id=folder_id)
 
     def get_call_in_folders(self):
         call_in_folders_ids = self.get_call_in_models_ids()
@@ -176,11 +176,11 @@ class FolderModel(ClusteredNodes):
         self.cluster(model_to_cluster)
 
 
-class FileModel(ClusteredNodes):
+class FileModel(TreeNodeModel):
     def __init__(self, redis_session=None, contained_address=None, file_id=None):
-        ClusteredNodes.__init__(self, model_name=b'file', redis_session=redis_session,
-                                contained_address=contained_address,
-                                model_id=file_id)
+        TreeNodeModel.__init__(self, model_name=b'file', redis_session=redis_session,
+                               contained_address=contained_address,
+                               model_id=file_id)
         self.folder_id = b'folder:' + self.contained_function_address
 
     def get_call_in_files(self):

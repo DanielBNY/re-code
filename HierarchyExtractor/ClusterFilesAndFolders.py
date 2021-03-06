@@ -1,4 +1,4 @@
-from Models import Files, TreesEntriesFunctionsAddresses, get_models_by_ids, ClusteredNodes
+from Models import Files, TreesEntriesFunctionsAddresses, get_models_by_ids, TreeNodeModel
 from collections.abc import Sequence
 
 
@@ -37,7 +37,7 @@ class ClusterFilesAndFolders:
                 neighbors_to_revisit += returned_merged_nodes
         return neighbors_to_revisit
 
-    def get_merged_nodes(self, father_node: ClusteredNodes, max_node_size):
+    def get_merged_nodes(self, father_node: TreeNodeModel, max_node_size):
         model_ids = father_node.get_call_out_models_ids()
         sons_models = get_models_by_ids(model_ids=model_ids, redis_session=self.redis_session)
         sum_of_sons = father_node.get_sum_of_sons()
