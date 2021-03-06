@@ -217,8 +217,6 @@ class FileModel(TreeNodeModel):
         self.redis_session.hset(self.model_id, b'contained_functions_set_id', self.contained_nodes_set_id)
         self.redis_session.hset(self.model_id, b'folder_id', first_folder_id)
         Files(self.redis_session).add_model_id(self.model_id)
-        self.redis_session.sadd(self.contained_nodes_set_id,
-                                FunctionModel(address=self.contained_function_address).model_id)
 
     def recursion_init(self, size):
         """
@@ -329,8 +327,12 @@ class FunctionModel(NodeModel):
         """
         first_file_id = b'file:' + self.contained_function_address
         self.add_init_function_info(size, first_file_id)
-        file_repo_actions = FileModel(file_id=first_file_id, redis_session=self.redis_session)
-        file_repo_actions.recursion_init(size)
+        first_file_model = FileModel(file_id=first_file_id, redis_session=self.redis_session)
+        first_file_model.recursion_init(size)
+        self.add_function_id_to_file_contained_functions(first_file_model=first_file_model)
+
+    def add_function_id_to_file_contained_functions(self, first_file_model: FileModel):
+        self.redis_session.sadd(first_file_model.contained_nodes_set_id, self.model_id)
 
     def add_function_edge(self, called_function_model):
         """
