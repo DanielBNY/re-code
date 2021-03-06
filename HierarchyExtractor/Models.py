@@ -5,14 +5,10 @@ from typing import Set, List, Union
 
 
 class NodeModel:
-    def __init__(self, redis_session: redis.Redis, model_name=None, contained_address=None, model_id=None):
+    def __init__(self, redis_session: redis.Redis, model_id):
         self.redis_session = redis_session
-        if model_id:
-            self.model_id = model_id
-            self.contained_function_address = model_id.split(b':')[1]
-        elif contained_address and model_name:
-            self.model_id = model_name + b':' + contained_address
-            self.contained_function_address = contained_address
+        self.model_id = model_id
+        self.contained_function_address = model_id.split(b':')[1]
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
 
@@ -250,9 +246,10 @@ class FileModel(TreeNodeModel):
 
 class FunctionModel(NodeModel):
     def __init__(self, redis_session: redis.Redis, address=None, function_id=None):
-        NodeModel.__init__(self, model_name=b'function', redis_session=redis_session,
-                           contained_address=address,
-                           model_id=function_id)
+        model_id = function_id
+        if address:
+            model_id = b'function:' + address
+        NodeModel.__init__(self, redis_session=redis_session, model_id=model_id)
 
     def get_call_in_functions(self):
         call_in_functions_ids = self.get_call_in_models_ids()
