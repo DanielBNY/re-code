@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import redis
 from typing import Set, List
 
@@ -52,10 +54,8 @@ class NodeModel:
 
 
 class TreeNodeModel(NodeModel):
-    def __init__(self, redis_session: redis.Redis, model_name, contained_address=None, model_id=None):
-        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name,
-                           contained_address=contained_address,
-                           model_id=model_id)
+    def __init__(self, redis_session: redis.Redis, model_name, model_id):
+        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name, model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
     def set_folders_path(self, folders_path):
@@ -109,10 +109,8 @@ class TreeNodeModel(NodeModel):
 
 
 class FolderModel(TreeNodeModel):
-    def __init__(self, redis_session: redis.Redis, contained_address=None, folder_id=None):
-        TreeNodeModel.__init__(self, model_name=b'folder', redis_session=redis_session,
-                               contained_address=contained_address,
-                               model_id=folder_id)
+    def __init__(self, redis_session: redis.Redis, folder_id):
+        TreeNodeModel.__init__(self, model_name=b'folder', redis_session=redis_session, model_id=folder_id)
 
     def get_call_in_folders(self):
         call_in_folders_ids = self.get_call_in_models_ids()
@@ -176,10 +174,8 @@ class FolderModel(TreeNodeModel):
 
 
 class FileModel(TreeNodeModel):
-    def __init__(self, redis_session: redis.Redis, contained_address=None, file_id=None):
-        TreeNodeModel.__init__(self, model_name=b'file', redis_session=redis_session,
-                               contained_address=contained_address,
-                               model_id=file_id)
+    def __init__(self, redis_session: redis.Redis, file_id):
+        TreeNodeModel.__init__(self, model_name=b'file', redis_session=redis_session, model_id=file_id)
 
     def get_call_in_files(self):
         call_in_files_ids = self.get_call_in_models_ids()
@@ -248,12 +244,11 @@ class FileModel(TreeNodeModel):
         father_folder_model.remove_contained_file(self.model_id)
         self.delete_model()
 
-    def recursion_cluster(self, model_to_cluster):
-        folder_model = FolderModel(folder_id=self.get_parent_folder_id(), redis_session=self.redis_session)
-        folder_to_cluster = FolderModel(contained_address=model_to_cluster.contained_function_address,
-                                        redis_session=self.redis_session)
-        self.cluster(model_to_cluster)
-        folder_model.cluster(folder_to_cluster)
+    def recursion_cluster(self, file_to_cluster: FileModel):
+        current_folder_model = self.get_parent_folder_model()
+        folder_to_cluster = file_to_cluster.get_parent_folder_model()
+        self.cluster(file_to_cluster)
+        current_folder_model.cluster(folder_to_cluster)
 
 
 class FunctionModel(NodeModel):

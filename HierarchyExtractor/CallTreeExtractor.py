@@ -33,8 +33,7 @@ class CallTreeExtractor:
         for called_function_model in functions_calls_out_models:
             called_file_model = called_function_model.get_parent_file_model()
             file_calls_in_models = called_file_model.get_call_in_files()
-            origin_file_repo = FileModel(contained_address=origin_function_model.contained_function_address,
-                                         redis_session=self.redis_session)
+            origin_file_repo = origin_function_model.get_parent_file_model()
             if not bool(file_calls_in_models) and not called_file_model.is_multiple_entries_models():
                 origin_file_repo.recursion_add_edge(called_file_model)
                 called_function_model.set_tree_head_function_model_id(tree_head_model.model_id)
