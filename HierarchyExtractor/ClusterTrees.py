@@ -12,7 +12,8 @@ class ClusterTrees:
         self.set_trees_entries_points()
 
     def set_trees_heads_sets_and_sorted_set(self):
-        multiple_entries_models = MultipleEntriesModels(redis_session=self.redis_session).get_multiple_entries_functions()
+        multiple_entries_models = MultipleEntriesModels(
+            redis_session=self.redis_session).get_multiple_entries_functions()
         for multiple_entries_model in multiple_entries_models:
             self.set_trees_heads_set(multiple_entries_model)
             MultipleEntriesSortedSet(redis_session=self.redis_session). \
@@ -58,8 +59,7 @@ class ClusterTrees:
         called_function_models = multiple_entries_model.get_call_in_functions()
         first_called_function = called_function_models[0]
         first_called_file = first_called_function.get_parent_file_model()
-        first_called_file.recursion_add_edge(
-            called_function_address=multiple_entries_file_model.contained_function_address)
+        first_called_file.recursion_add_edge(called_file_model=multiple_entries_file_model)
 
     def connect_multiple_trees_with_multiple_entries_node(self, function_call_in_trees_heads_models,
                                                           multiple_entries_file_model: FileModel):
@@ -67,8 +67,7 @@ class ClusterTrees:
             parent_file_model = function_model.get_parent_file_model()
             last_father_file_model = self.get_tree_head(file_model=parent_file_model)
             if multiple_entries_file_model.model_id != last_father_file_model.model_id:
-                multiple_entries_file_model.recursion_add_edge(
-                    called_function_address=last_father_file_model.contained_function_address)
+                multiple_entries_file_model.recursion_add_edge(called_file_model=last_father_file_model)
 
     @staticmethod
     def get_tree_head(file_model: FileModel):

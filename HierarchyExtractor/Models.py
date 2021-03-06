@@ -162,12 +162,12 @@ class FolderModel(TreeNodeModel):
     def recursion_init(self, size):
         self.add_init_folder_info(size)
 
-    def add_folder_edge(self, called_function_address):
+    def add_folder_edge(self, called_file_model):
         """
         Add to the calls out set the called folder id,
         Add to the calls in set of the called folder the calling folder id.
         """
-        called_folder_model = FolderModel(contained_address=called_function_address)
+        called_folder_model = called_file_model.get_parent_folder_model()
         self.add_edge(called_folder_model)
 
     def recursion_cluster(self, model_to_cluster):
@@ -229,22 +229,14 @@ class FileModel(TreeNodeModel):
     def add_file_id_to_folder_contained_files(self, folder_model: FolderModel):
         self.redis_session.sadd(folder_model.contained_nodes_set_id, self.model_id)
 
-    def add_file_edge(self, called_function_address):
-        """
-        Add to the calls out set the called file id,
-        Add to the calls in set of the called file the calling file id.
-        """
-        called_file_model = FileModel(contained_address=called_function_address)
-        self.add_edge(called_file_model)
-
-    def recursion_add_edge(self, called_function_address):
+    def recursion_add_edge(self, called_file_model):
         """
         Add edge to the called file and call add edge for folder
         The edged contained in the files relations need to exist inside the folder relations
         """
-        self.add_file_edge(called_function_address)
+        self.add_edge(called_file_model)
         folder_model = FolderModel(folder_id=self.get_parent_folder_id(), redis_session=self.redis_session)
-        folder_model.add_folder_edge(called_function_address=called_function_address)
+        folder_model.add_folder_edge(called_file_model=called_file_model)
 
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
