@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import redis
-from typing import Set, List
+from typing import Set, List, Union
 
 
 class NodeModel:
@@ -97,13 +97,13 @@ class TreeNodeModel(NodeModel):
         removing references to the old node and replacing them with references to the new node
         """
         call_out_models_ids = self.get_call_out_models_ids()
-        call_out_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_out_models_ids)
+        call_out_models = get_tree_models_by_ids(redis_session=self.redis_session, model_ids=call_out_models_ids)
         for call_out_model in call_out_models:
             merging_node.remove_edge(call_out_model)
             self.add_edge(call_out_model)
 
         call_in_models_ids = self.get_call_in_models_ids()
-        call_in_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_in_models_ids)
+        call_in_models = get_tree_models_by_ids(redis_session=self.redis_session, model_ids=call_in_models_ids)
         for call_in_model in call_in_models:
             call_in_model.change_edge_target(last_target_node=merging_node, new_target_node=self)
 
@@ -622,19 +622,12 @@ def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bin]) -> 
     return node_models
 
 
-def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
-    """
-    redis_session: redis session
-    model_ids: model ids
-    """
-    models = []
+def get_tree_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[Union[FileModel, FolderModel]]:
+    tree_models = []
     for model_id in model_ids:
-        if b'function' in model_id:
-            models.append(FunctionModel(function_id=model_id, redis_session=redis_session))
-        elif b'file' in model_id:
-            models.append(FileModel(file_id=model_id, redis_session=redis_session))
+        if b'file' in model_id:
+            tree_models.append(FileModel(file_id=model_id, redis_session=redis_session))
         elif b'folder' in model_id:
-            models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
-    return models
-
+            tree_models.append(FolderModel(folder_id=model_id, redis_session=redis_session))
+    return tree_models
 # ---------------------------------------------------------------------------------------------------------------------

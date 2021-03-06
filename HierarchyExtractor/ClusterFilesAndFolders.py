@@ -1,4 +1,4 @@
-from Models import Files, TreesEntriesFunctionsAddresses, get_models_by_ids
+from Models import Files, TreesEntriesFunctionsAddresses, get_tree_models_by_ids
 from Models import FileModel, FolderModel
 from typing import Union, List
 import redis
@@ -42,7 +42,7 @@ class ClusterFilesAndFolders:
     def get_merged_nodes(self, father_node: Union[FileModel, FolderModel], max_node_size: int) \
             -> List[Union[FileModel, FolderModel]]:
         model_ids = father_node.get_call_out_models_ids()
-        sons_models = get_models_by_ids(model_ids=model_ids, redis_session=self.redis_session)
+        sons_models = get_tree_models_by_ids(model_ids=model_ids, redis_session=self.redis_session)
         sum_of_sons = father_node.get_sum_of_sons()
         if not sons_models:
             return []

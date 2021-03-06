@@ -1,4 +1,4 @@
-from Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, get_models_by_ids, \
+from Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, \
     FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
 
 
