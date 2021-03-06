@@ -257,7 +257,7 @@ class FunctionModel(NodeModel):
                                                        functions_models_ids=call_in_functions_ids)
         return call_in_function
 
-    def get_call_out_models(self):
+    def get_call_out_models(self) -> List[FunctionModel]:
         call_out_functions_ids = self.get_call_out_models_ids()
         call_out_functions_models = get_functions_models_by_ids(functions_models_ids=call_out_functions_ids,
                                                                 redis_session=self.redis_session)
@@ -266,10 +266,10 @@ class FunctionModel(NodeModel):
     def set_tree_head_function_model_id(self, tree_head_model_id):
         self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
 
-    def get_tree_head_function_model_id(self):
+    def get_tree_head_function_model_id(self) -> bin:
         return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
-    def is_api_wrapper(self):
+    def is_api_wrapper(self) -> bool:
         return bool(APIWrapperModel(redis_session=self.redis_session, function_id=self.model_id).get_api_name())
 
     def set_function_code(self, decompiled_code):
@@ -278,7 +278,7 @@ class FunctionModel(NodeModel):
     def set_called_function_wrapper(self, function_model_id: bin):
         self.redis_session.sadd(self.model_id + b':called_function_wrapper', function_model_id)
 
-    def get_called_functions_wrapper(self):
+    def get_called_functions_wrapper(self) -> List[FunctionModel]:
         called_functions_ids = self.redis_session.smembers(self.model_id + b':called_function_wrapper')
         called_functions_models = []
         for function_model_id in called_functions_ids:
