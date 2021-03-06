@@ -53,7 +53,8 @@ class NodeModel:
 
 class TreeNodeModel(NodeModel):
     def __init__(self, redis_session: redis.Redis, model_name, contained_address=None, model_id=None):
-        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name, contained_address=contained_address,
+        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name,
+                           contained_address=contained_address,
                            model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
@@ -280,7 +281,7 @@ class FunctionModel(NodeModel):
         return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
     def is_api_wrapper(self):
-        return bool(APIWrapperModel(self).get_api_name())
+        return bool(APIWrapperModel(redis_session=self.redis_session, function_id=self.model_id).get_api_name())
 
     def set_function_code(self, decompiled_code):
         self.redis_session.hset(self.model_id, b'decompiled_code', decompiled_code)
