@@ -3,7 +3,7 @@ from typing import Set, List
 
 
 class NodeModel:
-    def __init__(self, model_name=None, redis_session=None, contained_address=None, model_id=None):
+    def __init__(self, redis_session: redis.Redis, model_name=None, contained_address=None, model_id=None):
         self.redis_session = redis_session
         if model_id:
             self.model_id = model_id
@@ -52,8 +52,8 @@ class NodeModel:
 
 
 class TreeNodeModel(NodeModel):
-    def __init__(self, model_name, redis_session=None, contained_address=None, model_id=None):
-        NodeModel.__init__(self, model_name, redis_session=redis_session, contained_address=contained_address,
+    def __init__(self, redis_session: redis.Redis, model_name, contained_address=None, model_id=None):
+        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name, contained_address=contained_address,
                            model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
@@ -108,7 +108,7 @@ class TreeNodeModel(NodeModel):
 
 
 class FolderModel(TreeNodeModel):
-    def __init__(self, redis_session=None, contained_address=None, folder_id=None):
+    def __init__(self, redis_session: redis.Redis, contained_address=None, folder_id=None):
         TreeNodeModel.__init__(self, model_name=b'folder', redis_session=redis_session,
                                contained_address=contained_address,
                                model_id=folder_id)
@@ -175,7 +175,7 @@ class FolderModel(TreeNodeModel):
 
 
 class FileModel(TreeNodeModel):
-    def __init__(self, redis_session=None, contained_address=None, file_id=None):
+    def __init__(self, redis_session: redis.Redis, contained_address=None, file_id=None):
         TreeNodeModel.__init__(self, model_name=b'file', redis_session=redis_session,
                                contained_address=contained_address,
                                model_id=file_id)
@@ -256,7 +256,7 @@ class FileModel(TreeNodeModel):
 
 
 class FunctionModel(NodeModel):
-    def __init__(self, redis_session=None, address=None, function_id=None):
+    def __init__(self, redis_session: redis.Redis, address=None, function_id=None):
         NodeModel.__init__(self, model_name=b'function', redis_session=redis_session,
                            contained_address=address,
                            model_id=function_id)
@@ -337,7 +337,7 @@ class FunctionModel(NodeModel):
 
 
 class MultipleEntriesFunctionNode(FunctionModel):
-    def __init__(self, redis_session=None, address=None, function_id=None):
+    def __init__(self, redis_session: redis.Redis, address=None, function_id=None):
         FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
 
     def add_called_tree_head_function_models_id(self, tree_head_function_models_id):
@@ -375,7 +375,7 @@ class MultipleEntriesSortedSet:
 
 
 class APIWrapperModel(FunctionModel):
-    def __init__(self, redis_session=None, address=None, function_id=None):
+    def __init__(self, redis_session: redis.Redis, address=None, function_id=None):
         FunctionModel.__init__(self, redis_session=redis_session, address=address, function_id=function_id)
 
     def set_api_name(self, api_name):
