@@ -471,14 +471,10 @@ class MultipleNodesModels:
         return self.redis_session.sismember(self.multiple_nodes_models_key, model_id)
 
     def get_average_model_size(self):
-        nodes_models = self.get_node_models()
-        average_models_size = get_average_models_size(nodes_models)
+        models_ids = self.get_model_ids()
+        nodes_models = get_node_models_by_ids(redis_session=self.redis_session, models_ids=models_ids)
+        average_models_size = get_average_models_size(nodes_models=nodes_models)
         return average_models_size
-
-    def get_node_models(self) -> List[NodeModel]:
-        model_ids = self.get_model_ids()
-        nodes_models_list = get_models_by_ids(redis_session=self.redis_session, model_ids=model_ids)
-        return nodes_models_list
 
     def get_model_ids(self) -> Set[bin]:
         return self.redis_session.smembers(self.multiple_nodes_models_key)
@@ -606,6 +602,13 @@ def get_multiple_entries_functions_by_addresses(functions_addresses, redis_sessi
         multiple_entries_function = MultipleEntriesFunctionNode(address=address, redis_session=redis_session)
         multiple_entries_functions.append(multiple_entries_function)
     return multiple_entries_functions
+
+
+def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bin]) -> List[NodeModel]:
+    node_models = []
+    for model_id in models_ids:
+        node_models.append(NodeModel(model_id=model_id, redis_session=redis_session))
+    return node_models
 
 
 def get_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[NodeModel]:
