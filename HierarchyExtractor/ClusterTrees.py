@@ -37,9 +37,7 @@ class ClusterTrees:
         for multiple_entries_model_id in sorted_multiple_entries_model_ids:
             multiple_entries_model = MultipleEntriesFunctionNode(redis_session=self.redis_session,
                                                                  function_id=multiple_entries_model_id)
-            function_call_in_trees_heads_ids = multiple_entries_model.get_call_in_trees_heads_ids()
-            function_call_in_trees_heads_models = get_models_by_ids(model_ids=function_call_in_trees_heads_ids,
-                                                                    redis_session=self.redis_session)
+            function_call_in_trees_heads_models = multiple_entries_model.get_call_in_functions_trees_heads()
             self.connect_trees(function_call_in_trees_heads_models=function_call_in_trees_heads_models,
                                multiple_entries_model=multiple_entries_model)
 

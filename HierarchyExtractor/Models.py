@@ -337,6 +337,12 @@ class MultipleEntriesFunctionNode(FunctionModel):
     def get_call_in_trees_heads_ids(self):
         return self.redis_session.smembers(self.model_id + b':tree_head_function_models_ids')
 
+    def get_call_in_functions_trees_heads(self) -> List[FunctionModel]:
+        functions_ids = self.get_call_in_trees_heads_ids()
+        functions_models = get_functions_models_by_ids(functions_models_ids=functions_ids,
+                                                       redis_session=self.redis_session)
+        return functions_models
+
     def get_number_of_call_in_trees(self):
         return self.redis_session.scard(self.model_id + b':tree_head_function_models_ids')
 
