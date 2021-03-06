@@ -54,8 +54,8 @@ class NodeModel:
 
 
 class TreeNodeModel(NodeModel):
-    def __init__(self, redis_session: redis.Redis, model_name, model_id):
-        NodeModel.__init__(self, redis_session=redis_session, model_name=model_name, model_id=model_id)
+    def __init__(self, redis_session: redis.Redis, model_id):
+        NodeModel.__init__(self, redis_session=redis_session, model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
 
     def set_folders_path(self, folders_path):
@@ -110,7 +110,7 @@ class TreeNodeModel(NodeModel):
 
 class FolderModel(TreeNodeModel):
     def __init__(self, redis_session: redis.Redis, folder_id):
-        TreeNodeModel.__init__(self, model_name=b'folder', redis_session=redis_session, model_id=folder_id)
+        TreeNodeModel.__init__(self, redis_session=redis_session, model_id=folder_id)
 
     def get_call_in_folders(self):
         call_in_folders_ids = self.get_call_in_models_ids()
@@ -175,7 +175,7 @@ class FolderModel(TreeNodeModel):
 
 class FileModel(TreeNodeModel):
     def __init__(self, redis_session: redis.Redis, file_id):
-        TreeNodeModel.__init__(self, model_name=b'file', redis_session=redis_session, model_id=file_id)
+        TreeNodeModel.__init__(self, redis_session=redis_session, model_id=file_id)
 
     def get_call_in_files(self):
         call_in_files_ids = self.get_call_in_models_ids()
