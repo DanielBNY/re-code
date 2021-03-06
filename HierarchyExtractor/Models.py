@@ -29,13 +29,10 @@ class NodeModel:
         return int(self.redis_session.hget(self.model_id, b'size'))
 
     def get_call_out_models_ids(self):
-        return self.get_calls_in_or_out_ids(b'out')
+        return self.redis_session.smembers(self.model_id + b':calls_out')
 
     def get_call_in_models_ids(self):
-        return self.get_calls_in_or_out_ids(b'in')
-
-    def get_calls_in_or_out_ids(self, in_or_out):
-        return self.redis_session.smembers(self.model_id + b':calls_' + in_or_out)
+        return self.redis_session.smembers(self.model_id + b':calls_in')
 
     def add_edge(self, target_node):
         self.redis_session.sadd(self.calls_out_set_id, target_node.model_id)
