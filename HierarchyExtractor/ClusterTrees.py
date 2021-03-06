@@ -20,7 +20,7 @@ class ClusterTrees:
                             function_model_id=multiple_entries_model.model_id)
 
     def set_trees_heads_set(self, multiple_entries_model: MultipleEntriesFunctionNode):
-        call_in_models = multiple_entries_model.get_call_in_models()
+        call_in_models = multiple_entries_model.get_call_in_functions()
         for call_in_model in call_in_models:
             tree_head_function_model_id = call_in_model.get_tree_head_function_model_id()
             tree_head_function_model = FunctionModel(redis_session=self.redis_session,
@@ -55,7 +55,7 @@ class ClusterTrees:
     @staticmethod
     def connect_multiple_entries_node_in_a_tree(multiple_entries_model: MultipleEntriesFunctionNode):
         multiple_entries_file_model = multiple_entries_model.get_parent_file_model()
-        called_function_models = multiple_entries_model.get_call_in_models()
+        called_function_models = multiple_entries_model.get_call_in_functions()
         first_called_function = called_function_models[0]
         first_called_file = first_called_function.get_parent_file_model()
         first_called_file.recursion_add_edge(
@@ -73,12 +73,12 @@ class ClusterTrees:
     @staticmethod
     def get_tree_head(file_model: FileModel):
         relative_distance = 0
-        file_father = file_model.get_call_in_models()
+        file_father = file_model.get_call_in_files()
         last_father = file_model
         while file_father:
             relative_distance += 1
             last_father = file_father[0]
-            file_father = file_father[0].get_call_in_models()
+            file_father = file_father[0].get_call_in_files()
 
         return last_father
 

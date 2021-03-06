@@ -47,11 +47,6 @@ class NodeModel:
         self.remove_edge(last_target_node)
         self.add_edge(new_target_node)
 
-    def get_call_in_models(self):
-        call_in_functions_ids = self.get_call_in_models_ids()
-        call_in_models = get_models_by_ids(redis_session=self.redis_session, model_ids=call_in_functions_ids)
-        return call_in_models
-
     def delete_model(self):
         self.redis_session.delete(self.model_id)
 
@@ -118,6 +113,12 @@ class FolderModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=folder_id)
 
+    def get_call_in_folders(self):
+        call_in_folders_ids = self.get_call_in_models_ids()
+        call_in_folders = get_folders_models_by_ids(redis_session=self.redis_session,
+                                                    folders_models_ids=call_in_folders_ids)
+        return call_in_folders
+
     def get_call_out_models(self):
         call_out_folders_ids = self.get_call_out_models_ids()
         call_out_folders_models = get_folders_models_by_ids(folders_models_ids=call_out_folders_ids,
@@ -181,6 +182,12 @@ class FileModel(ClusteredNodes):
                                 contained_address=contained_address,
                                 model_id=file_id)
         self.folder_id = b'folder:' + self.contained_function_address
+
+    def get_call_in_files(self):
+        call_in_files_ids = self.get_call_in_models_ids()
+        call_in_files_models = get_files_models_by_ids(redis_session=self.redis_session,
+                                                       files_models_ids=call_in_files_ids)
+        return call_in_files_models
 
     def get_call_out_models(self):
         call_out_files_ids = self.get_call_out_models_ids()
@@ -262,6 +269,12 @@ class FunctionModel(NodeModel):
                            contained_address=address,
                            model_id=function_id)
         self.file_id = b'file:' + self.contained_function_address
+
+    def get_call_in_functions(self):
+        call_in_functions_ids = self.get_call_in_models_ids()
+        call_in_function = get_functions_models_by_ids(redis_session=self.redis_session,
+                                                       functions_models_ids=call_in_functions_ids)
+        return call_in_function
 
     def get_call_out_models(self):
         call_out_functions_ids = self.get_call_out_models_ids()
