@@ -151,8 +151,6 @@ class FolderModel(TreeNodeModel):
         self.basic_init_save(size=size)
         self.redis_session.hset(self.model_id, b'contained_files_set_id', self.contained_nodes_set_id)
         Folders(self.redis_session).add_model_id(self.model_id)
-        self.redis_session.sadd(self.contained_nodes_set_id,
-                                FileModel(contained_address=self.contained_function_address).model_id)
 
     def remove(self):
         self.redis_session.delete(self.calls_out_set_id)
@@ -226,6 +224,10 @@ class FileModel(TreeNodeModel):
         self.add_init_file_info(size, first_folder_id)
         folder_model = FolderModel(folder_id=first_folder_id, redis_session=self.redis_session)
         folder_model.recursion_init(size)
+        self.add_file_id_to_folder_contained_files(folder_model=folder_model)
+
+    def add_file_id_to_folder_contained_files(self, folder_model: FolderModel):
+        self.redis_session.sadd(folder_model.contained_nodes_set_id, self.model_id)
 
     def add_file_edge(self, called_function_address):
         """
