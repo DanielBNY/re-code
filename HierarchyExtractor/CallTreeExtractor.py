@@ -11,7 +11,7 @@ class CallTreeExtractor:
 
     def run(self):
         function_entries_models = EntryModels(self.redis_session).get_functions_models() + \
-                               MultipleEntriesModels(self.redis_session).get_functions_models()
+                                  MultipleEntriesModels(self.redis_session).get_functions_models()
         for function_entry_model in function_entries_models:
             function_entry_model.set_tree_head_function_model_id(function_entry_model.model_id)
             self.extract_tree_from_entry(tree_head_model=function_entry_model)
@@ -41,30 +41,3 @@ class CallTreeExtractor:
                                                           redis_session=self.redis_session))
 
         return neighbors_to_revisit
-
-    def connect_two_trees(self, first_tree_file: FileModel, second_tree_file: FileModel):
-        first_head_and_relative_distance = self.get_head_and_relative_distance(first_tree_file)
-        second_head_and_relative_distance = self.get_head_and_relative_distance(second_tree_file)
-        first_relative_distance = first_head_and_relative_distance["relative_distance"]
-        second_relative_distance = second_head_and_relative_distance["relative_distance"]
-        first_tree_head = first_head_and_relative_distance["last_father"]
-        second_tree_head = second_head_and_relative_distance["last_father"]
-        if first_tree_head.contained_function_address != second_tree_head.contained_function_address:
-            if first_relative_distance > second_relative_distance:
-                first_tree_head.recursion_add_edge(second_tree_head)
-                self.redis_session.srem('entry:addresses', second_tree_head.contained_function_address)
-            else:
-                second_tree_head.recursion_add_edge(first_tree_head)
-                self.redis_session.srem('entry:addresses', first_tree_head.contained_function_address)
-
-    @staticmethod
-    def get_head_and_relative_distance(file_model: FileModel):
-        relative_distance = 0
-        file_father = file_model.get_call_in_files()
-        last_father = file_model
-        while file_father:
-            relative_distance += 1
-            last_father = file_father[0]
-            file_father = file_father[0].get_call_in_files()
-
-        return {"last_father": last_father, "relative_distance": relative_distance}
