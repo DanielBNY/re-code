@@ -86,10 +86,15 @@ class ImportRetdecData:
         for last_decompiler_process in decompilers_processes:
             last_decompiler_process.communicate()
 
-    def calculate_analyzed_chunks_size(self, file_size):
+    def calculate_analyzed_chunks_size(self, file_size) -> int:
         available_memory_space_kb = psutil.virtual_memory().available
-        minimized_chunk = int(available_memory_space_kb / (file_size * self.number_of_processes))
-        return minimized_chunk
+        minimized_memory_percentage = available_memory_space_kb / (
+                    1024 * self.number_of_processes * self.number_of_processes)
+        minimized_file_chunk = file_size / (self.number_of_processes * 2)
+        if minimized_file_chunk >= minimized_memory_percentage:
+            return int(minimized_memory_percentage / 1024)
+        else:
+            return int(minimized_file_chunk)
 
 
 class FunctionDetector:
