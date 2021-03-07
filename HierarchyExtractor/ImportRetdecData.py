@@ -7,6 +7,7 @@ from BinaryExtractor import BinaryExtractor
 from os import listdir
 from os.path import isfile, join
 import subprocess
+import psutil
 
 
 class ImportRetdecData:
@@ -31,7 +32,8 @@ class ImportRetdecData:
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
-                    RetdecDetectedModels(redis_session=self.redis_session).add_address(function_detector.function_address)
+                    RetdecDetectedModels(redis_session=self.redis_session).add_address(
+                        function_detector.function_address)
                     radare_detected_address = None
                     radare_detected_models = RadareDetectedModels(self.redis_session)
                     if radare_detected_models.is_member(function_detector.function_address):
@@ -65,26 +67,29 @@ class ImportRetdecData:
             shutil.rmtree(self.decompiled_file_path)
         os.mkdir(self.decompiled_file_path)
         file_size = os.stat(self.analyzed_file).st_size
-        analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
         decompilers_processes = []
-        for start_address in range(self.binary_extractor.start_virtual_address,
-                                   self.binary_extractor.end_virtual_address, analyzed_chunks_size):
+        start_address = self.binary_extractor.start_virtual_address
+        while start_address < self.binary_extractor.end_virtual_address:
+            analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
             decompiler_process = subprocess.Popen([conf.retdec_decompiler['decompiler_path'], "--select-ranges",
                                                    f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
                                                    "-o",
                                                    f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
                                                    self.analyzed_file,
-                                                   "--cleanup"])
+                                                   "--cleanup", "--select-decode-only"])
             decompilers_processes.append(decompiler_process)
             if len(decompilers_processes) == self.number_of_processes:
                 decompilers_processes[0].communicate()
                 del decompilers_processes[0]
+            start_address += analyzed_chunks_size
 
         for last_decompiler_process in decompilers_processes:
             last_decompiler_process.communicate()
 
     def calculate_analyzed_chunks_size(self, file_size):
-        return int(file_size / self.number_of_processes)
+        available_memory_space_kb = psutil.virtual_memory().available
+        minimized_chunk = int(available_memory_space_kb / (file_size * self.number_of_processes))
+        return minimized_chunk
 
 
 class FunctionDetector:
