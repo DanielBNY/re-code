@@ -2,6 +2,8 @@ mongo_db = dict(
     db_name='re_code'
 )
 retdec_decompiler = dict(
-    decompiler_path='~/Downloads/retdec-v4.0-ubuntu-64b/retdec/bin/retdec-decompiler.py',
-    collection_name='retdec_info'
+    decompiler_path='/retdec/bin/retdec-decompiler.py',
+    collection_name='retdec_info',
+    exported_file_path='/tmp/out_new',
+    decompiled_file_path='/tmp/out_new'
 )
