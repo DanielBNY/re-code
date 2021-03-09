@@ -15,7 +15,7 @@ class ImportRetdecData:
                  decompiler_path: str):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
-        self.decompiled_file_path = conf.retdec_decompiler["decompiled_file_path"]
+        self.decompiled_files_path = conf.retdec_decompiler["decompiled_file_path"]
         self.decompiler_path = decompiler_path
         self.binary_extractor = binary_extractor
         self.number_of_processes = number_of_processes
@@ -23,13 +23,13 @@ class ImportRetdecData:
     def run(self):
         self.binary_extractor.export_functions_addresses()
         self.decompile_to_multiple_files()
-        decompiled_files = [file for file in listdir(self.decompiled_file_path) if
-                            isfile(join(self.decompiled_file_path, file)) and file.endswith(".c")]
+        decompiled_files = [file for file in listdir(self.decompiled_files_path) if
+                            isfile(join(self.decompiled_files_path, file)) and file.endswith(".c")]
         for file in decompiled_files:
             self.import_decompiled_functions(file_name=file)
 
     def import_decompiled_functions(self, file_name):
-        with open(self.decompiled_file_path + '/' + file_name) as file:
+        with open(self.decompiled_files_path + '/' + file_name) as file:
             function_detector = FunctionDetector(redis_session=self.redis_session)
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
@@ -65,9 +65,9 @@ class ImportRetdecData:
                                 address=function_detector.function_address)
 
     def decompile_to_multiple_files(self):
-        if os.path.exists(self.decompiled_file_path):
-            shutil.rmtree(self.decompiled_file_path)
-        os.mkdir(self.decompiled_file_path)
+        if os.path.exists(self.decompiled_files_path):
+            shutil.rmtree(self.decompiled_files_path)
+        os.mkdir(self.decompiled_files_path)
         file_size = os.stat(self.analyzed_file).st_size
         decompilers_processes = []
         start_address = self.binary_extractor.start_virtual_address
@@ -76,7 +76,7 @@ class ImportRetdecData:
             decompiler_process = subprocess.Popen([self.decompiler_path, "--select-ranges",
                                                    f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
                                                    "-o",
-                                                   f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
+                                                   f"{self.decompiled_files_path + '/file' + str(start_address)}.c",
                                                    self.analyzed_file,
                                                    "--cleanup", "--select-decode-only"])
             decompilers_processes.append(decompiler_process)
