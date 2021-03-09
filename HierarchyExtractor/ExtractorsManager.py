@@ -40,7 +40,7 @@ class ExtractorsManager:
         FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()
         CallTreeExtractor(self.redis_session).run()
         ClusterTrees(redis_session=self.redis_session).run()
-        ClusterFilesAndFolders(redis_session=redis.Redis('localhost'), max_file_size=max_file_size,
+        ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=max_file_size,
                                max_number_of_max_files_in_folder=max_number_of_max_files_in_folder).run()
         BuildSampleStructure(recovered_project_path=self.recovered_project_path.encode(),
                              redis_session=self.redis_session).run()
