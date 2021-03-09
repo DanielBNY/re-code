@@ -12,9 +12,9 @@ import conf
 
 
 class ExtractorsManager:
-    def __init__(self, output_directory):
-        self.redis_session = redis.Redis('localhost')
-        self.mongo_client = MongoClient("localhost", 27017)
+    def __init__(self, output_directory: str, redis_ip: str, mongo_ip: str, mongo_db_port=27017):
+        self.redis_session = redis.Redis(redis_ip)
+        self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
         self.output_directory = output_directory
 
     def cleanup(self):
