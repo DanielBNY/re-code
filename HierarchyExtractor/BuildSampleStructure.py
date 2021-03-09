@@ -5,13 +5,13 @@ import os
 
 
 class BuildSampleStructure:
-    def __init__(self, destination_sample, redis_session):
-        self.destination_sample = destination_sample
+    def __init__(self, recovered_project_path, redis_session):
+        self.recovered_project_path = recovered_project_path
         self.redis_session = redis_session
 
     def run(self):
         entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_folders_models()
-        self.create_folders_in_path(self.destination_sample, entry_folders_models)
+        self.create_folders_in_path(self.recovered_project_path, entry_folders_models)
         folders_to_revisit = entry_folders_models
         while folders_to_revisit:
             folders_to_revisit = self.create_folder_for_sons(folders_to_revisit)
@@ -22,7 +22,7 @@ class BuildSampleStructure:
     def create_lonely_functions_file(self):
         lonely_files_models = LonelyModels(redis_session=self.redis_session).get_files_models()
         self.write_files_to_file(files_models=lonely_files_models,
-                                 file_path=self.destination_sample + b'/lonely_file')
+                                 file_path=self.recovered_project_path + b'/lonely_file')
 
     def create_folder_for_sons(self, folders):
         folders_to_revisit = []

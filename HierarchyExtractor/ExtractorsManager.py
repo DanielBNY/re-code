@@ -12,15 +12,15 @@ import conf
 
 
 class ExtractorsManager:
-    def __init__(self, output_directory: str, redis_ip: str, mongo_ip: str, mongo_db_port=27017):
+    def __init__(self, recovered_project_path: str, redis_ip: str, mongo_ip: str, mongo_db_port=27017):
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
-        self.output_directory = output_directory
+        self.recovered_project_path = recovered_project_path
 
     def cleanup(self):
-        if os.path.exists(self.output_directory):
-            shutil.rmtree(self.output_directory)
-        os.mkdir(self.output_directory)
+        if os.path.exists(self.recovered_project_path):
+            shutil.rmtree(self.recovered_project_path)
+        os.mkdir(self.recovered_project_path)
         self.redis_session.flushdb()
         self.mongo_client.drop_database(conf.mongo_db["db_name"])
 
@@ -40,4 +40,5 @@ class ExtractorsManager:
         ClusterTrees(redis_session=self.redis_session).run()
         ClusterFilesAndFolders(redis_session=redis.Redis('localhost'), max_file_size=max_file_size,
                                max_number_of_max_files_in_folder=max_number_of_max_files_in_folder).run()
-        BuildSampleStructure(self.output_directory.encode(), self.redis_session).run()
+        BuildSampleStructure(recovered_project_path=self.recovered_project_path.encode(),
+                             redis_session=self.redis_session).run()
