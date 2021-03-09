@@ -30,7 +30,9 @@ class ExtractorsManager:
         bin_ex.analyze_all_functions_calls()
         import_retdec_data = ImportRetdecData(redis_session=self.redis_session,
                                               binary_extractor=bin_ex, analyzed_file=file_path_to_analyze,
-                                              number_of_processes=number_of_processes)
+                                              number_of_processes=number_of_processes,
+                                              decompiler_path=conf.retdec_decompiler['decompiler_path'],
+                                              decompiled_files_path=conf.retdec_decompiler["decompiled_file_path"])
         import_retdec_data.run()
         bin_ex.extract_functions_info('/tmp/analyzed', imported_collection_name="FunctionsInfo")
         FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()
