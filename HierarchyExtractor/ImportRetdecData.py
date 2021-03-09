@@ -11,10 +11,12 @@ import psutil
 
 
 class ImportRetdecData:
-    def __init__(self, redis_session, binary_extractor: BinaryExtractor, analyzed_file, number_of_processes):
+    def __init__(self, redis_session, binary_extractor: BinaryExtractor, analyzed_file, number_of_processes,
+                 decompiler_path: str):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
         self.decompiled_file_path = conf.retdec_decompiler["decompiled_file_path"]
+        self.decompiler_path = decompiler_path
         self.binary_extractor = binary_extractor
         self.number_of_processes = number_of_processes
 
@@ -71,7 +73,7 @@ class ImportRetdecData:
         start_address = self.binary_extractor.start_virtual_address
         while start_address < self.binary_extractor.end_virtual_address:
             analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
-            decompiler_process = subprocess.Popen([conf.retdec_decompiler['decompiler_path'], "--select-ranges",
+            decompiler_process = subprocess.Popen([self.decompiler_path, "--select-ranges",
                                                    f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
                                                    "-o",
                                                    f"{self.decompiled_file_path + '/file' + str(start_address)}.c",
@@ -89,7 +91,7 @@ class ImportRetdecData:
     def calculate_analyzed_chunks_size(self, file_size) -> int:
         available_memory_space_kb = psutil.virtual_memory().available
         minimized_memory_percentage = available_memory_space_kb / (
-                    1024 * self.number_of_processes * self.number_of_processes)
+                1024 * self.number_of_processes * self.number_of_processes)
         minimized_file_chunk = file_size / (self.number_of_processes * 2)
         if minimized_file_chunk >= minimized_memory_percentage:
             return int(minimized_memory_percentage / 1024)
