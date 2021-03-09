@@ -2,7 +2,6 @@ import shutil, os.path
 import os
 import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
-import conf
 from BinaryExtractor import BinaryExtractor
 from os import listdir
 from os.path import isfile, join
@@ -12,10 +11,10 @@ import psutil
 
 class ImportRetdecData:
     def __init__(self, redis_session, binary_extractor: BinaryExtractor, analyzed_file, number_of_processes,
-                 decompiler_path: str):
+                 decompiler_path: str, decompiled_files_path: str):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
-        self.decompiled_files_path = conf.retdec_decompiler["decompiled_file_path"]
+        self.decompiled_files_path = decompiled_files_path
         self.decompiler_path = decompiler_path
         self.binary_extractor = binary_extractor
         self.number_of_processes = number_of_processes
