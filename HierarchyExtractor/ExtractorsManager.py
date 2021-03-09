@@ -12,10 +12,12 @@ import conf
 
 
 class ExtractorsManager:
-    def __init__(self, recovered_project_path: str, redis_ip: str, mongo_ip: str, mongo_db_port=27017):
+    def __init__(self, recovered_project_path: str, redis_ip: str, mongo_ip: str, decompiler_path: str,
+                 mongo_db_port=27017):
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
         self.recovered_project_path = recovered_project_path
+        self.decompiler_path = decompiler_path
 
     def cleanup(self):
         if os.path.exists(self.recovered_project_path):
@@ -31,7 +33,7 @@ class ExtractorsManager:
         import_retdec_data = ImportRetdecData(redis_session=self.redis_session,
                                               binary_extractor=bin_ex, analyzed_file=file_path_to_analyze,
                                               number_of_processes=number_of_processes,
-                                              decompiler_path=conf.retdec_decompiler['decompiler_path'],
+                                              decompiler_path=self.decompiler_path,
                                               decompiled_files_path=conf.retdec_decompiler["decompiled_file_path"])
         import_retdec_data.run()
         bin_ex.extract_functions_info('/tmp/analyzed', imported_collection_name="FunctionsInfo")
