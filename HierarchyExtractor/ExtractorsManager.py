@@ -46,7 +46,8 @@ class ExtractorsManager:
                                               decompiled_files_path=self.decompiled_files_path)
         import_retdec_data.run()
         bin_ex.extract_functions_info(self.functions_info_file_path,
-                                      imported_collection_name=self.functions_info_collection_name)
+                                      imported_collection_name=self.functions_info_collection_name,
+                                      mongo_db_name=self.mongo_db_name)
         FunctionsGraphExtractor(redis_session=self.redis_session, mongodb_client=self.mongo_client,
                                 functions_info_collection_name=self.functions_info_collection_name,
                                 mongo_db_name=self.mongo_db_name).run()

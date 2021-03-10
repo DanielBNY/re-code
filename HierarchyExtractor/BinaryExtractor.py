@@ -1,8 +1,8 @@
 import r2pipe
 import os
-from MongoImport import import_collection_from_json_array
 import json
 from Models import RadareDetectedModels
+
 
 class BinaryExtractor:
     def __init__(self, binary_path, redis_session):
@@ -48,17 +48,21 @@ class BinaryExtractor:
             if address:
                 RadareDetectedModels(redis_session=self.redis_session).add_address(int(address, 16))
 
-    def extract_functions_info(self, output_path, imported_collection_name):
+    def extract_functions_info(self, output_path: str, imported_collection_name: str, mongo_db_name: str):
         self.export_functions_info(output_json_path=output_path)
-        self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name)
+        self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name,
+                                   mongo_db_name=mongo_db_name)
         os.remove(output_path)
 
     def export_functions_info(self, output_json_path):
         self.command_pipe.cmd(f"aflj > {output_json_path}")
 
     @staticmethod
-    def import_functions_info(input_json_path, imported_collection_name):
-        import_collection_from_json_array(file_path=input_json_path, collection_name=imported_collection_name)
+    def import_functions_info(mongo_db_name: str, input_json_path: str, imported_collection_name: str):
+        stream = os.popen(
+            f"mongoimport --db {mongo_db_name} --collection {imported_collection_name} --file {input_json_path} --jsonArray")
+        output = stream.read()
+        return output
 
     def analyze_function_at_address(self, address):
         self.command_pipe.cmd(f"s {address}; af")
