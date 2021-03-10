@@ -47,7 +47,8 @@ class ExtractorsManager:
         import_retdec_data.run()
         bin_ex.extract_functions_info(self.functions_info_file_path,
                                       imported_collection_name=self.functions_info_collection_name)
-        FunctionsGraphExtractor(self.redis_session, self.mongo_client).run()
+        FunctionsGraphExtractor(redis_session=self.redis_session, mongodb_client=self.mongo_client,
+                                functions_info_collection_name=self.functions_info_collection_name).run()
         CallTreeExtractor(self.redis_session).run()
         ClusterTrees(redis_session=self.redis_session).run()
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
