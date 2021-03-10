@@ -110,29 +110,3 @@ class FunctionsGraphExtractor:
                     function_model.contained_function_address)
             if not bool(call_in_functions) and not bool(call_out_functions):
                 LonelyModels(redis_session=self.redis_session).add_address(function_model.contained_function_address)
-
-    def import_calls_for_lonely_functions(self):
-        lonely_function_models = LonelyModels(redis_session=self.redis_session).get_functions_models()
-        for lonely_function in lonely_function_models:
-            self.import_calls_from_code(function_model=lonely_function)
-
-    def import_calls_from_code(self, function_model: FunctionModel):
-        """
-        functions arrived to lonely functions because no calls out where detected but the
-        functions do have calls to functions. The issue is that radare2 calls detection missed
-        those calls but they exists in the decompiled code. The solution is to parser the functions code and
-        find the called functions addresses.
-        """
-        string_function_code = function_model.get_function_code().decode()
-        all_functions_hex_addresses = re.findall(r'function_([a-f0-9]+)\(', string_function_code)
-        for hex_function_address in all_functions_hex_addresses:
-            decimal_function_address = str(int(hex_function_address, 16)).encode()
-            if decimal_function_address != function_model.contained_function_address:
-                correct_function_address = str(
-                    self.get_valid_function_address(address=int(decimal_function_address))).encode()
-                called_function_model = FunctionModel(redis_session=self.redis_session,
-                                                      address=correct_function_address)
-                if Functions(redis_session=self.redis_session).is_member(function_model.model_id):
-                    if Functions(redis_session=self.redis_session).is_member(called_function_model.model_id):
-                        self.set_edge(source_function_model=function_model,
-                                      called_function_model=called_function_model)
