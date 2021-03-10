@@ -10,15 +10,11 @@ class FunctionsGraphExtractor:
     Functions call graph - functions are nodes and edges are calls to other functions
     """
 
-    def __init__(self, redis_session, mongodb_client: MongoClient, functions_info_collection_name: str):
-        """
-        The class contain the connection between functions and the list of functions addresses
-        :param redis_session
-        :param mongodb_client
-        """
+    def __init__(self, redis_session, mongodb_client: MongoClient, functions_info_collection_name: str,
+                 mongo_db_name: str):
         self.mongodb_client = mongodb_client
         self.redis_session = redis_session
-        db = self.mongodb_client[conf.mongo_db['db_name']]
+        db = self.mongodb_client[mongo_db_name]
         self.functions_info_collection = db[functions_info_collection_name]
         self.functions_info_ids = self.functions_info_collection.distinct("_id")
 
