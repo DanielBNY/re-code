@@ -1,8 +1,6 @@
 from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, \
     MultipleEntriesModels
 from pymongo import MongoClient
-import conf
-import re
 
 
 class FunctionsGraphExtractor:
