@@ -8,14 +8,13 @@ from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
 from ImportRetdecData import ImportRetdecData
 from ClusterTrees import ClusterTrees
-import conf
 
 
 class ExtractorsManager:
     def __init__(self, recovered_project_path: str, redis_ip: str, mongo_ip: str, decompiler_path: str,
                  file_path_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
                  number_of_processes: int, functions_info_file_path: str, decompiled_files_path: str,
-                 functions_info_collection_name: str, mongo_db_port=27017):
+                 functions_info_collection_name: str, mongo_db_name: str, mongo_db_port=27017):
         self.functions_info_collection_name = functions_info_collection_name
         self.file_path_to_analyze = file_path_to_analyze
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
@@ -27,13 +26,14 @@ class ExtractorsManager:
         self.decompiler_path = decompiler_path
         self.functions_info_file_path = functions_info_file_path
         self.decompiled_files_path = decompiled_files_path
+        self.mongo_db_name = mongo_db_name
 
     def cleanup(self):
         if os.path.exists(self.recovered_project_path):
             shutil.rmtree(self.recovered_project_path)
         os.mkdir(self.recovered_project_path)
         self.redis_session.flushdb()
-        self.mongo_client.drop_database(conf.mongo_db["db_name"])
+        self.mongo_client.drop_database(self.mongo_db_name)
 
     def flow(self):
         self.cleanup()
