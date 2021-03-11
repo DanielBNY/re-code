@@ -12,8 +12,11 @@ class NodeModel:
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
 
-    def basic_init_save(self, size):
+    def set_size(self, size: int):
         self.redis_session.hset(self.model_id, b'size', size)
+
+    def basic_init_save(self, size):
+        self.set_size(size)
         self.redis_session.hset(self.model_id, b'calls_out_set_id', self.calls_out_set_id)
         self.redis_session.hset(self.model_id, b'calls_in_set_id', self.calls_in_set_id)
         self.redis_session.hset(self.model_id, b'contained_address', self.contained_function_address)
