@@ -31,7 +31,7 @@ class FunctionsGraphExtractor:
                 fcn_address = function_info['offset']
                 if RetdecDetectedModels(redis_session=self.redis_session).is_member(address=fcn_address):
                     fcn_model = FunctionModel(address=str(fcn_address).encode(), redis_session=self.redis_session)
-                    fcn_model.recursion_init(str(function_info['realsz']).encode())
+                    fcn_model.recursion_init()
 
     def get_valid_function_address(self, address):
         """

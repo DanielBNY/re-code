@@ -308,14 +308,15 @@ class FunctionModel(NodeModel):
         self.redis_session.hset(self.model_id, b'file_id', first_file_id)
         Functions(self.redis_session).add_model_id(self.model_id)
 
-    def recursion_init(self, size):
+    def recursion_init(self):
         """
         Init the function metadata and initialize files nodes.
         """
         first_file_id = b'file:' + self.contained_function_address
-        self.add_init_function_info(size, first_file_id)
+        function_size = self.get_size()
+        self.add_init_function_info(size=function_size, first_file_id=first_file_id)
         first_file_model = FileModel(file_id=first_file_id, redis_session=self.redis_session)
-        first_file_model.recursion_init(size)
+        first_file_model.recursion_init(size=function_size)
         self.add_function_id_to_file_contained_functions(first_file_model=first_file_model)
 
     def add_function_id_to_file_contained_functions(self, first_file_model: FileModel):
