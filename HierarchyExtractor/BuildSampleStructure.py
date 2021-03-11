@@ -22,27 +22,28 @@ class BuildSampleStructure:
     def create_lonely_functions_file(self):
         lonely_files_models = LonelyModels(redis_session=self.redis_session).get_files_models()
         self.write_files_to_file(files_models=lonely_files_models,
-                                 file_path=self.recovered_project_path + b'/lonely_file')
+                                 file_path=os.path.join(self.recovered_project_path, b'lonely_file'))
 
     def create_folder_for_sons(self, folders):
         folders_to_revisit = []
         for folder in folders:
             sons_models = folder.get_sons_models()
-            self.create_folders_in_path(path=folder.get_folders_path() + b'/' + folder.model_id, models=sons_models)
+            self.create_folders_in_path(path=os.path.join(folder.get_folders_path(), folder.model_id),
+                                        models=sons_models)
             folders_to_revisit += sons_models
         return folders_to_revisit
 
     @staticmethod
     def create_folders_in_path(path, models):
         for model in models:
-            os.mkdir(path + b'/' + model.model_id)
+            os.mkdir(os.path.join(path, model.model_id))
             model.set_folders_path(path)
 
     def set_all_files_paths(self):
         folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folders()
         for folder in folder_models:
             if folder.get_folders_path():
-                full_path = folder.get_folders_path() + b'/' + folder.model_id
+                full_path = os.path.join(folder.get_folders_path(), folder.model_id)
                 files_models = folder.get_contained_files_models()
                 self.set_files_paths(path=full_path, models=files_models)
 
@@ -55,7 +56,7 @@ class BuildSampleStructure:
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files()
         for file_model in files_models:
             if file_model.get_folders_path():
-                file_path = file_model.get_folders_path() + b'/' + file_model.model_id
+                file_path = os.path.join(file_model.get_folders_path(), file_model.model_id)
                 functions_models = file_model.get_contained_functions_models()
                 self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 
