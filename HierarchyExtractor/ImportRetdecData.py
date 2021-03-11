@@ -47,18 +47,18 @@ class ImportRetdecData:
                     else:
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(function_detector.function_address).encode())
+                    function_model.set_function_code(function_detector.function_code)
+                    function_model.set_size(size=function_detector.functions_lines)
                     if function_detector.wrapped_function_name:
                         contained_address_minus_three = str(int(function_model.contained_function_address) - 3).encode()
                         wrapper_function_model = FunctionModel(redis_session=self.redis_session,
                                                                address=contained_address_minus_three)
-                        wrapper_function_model.set_function_code(function_detector.function_code)
                         APIWrapperModel(redis_session=self.redis_session,
                                         function_id=wrapper_function_model.model_id).set_api_name(
                             function_detector.wrapped_function_name)
                         ApiWrappers(redis_session=self.redis_session).add_function(
                             model_id=wrapper_function_model.model_id)
                     else:
-                        function_model.set_function_code(function_detector.function_code)
                         if not radare_detected_address and not function_detector.empty_function:
                             self.binary_extractor.analyze_function_at_address(
                                 address=function_detector.function_address)
