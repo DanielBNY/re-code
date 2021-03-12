@@ -72,7 +72,7 @@ class ImportRetdecData:
         start_address = self.binary_extractor.start_virtual_address
         while start_address < self.binary_extractor.end_virtual_address:
             analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
-            decompiler_process = subprocess.Popen([self.decompiler_path, "--select-ranges",
+            decompiler_process = subprocess.Popen(["python", self.decompiler_path, "--select-ranges",
                                                    f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
                                                    "-o",
                                                    f"{self.decompiled_files_path + '/file' + str(start_address)}.c",
