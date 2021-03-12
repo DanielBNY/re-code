@@ -52,7 +52,6 @@ class BinaryExtractor:
         self.export_functions_info(output_json_path=output_path)
         self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name,
                                    mongo_db_name=mongo_db_name)
-        os.remove(output_path)
 
     def export_functions_info(self, output_json_path):
         self.command_pipe.cmd(f"aflj > {output_json_path}")
