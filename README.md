@@ -48,7 +48,9 @@ https://docs.docker.com/engine/install/
 
 #### Step 7: start a redis and a mongo container 
 `sudo docker ps -a` Return a table the container id is in the first column, and the container name at the last column
+
 `sudo docker start REDIS_CONTAINER_ID`
+
 `sudo docker start MONGO_CONTAINER_ID`
 
 #### Step 8: install radare2
@@ -69,6 +71,7 @@ Installing from https://www.mongodb.com/try/download/database-tools
 6) Add the path to the mongodb database-tools bin
 ##### Linux
 sudo apt-get update -y
+
 sudo apt-get install -y mongo-tools
 
 #### Step 11: run the /ExtractorsManager.py
