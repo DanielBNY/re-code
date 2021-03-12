@@ -21,7 +21,7 @@ SAMPLES_DIR_NAME = "Samples"
 
 class ExtractorsManager:
     def __init__(self, redis_ip: str, mongo_ip: str, decompiler_path: str,
-                 file_name_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
+                 file_name_to_analyze: str, max_number_of_max_files_in_folder=4, max_file_size=200,
                  mongo_db_port=27017, number_of_processes=None):
         self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
