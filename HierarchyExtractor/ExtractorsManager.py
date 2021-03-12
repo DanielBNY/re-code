@@ -16,14 +16,14 @@ MONGO_DB_NAME = "re-code"
 TEMPORARY_SAMPLE_DATA_DIRECTORY = "SampleData"
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
 FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
+SAMPLES_DIR_NAME = "Samples"
 
 
 class ExtractorsManager:
     def __init__(self, redis_ip: str, mongo_ip: str, decompiler_path: str,
-                 file_path_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
+                 file_name_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
                  mongo_db_port=27017, number_of_processes=None):
         self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
-        self.file_path_to_analyze = file_path_to_analyze
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
         self.max_file_size = max_file_size
         if not number_of_processes:
@@ -33,6 +33,7 @@ class ExtractorsManager:
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
         current_working_directory = os.getcwd()
+        self.file_path_to_analyze = os.path.join(current_working_directory, SAMPLES_DIR_NAME, file_name_to_analyze)
         self.recovered_project_path = os.path.join(current_working_directory, RECOVERED_CODE_DIRECTORY_NAME)
         self.decompiler_path = decompiler_path
         self.temporary_sample_data_directory = os.path.join(current_working_directory, TEMPORARY_SAMPLE_DATA_DIRECTORY)
