@@ -38,8 +38,7 @@ class ExtractorsManager:
     def cleanup(self):
         if os.path.exists(self.recovered_project_path):
             shutil.rmtree(self.recovered_project_path)
-        else:
-            os.mkdir(self.recovered_project_path)
+        os.mkdir(self.recovered_project_path)
         self.redis_session.flushdb()
         self.mongo_client.drop_database(self.mongo_db_name)
 
