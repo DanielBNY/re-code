@@ -11,14 +11,15 @@ from ClusterTrees import ClusterTrees
 import multiprocessing
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
+FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
 
 
 class ExtractorsManager:
     def __init__(self, redis_ip: str, mongo_ip: str, decompiler_path: str,
                  file_path_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
-                 functions_info_file_path: str, decompiled_files_path: str, functions_info_collection_name: str,
-                 mongo_db_name: str, mongo_db_port=27017, number_of_processes=None):
-        self.functions_info_collection_name = functions_info_collection_name
+                 functions_info_file_path: str, decompiled_files_path: str, mongo_db_name: str, mongo_db_port=27017,
+                 number_of_processes=None):
+        self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
         self.file_path_to_analyze = file_path_to_analyze
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
         self.max_file_size = max_file_size
