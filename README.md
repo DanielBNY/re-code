@@ -24,6 +24,7 @@ https://github.com/redis/redis
 https://github.com/mongodb/mongo
 
 ## Use
+### Installations and configurations
 
 #### Step 1: installing and moving the decompiler
 The src/RetdecDecompiler need to contain the retdec decompiler. 
@@ -46,21 +47,14 @@ https://docs.docker.com/engine/install/
 #### Step 6: creating a mongo container
 `sudo docker run -d --name mongo -p 27017:27017 mongo`
 
-#### Step 7: start a redis and a mongo container 
-`sudo docker ps -a` Return a table the container id is in the first column, and the container name at the last column
-
-`sudo docker start REDIS_CONTAINER_ID`
-
-`sudo docker start MONGO_CONTAINER_ID`
-
-#### Step 8: install radare2
+#### Step 7: install radare2
 1) Install the binary for radare2 from https://radare.mikelloc.com/list
 2) Restart the system
 
-#### Step 9: install packages
+#### Step 8: install packages
 `pip install -r requirements`
 
-#### Step 10: install the MongoDB Database Tools (for mongoimport)
+#### Step 9: install the MongoDB Database Tools (for mongoimport)
 ##### Windows
 Installing from https://www.mongodb.com/try/download/database-tools
 1) Moving the directory to the Program Files directory
@@ -74,5 +68,15 @@ sudo apt-get update -y
 
 sudo apt-get install -y mongo-tools
 
-#### Step 11: run the /ExtractorsManager.py
+------------------
+
+### Running the program
+#### Start a redis and a mongo container 
+`sudo docker ps -a` Return a table the container id is in the first column, and the container name at the last column
+
+`sudo docker start REDIS_CONTAINER_ID`
+
+`sudo docker start MONGO_CONTAINER_ID`
+
+#### Run the src/ExtractorsManager.py
 The output is in src/RecoveredCodeOutput
