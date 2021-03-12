@@ -51,4 +51,7 @@ https://docs.docker.com/engine/install/
 `sudo docker start REDIS_CONTAINER_ID`
 `sudo docker start MONGO_CONTAINER_ID`
 
-####Step 8: run the /ExtractorsManager.py
+####Step 8: install packages
+`pip install -r requirements`
+
+####Step 9: run the /ExtractorsManager.py
