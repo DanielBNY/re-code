@@ -89,7 +89,7 @@ class ExtractorsManager:
 
 if __name__ == "__main__":
     # Basic run
-    file_name = input("Please Enter the Samples/{file name} to analyze:")
+    file_name = input("Please Enter the Samples/{file name} to analyze:    (try bin_ls for test)")
     start_flow_time = time.time()
     ExtractorsManager(redis_ip='localhost', mongo_ip='localhost',
                       file_name_to_analyze=file_name).flow()
