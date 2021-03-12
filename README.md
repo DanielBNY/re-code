@@ -59,3 +59,4 @@ https://docs.docker.com/engine/install/
 `pip install -r requirements`
 
 #### Step 10: run the /ExtractorsManager.py
+The output is in src/RecoveredCodeOutput
