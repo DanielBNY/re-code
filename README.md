@@ -58,4 +58,4 @@ https://docs.docker.com/engine/install/
 #### Step 9: install packages
 `pip install -r requirements`
 
-#### Step 9: run the /ExtractorsManager.py
+#### Step 10: run the /ExtractorsManager.py
