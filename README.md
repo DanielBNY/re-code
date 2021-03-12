@@ -58,5 +58,18 @@ https://docs.docker.com/engine/install/
 #### Step 9: install packages
 `pip install -r requirements`
 
-#### Step 10: run the /ExtractorsManager.py
+#### Step 10: install the MongoDB Database Tools (for mongoimport)
+##### Windows
+Installing from https://www.mongodb.com/try/download/database-tools
+1) Moving the directory to the Program Files directory
+2) WinKey search 'Environment variables' 
+3) Click on **Environment Variables** 
+4) Double click on User variables **Path**
+5) Click on **New**
+6) Add the path to the mongodb database-tools bin
+##### Linux
+sudo apt-get update -y
+sudo apt-get install -y mongo-tools
+
+#### Step 11: run the /ExtractorsManager.py
 The output is in src/RecoveredCodeOutput
