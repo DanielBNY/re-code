@@ -17,11 +17,12 @@ TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
 FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
 SAMPLES_DIR_NAME = "Samples"
+RETDEC_DECOMPILER_FOLDER_NAME = "RetdecDecompiler"
 
 
 class ExtractorsManager:
-    def __init__(self, redis_ip: str, mongo_ip: str, decompiler_path: str,
-                 file_name_to_analyze: str, max_number_of_max_files_in_folder=4, max_file_size=200,
+    def __init__(self, redis_ip: str, mongo_ip: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
+                 max_file_size=200,
                  mongo_db_port=27017, number_of_processes=None):
         self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
@@ -35,7 +36,8 @@ class ExtractorsManager:
         current_working_directory = os.getcwd()
         self.file_path_to_analyze = os.path.join(current_working_directory, SAMPLES_DIR_NAME, file_name_to_analyze)
         self.recovered_project_path = os.path.join(current_working_directory, RECOVERED_CODE_DIRECTORY_NAME)
-        self.decompiler_path = decompiler_path
+        self.decompiler_path = os.path.join(current_working_directory, RETDEC_DECOMPILER_FOLDER_NAME, "bin",
+                                            "retdec-decompiler.py")
         self.temporary_sample_data_directory = os.path.join(current_working_directory, TEMPORARY_SAMPLE_DATA_DIRECTORY)
         self.functions_info_file_path = os.path.join(self.temporary_sample_data_directory,
                                                      FUNCTIONS_INFO_FILE_NAME)
