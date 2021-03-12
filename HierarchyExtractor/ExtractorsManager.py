@@ -10,9 +10,11 @@ from ImportRetdecData import ImportRetdecData
 from ClusterTrees import ClusterTrees
 import multiprocessing
 
+RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
+
 
 class ExtractorsManager:
-    def __init__(self, recovered_project_path: str, redis_ip: str, mongo_ip: str, decompiler_path: str,
+    def __init__(self, redis_ip: str, mongo_ip: str, decompiler_path: str,
                  file_path_to_analyze: str, max_number_of_max_files_in_folder: int, max_file_size: int,
                  functions_info_file_path: str, decompiled_files_path: str, functions_info_collection_name: str,
                  mongo_db_name: str, mongo_db_port=27017, number_of_processes=None):
@@ -26,7 +28,7 @@ class ExtractorsManager:
             self.number_of_processes = number_of_processes
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
-        self.recovered_project_path = recovered_project_path
+        self.recovered_project_path = os.path.join(os.getcwd(), RECOVERED_CODE_DIRECTORY_NAME)
         self.decompiler_path = decompiler_path
         self.functions_info_file_path = functions_info_file_path
         self.decompiled_files_path = decompiled_files_path
@@ -35,7 +37,8 @@ class ExtractorsManager:
     def cleanup(self):
         if os.path.exists(self.recovered_project_path):
             shutil.rmtree(self.recovered_project_path)
-        os.mkdir(self.recovered_project_path)
+        else:
+            os.mkdir(self.recovered_project_path)
         self.redis_session.flushdb()
         self.mongo_client.drop_database(self.mongo_db_name)
 
