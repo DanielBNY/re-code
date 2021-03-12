@@ -89,9 +89,9 @@ class ExtractorsManager:
 
 if __name__ == "__main__":
     # Basic run
-    file_name_to_analyze = input("Please Enter the Samples/{filname} to analyze:")
+    file_name = input("Please Enter the Samples/{file name} to analyze:")
     start_flow_time = time.time()
     ExtractorsManager(redis_ip='localhost', mongo_ip='localhost',
-                      file_name_to_analyze=file_name_to_analyze).flow()
+                      file_name_to_analyze=file_name).flow()
     end_flow_time = time.time()
     print(f"total time    {end_flow_time - start_flow_time}")
