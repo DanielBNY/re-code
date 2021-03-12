@@ -13,7 +13,7 @@ import multiprocessing
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
 MONGO_DB_NAME = "re-code"
-TEMPORARY_SAMPLE_DATA_DIRECTORY = "SampleData"
+TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
 FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
 SAMPLES_DIR_NAME = "Samples"
