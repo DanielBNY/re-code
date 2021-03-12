@@ -28,7 +28,7 @@ class ImportRetdecData:
             self.import_decompiled_functions(file_name=file)
 
     def import_decompiled_functions(self, file_name):
-        with open(self.decompiled_files_path + '/' + file_name) as file:
+        with open(os.path.join(self.decompiled_files_path, file_name)) as file:
             function_detector = FunctionDetector(redis_session=self.redis_session)
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
