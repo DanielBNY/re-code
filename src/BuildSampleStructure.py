@@ -28,7 +28,7 @@ class BuildSampleStructure:
         folders_to_revisit = []
         for folder in folders:
             sons_models = folder.get_sons_models()
-            self.create_folders_in_path(path=os.path.join(folder.get_folders_path(), folder.model_id),
+            self.create_folders_in_path(path=os.path.join(folder.get_folders_path(), folder.get_name()),
                                         models=sons_models)
             folders_to_revisit += sons_models
         return folders_to_revisit
@@ -36,14 +36,14 @@ class BuildSampleStructure:
     @staticmethod
     def create_folders_in_path(path, models):
         for model in models:
-            os.mkdir(os.path.join(path, model.model_id))
+            os.mkdir(os.path.join(path, model.get_name()))
             model.set_folders_path(path)
 
     def set_all_files_paths(self):
         folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folders()
         for folder in folder_models:
             if folder.get_folders_path():
-                full_path = os.path.join(folder.get_folders_path(), folder.model_id)
+                full_path = os.path.join(folder.get_folders_path(), folder.get_name())
                 files_models = folder.get_contained_files_models()
                 self.set_files_paths(path=full_path, models=files_models)
 
@@ -56,7 +56,7 @@ class BuildSampleStructure:
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files()
         for file_model in files_models:
             if file_model.get_folders_path():
-                file_path = os.path.join(file_model.get_folders_path(), file_model.model_id)
+                file_path = os.path.join(file_model.get_folders_path(), file_model.get_name())
                 functions_models = file_model.get_contained_functions_models()
                 self.write_function_to_file(functions_models=functions_models, file_path=file_path)
 

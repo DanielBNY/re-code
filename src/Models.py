@@ -12,6 +12,9 @@ class NodeModel:
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
 
+    def get_name(self):
+        return self.model_id.replace(b':', b'_')
+
     def set_size(self, size: int):
         self.redis_session.hset(self.model_id, b'size', size)
 
