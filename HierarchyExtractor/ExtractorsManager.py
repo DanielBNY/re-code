@@ -9,6 +9,7 @@ import shutil, os.path
 from ImportRetdecData import ImportRetdecData
 from ClusterTrees import ClusterTrees
 import multiprocessing
+import time
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
@@ -84,3 +85,13 @@ class ExtractorsManager:
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
         BuildSampleStructure(recovered_project_path=self.recovered_project_path.encode(),
                              redis_session=self.redis_session).run()
+
+
+if __name__ == "__main__":
+    # Basic run
+    file_name_to_analyze = input("Please Enter the Samples/{filname} to analyze:")
+    start_flow_time = time.time()
+    ExtractorsManager(redis_ip='localhost', mongo_ip='localhost',
+                      file_name_to_analyze=file_name_to_analyze).flow()
+    end_flow_time = time.time()
+    print(f"total time    {end_flow_time - start_flow_time}")
