@@ -23,35 +23,35 @@ https://github.com/avast/retdec
 https://github.com/redis/redis
 https://github.com/mongodb/mongo
 
-##Use
+## Use
 
-####Step 1: installing and moving the decompiler
+#### Step 1: installing and moving the decompiler
 The FirstProjectFolder/RetdecDecompiler need to contain the retdec decompiler. 
 1) Install it from https://github.com/avast/retdec/releases/ (version 4.0)
 2) Extract the content. 
 3) Copy the content from the first retdec folder, So the first folders in this directory would be: bin, include, lib, share
 
-####Step 2: install docker on your system
+#### Step 2: install docker on your system
 https://docs.docker.com/engine/install/
 
-####Step 3: pull redis image
+#### Step 3: pull redis image
 `sudo docker pull redis:6.2.1`
 
-####Step 4: pull mongodb image
+#### Step 4: pull mongodb image
 `sudo docker pull mongo:4.0`
 
-####Step 5: creating a redis container
+#### Step 5: creating a redis container
 `sudo docker run -d --name redis -p 6379:6379 redis`
 
-####Step 6: creating a mongo container
+#### Step 6: creating a mongo container
 `sudo docker run -d --name mongo -p 27017:27017 mongo`
 
-####Step 7: start a redis and a mongo container 
+#### Step 7: start a redis and a mongo container 
 `sudo docker ps -a` Return a table the container id is in the first column, and the container name at the last column
 `sudo docker start REDIS_CONTAINER_ID`
 `sudo docker start MONGO_CONTAINER_ID`
 
-####Step 8: install packages
+#### Step 8: install packages
 `pip install -r requirements`
 
-####Step 9: run the /ExtractorsManager.py
+#### Step 9: run the /ExtractorsManager.py
