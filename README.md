@@ -51,7 +51,11 @@ https://docs.docker.com/engine/install/
 `sudo docker start REDIS_CONTAINER_ID`
 `sudo docker start MONGO_CONTAINER_ID`
 
-#### Step 8: install packages
+#### Step 8: install radare2
+1) Install the binary for radare2 from https://radare.mikelloc.com/list
+2) Restart the system
+
+#### Step 9: install packages
 `pip install -r requirements`
 
 #### Step 9: run the /ExtractorsManager.py
