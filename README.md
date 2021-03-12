@@ -26,7 +26,7 @@ https://github.com/mongodb/mongo
 ## Use
 
 #### Step 1: installing and moving the decompiler
-The FirstProjectFolder/RetdecDecompiler need to contain the retdec decompiler. 
+The src/RetdecDecompiler need to contain the retdec decompiler. 
 1) Install it from https://github.com/avast/retdec/releases/ (version 4.0)
 2) Extract the content. 
 3) Copy the content from the first retdec folder, So the first folders in this directory would be: bin, include, lib, share
