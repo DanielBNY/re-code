@@ -1,6 +1,6 @@
 ## re-code
 
-re-code is a reverse engineering tool that reconstructs a project file hierarchy from a binary. Like developers, reverse
+re-code is a reverse engineering tool that constructs a project file hierarchy from a binary. Like developers, reverse
 engineers can benefit from a hierarchy view of a project instead of only a function view.
 
 The binary file hierarchy is gained by these steps:
