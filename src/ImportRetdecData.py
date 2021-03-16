@@ -47,8 +47,6 @@ class ImportRetdecData:
                     else:
                         function_model = FunctionModel(redis_session=self.redis_session,
                                                        address=str(function_detector.function_address).encode())
-                    function_model.set_function_code(function_detector.function_code)
-                    function_model.set_size(size=function_detector.functions_lines)
                     if function_detector.wrapped_function_name:
                         contained_address_minus_three = str(int(function_model.contained_function_address) - 3).encode()
                         wrapper_function_model = FunctionModel(redis_session=self.redis_session,
@@ -62,6 +60,8 @@ class ImportRetdecData:
                         if not radare_detected_address and not function_detector.empty_function:
                             self.binary_extractor.analyze_function_at_address(
                                 address=function_detector.function_address)
+                        function_model.set_function_code(function_detector.function_code)
+                        function_model.set_size(size=function_detector.functions_lines)
 
     def decompile_to_multiple_files(self):
         if os.path.exists(self.decompiled_files_path):
