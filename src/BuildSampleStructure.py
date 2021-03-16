@@ -68,7 +68,7 @@ class BuildSampleStructure:
             if function_code:
                 file_code += function_code + b'\n'
         if file_code:
-            with open(file_path, "wb") as file:
+            with open(file_path+b'.c', "wb") as file:
                 file.write(file_code)
 
     def write_files_to_file(self, files_models, file_path):
@@ -81,7 +81,7 @@ class BuildSampleStructure:
                 if function_code:
                     file_code += function_code + b'\n'
         if file_code:
-            with open(file_path, "wb") as file:
+            with open(file_path+b'.c', "wb") as file:
                 file.write(file_code)
 
     def replace_wrapped_functions(self, function_model: FunctionModel):
