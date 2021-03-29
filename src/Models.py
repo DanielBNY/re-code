@@ -5,6 +5,8 @@ from typing import Set, List, Union
 
 
 class NodeModel:
+    __slots__ = 'redis_session', 'model_id', 'contained_function_address', 'calls_out_set_id', 'calls_in_set_id'
+
     def __init__(self, redis_session: redis.Redis, model_id):
         self.redis_session = redis_session
         self.model_id = model_id
@@ -53,6 +55,8 @@ class NodeModel:
 
 
 class TreeNodeModel(NodeModel):
+    __slots__ = 'contained_nodes_set_id'
+
     def __init__(self, redis_session: redis.Redis, model_id):
         NodeModel.__init__(self, redis_session=redis_session, model_id=model_id)
         self.contained_nodes_set_id = self.model_id + b':contained_nodes'
@@ -251,6 +255,8 @@ class FileModel(TreeNodeModel):
 
 
 class FunctionModel(NodeModel):
+    __slots__ = 'model_id'
+
     def __init__(self, redis_session: redis.Redis, address=None, function_id=None):
         model_id = function_id
         if address:
@@ -354,6 +360,8 @@ class MultipleEntriesFunctionNode(FunctionModel):
 
 
 class MultipleEntriesSortedSet:
+    __slots__ = 'redis_session', 'key'
+
     def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
         self.key = b'sorted_set_multiple_entries'
@@ -388,6 +396,8 @@ def add_values_to_set(redis_session: redis.Redis, key, values):
 
 
 class SpecialModels:
+    __slots__ = 'key_name', 'redis_session'
+
     def __init__(self, key_name: str, redis_session: redis.Redis):
         self.key_name = key_name
         self.redis_session = redis_session
@@ -460,6 +470,8 @@ class RetdecDetectedModels(SpecialModels):
 
 
 class ApiWrappers:
+    __slots__ = 'key', 'redis_session'
+
     def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
         self.key = 'api-wrappers'
@@ -475,6 +487,8 @@ class ApiWrappers:
 
 
 class MultipleNodesModels:
+    __slots__ = 'multiple_nodes_models_key', 'redis_session'
+
     def __init__(self, redis_session: redis.Redis, multiple_node_models_key):
         self.redis_session = redis_session
         self.multiple_nodes_models_key = multiple_node_models_key
