@@ -63,7 +63,7 @@ class ExtractorsManager:
         self.redis_session.flushdb()
         self.mongo_client.drop_database(self.mongo_db_name)
 
-    def flow(self):
+    def run(self):
         self.cleanup()
         bin_ex = BinaryExtractor(self.file_path_to_analyze, self.redis_session)
         bin_ex.analyze_all_functions_calls()
@@ -92,6 +92,6 @@ if __name__ == "__main__":
     file_name = input("Please Enter the Samples/{file name} to analyze:    (try bin_ls for test)")
     start_flow_time = time.time()
     ExtractorsManager(redis_ip='localhost', mongo_ip='localhost',
-                      file_name_to_analyze=file_name).flow()
+                      file_name_to_analyze=file_name).run()
     end_flow_time = time.time()
     print(f"total time    {end_flow_time - start_flow_time}")
