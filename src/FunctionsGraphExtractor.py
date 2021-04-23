@@ -1,6 +1,7 @@
 from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, \
     MultipleEntriesModels
 from pymongo import MongoClient
+import redis
 
 
 class FunctionsGraphExtractor:
@@ -8,7 +9,7 @@ class FunctionsGraphExtractor:
     Functions call graph - functions are nodes and edges are calls to other functions
     """
 
-    def __init__(self, redis_session, mongodb_client: MongoClient, functions_info_collection_name: str,
+    def __init__(self, redis_session: redis.Redis, mongodb_client: MongoClient, functions_info_collection_name: str,
                  mongo_db_name: str):
         self.mongodb_client = mongodb_client
         self.redis_session = redis_session

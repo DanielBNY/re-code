@@ -2,10 +2,11 @@ import r2pipe
 import os
 import json
 from Models import RadareDetectedModels
+import redis
 
 
 class BinaryExtractor:
-    def __init__(self, binary_path, redis_session):
+    def __init__(self, binary_path, redis_session: redis.Redis):
         self.command_pipe = r2pipe.open(binary_path)
         self.redis_session = redis_session
         self.start_virtual_address = None

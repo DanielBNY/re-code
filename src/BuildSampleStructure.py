@@ -1,10 +1,10 @@
 from Models import Folders, Files, LonelyModels, FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
-
+import redis
 import os
 
 
 class BuildSampleStructure:
-    def __init__(self, recovered_project_path, redis_session):
+    def __init__(self, recovered_project_path, redis_session: redis.Redis):
         self.recovered_project_path = recovered_project_path
         self.redis_session = redis_session
 

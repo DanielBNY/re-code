@@ -1,9 +1,10 @@
 from Models import FunctionModel, EntryModels, MultipleEntriesModels
+import redis
 
 
 class CallTreeExtractor:
 
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         """
         :param redis_session
         """

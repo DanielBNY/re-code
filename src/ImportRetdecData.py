@@ -6,10 +6,12 @@ from BinaryExtractor import BinaryExtractor
 from os import listdir
 from os.path import isfile, join
 import subprocess
+import redis
 
 
 class ImportRetdecData:
-    def __init__(self, redis_session, binary_extractor: BinaryExtractor, analyzed_file, number_of_processes,
+    def __init__(self, redis_session: redis.Redis, binary_extractor: BinaryExtractor, analyzed_file,
+                 number_of_processes,
                  decompiler_path: str, decompiled_files_path: str):
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
@@ -92,7 +94,7 @@ class ImportRetdecData:
 
 
 class FunctionDetector:
-    def __init__(self, redis_session):
+    def __init__(self, redis_session: redis.Redis):
         self.function_code = ""
         self.functions_lines = 0
         self.redis_session = redis_session
