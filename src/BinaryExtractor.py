@@ -19,8 +19,8 @@ class BinaryExtractor:
         Sets the minimum and maximum virtual addresses in file.
         """
         file_sections_info = self.get_file_sections_info()
-        self.start_virtual_address = self.get_start_virtual_address(file_sections_info)
-        self.end_virtual_address = self.get_end_virtual_address(file_sections_info)
+        self.start_virtual_address = self.get_min_virtual_address(file_sections_info)
+        self.end_virtual_address = self.get_max_virtual_address(file_sections_info)
 
     def get_file_sections_info(self) -> List:
         """
@@ -30,7 +30,7 @@ class BinaryExtractor:
         return json.loads(self.command_pipe.cmd('iSj'))
 
     @staticmethod
-    def get_start_virtual_address(file_sections: List):
+    def get_min_virtual_address(file_sections: List):
         """
         :param file_sections: list, list of file sections
 
@@ -43,7 +43,7 @@ class BinaryExtractor:
         return min_address
 
     @staticmethod
-    def get_end_virtual_address(file_sections: List):
+    def get_max_virtual_address(file_sections: List):
         """
         :param file_sections: list, list of file sections
 
