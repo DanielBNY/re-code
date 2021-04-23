@@ -54,10 +54,6 @@ class BinaryExtractor:
         """
         self.command_pipe.cmd('aac')
 
-    def finish_analysis(self):
-        self.command_pipe.cmd('exit')
-        self.command_pipe = None
-
     def import_functions_addresses(self):
         """
         Import all radare2 detected functions addresses into redis models.
