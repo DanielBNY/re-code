@@ -21,7 +21,7 @@ class ImportRetdecData:
         self.number_of_processes = number_of_processes
 
     def run(self):
-        self.binary_extractor.export_functions_addresses()
+        self.binary_extractor.import_functions_addresses()
         self.decompile_to_multiple_files()
         decompiled_files = [file for file in listdir(self.decompiled_files_path) if
                             isfile(join(self.decompiled_files_path, file)) and file.endswith(".c")]

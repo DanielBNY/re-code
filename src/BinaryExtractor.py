@@ -58,7 +58,7 @@ class BinaryExtractor:
         self.command_pipe.cmd('exit')
         self.command_pipe = None
 
-    def export_functions_addresses(self):
+    def import_functions_addresses(self):
         """
         Import all radare2 detected functions addresses into redis models.
         Radare2 's @@ fcn.*' command goes over all detected functions and prints their addresses.
