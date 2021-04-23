@@ -3,6 +3,7 @@ import os
 import json
 from Models import RadareDetectedModels
 import redis
+from typing import List
 
 
 class BinaryExtractor:
@@ -17,9 +18,16 @@ class BinaryExtractor:
         """
         Sets the minimum and maximum virtual addresses in file.
         """
-        file_sections_json = json.loads(self.command_pipe.cmd('iSj'))
-        self.start_virtual_address = self.get_start_virtual_address(file_sections_json)
-        self.end_virtual_address = self.get_end_virtual_address(file_sections_json)
+        file_sections_info = self.get_file_sections_info()
+        self.start_virtual_address = self.get_start_virtual_address(file_sections_info)
+        self.end_virtual_address = self.get_end_virtual_address(file_sections_info)
+
+    def get_file_sections_info(self) -> List:
+        """
+        Returns the binary sections info.
+        Radare2 'iSj' command returns info about the binary sections in a json format.
+        """
+        return json.loads(self.command_pipe.cmd('iSj'))
 
     @staticmethod
     def get_start_virtual_address(file_sections):
