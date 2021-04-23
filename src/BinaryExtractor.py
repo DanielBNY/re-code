@@ -7,7 +7,7 @@ from typing import List
 
 
 class BinaryExtractor:
-    def __init__(self, binary_path, redis_session: redis.Redis):
+    def __init__(self, binary_path: str, redis_session: redis.Redis):
         self.command_pipe = r2pipe.open(binary_path)
         self.redis_session = redis_session
         self.start_virtual_address = None
@@ -30,7 +30,7 @@ class BinaryExtractor:
         return json.loads(self.command_pipe.cmd('iSj'))
 
     @staticmethod
-    def get_start_virtual_address(file_sections):
+    def get_start_virtual_address(file_sections: List):
         """
         :param file_sections: list, list of file sections
 
@@ -43,7 +43,7 @@ class BinaryExtractor:
         return min_address
 
     @staticmethod
-    def get_end_virtual_address(file_sections):
+    def get_end_virtual_address(file_sections: List):
         """
         :param file_sections: list, list of file sections
 
@@ -85,7 +85,7 @@ class BinaryExtractor:
         self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name,
                                    mongo_db_name=mongo_db_name)
 
-    def export_functions_info(self, output_json_path):
+    def export_functions_info(self, output_json_path: str):
         """
         :param output_json_path: str, json file path
 
@@ -108,7 +108,7 @@ class BinaryExtractor:
         output = stream.read()
         return output
 
-    def analyze_function_at_address(self, address):
+    def analyze_function_at_address(self, address: int):
         """
         :param address: int, address inside the binary file.
 
