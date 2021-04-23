@@ -1,6 +1,8 @@
-from Models import Folders, Files, LonelyModels, FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
+from Models import FolderModel, FileModel, Folders, Files, LonelyModels, FunctionModel, APIWrapperModel, \
+    TreesEntriesFunctionsAddresses
 import redis
 import os
+from typing import List
 
 
 class BuildSampleStructure:
@@ -9,6 +11,13 @@ class BuildSampleStructure:
         self.redis_session = redis_session
 
     def run(self):
+        """
+        Build the sample structure with several steps:
+        First get all the entry folders models (the trees heads).
+        Creates the first folders, and then in recursion create the sons of the father folders.
+        Sets all the files path and then write the functions inside the new files.
+        Write all the functions with no connection in a lonely file.
+        """
         entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_folders_models()
         self.create_folders_in_path(self.recovered_project_path, entry_folders_models)
         folders_to_revisit = entry_folders_models
@@ -19,49 +28,81 @@ class BuildSampleStructure:
         self.create_lonely_functions_file()
 
     def create_lonely_functions_file(self):
+        """
+        Creates lonely functions in one file called lonely file.
+        """
         lonely_files_models = LonelyModels(redis_session=self.redis_session).get_files_models()
-        self.write_files_to_file(files_models=lonely_files_models,
+        self.write_files_to_file(files=lonely_files_models,
                                  file_path=os.path.join(self.recovered_project_path, b'lonely_file'))
 
-    def create_folder_for_sons(self, folders):
+    def create_folder_for_sons(self, folders: List[FolderModel]):
+        """
+        :param folders: List of folder models
+
+        Iterates over the input folders and create the sons of those folders.
+        """
         folders_to_revisit = []
         for folder in folders:
             sons_models = folder.get_sons_models()
             self.create_folders_in_path(path=os.path.join(folder.get_folders_path(), folder.get_name()),
-                                        models=sons_models)
+                                        folders=sons_models)
             folders_to_revisit += sons_models
         return folders_to_revisit
 
     @staticmethod
-    def create_folders_in_path(path, models):
-        for model in models:
-            os.mkdir(os.path.join(path, model.get_name()))
-            model.set_folders_path(path)
+    def create_folders_in_path(path: bytes, folders: List[FolderModel]):
+        """
+        :param path: Path to create the folder.
+        :param folders: List of folders to create in the path
+
+        Creates folders in the target path.
+        """
+        for folder in folders:
+            os.mkdir(os.path.join(path, folder.get_name()))
+            folder.set_folders_path(path)
 
     def set_all_files_paths(self):
+        """
+        Iterates over all folders and set the contained files path.
+        """
         folder_models = Folders(redis_session=self.redis_session).get_non_lonely_folders()
         for folder in folder_models:
             if folder.get_folders_path():
                 full_path = os.path.join(folder.get_folders_path(), folder.get_name())
                 files_models = folder.get_contained_files_models()
-                self.set_files_paths(path=full_path, models=files_models)
+                self.set_files_paths(path=full_path, files_models=files_models)
 
     @staticmethod
-    def set_files_paths(path, models):
-        for model in models:
-            model.set_folders_path(path)
+    def set_files_paths(path: bytes, files_models: List[FileModel]):
+        """
+        :param path: The path to set for the file models.
+        :param files_models: List of file models
+
+        Sets for each file model the folder path.
+        """
+        for file_model in files_models:
+            file_model.set_folders_path(path)
 
     def write_functions_to_files(self):
+        """
+        Iterates over all files and write the contained functions code into them.
+        """
         files_models = Files(redis_session=self.redis_session).get_non_lonely_files()
         for file_model in files_models:
             if file_model.get_folders_path():
                 file_path = os.path.join(file_model.get_folders_path(), file_model.get_name())
                 functions_models = file_model.get_contained_functions_models()
-                self.write_function_to_file(functions_models=functions_models, file_path=file_path)
+                self.write_function_to_file(functions=functions_models, file_path=file_path)
 
-    def write_function_to_file(self, functions_models, file_path):
+    def write_function_to_file(self, functions: List[FunctionModel], file_path: bytes):
+        """
+        :param functions: List of functions models to be written into a file.
+        :param file_path: Output file path.
+
+        Write multiple functions into a file.
+        """
         file_code = b''
-        for function_model in functions_models:
+        for function_model in functions:
             self.replace_wrapped_functions(function_model)
             function_code = function_model.get_function_code()
             if function_code:
@@ -70,9 +111,15 @@ class BuildSampleStructure:
             with open(file_path + b'.c', "wb") as file:
                 file.write(file_code)
 
-    def write_files_to_file(self, files_models, file_path):
+    def write_files_to_file(self, files: List[FileModel], file_path: bytes):
+        """
+        :param files: List of file models
+        :param file_path: file path to write the code
+
+        Write all the functions in files into one file.
+        """
         file_code = b''
-        for file_model in files_models:
+        for file_model in files:
             functions_models = file_model.get_contained_functions_models()
             for function in functions_models:
                 self.replace_wrapped_functions(function)
@@ -84,6 +131,13 @@ class BuildSampleStructure:
                 file.write(file_code)
 
     def replace_wrapped_functions(self, function_model: FunctionModel):
+        """
+        :param function_model: Function model in which the code is manipulated.
+
+        Replace wrapped function names with wrapped function name.
+        For example a function calls the function 'function_123' that is wrapping the strcmp function.
+        The replacement will change the called function name function_123 to strcmp.
+        """
         called_wrapper_functions = function_model.get_called_functions_wrapper()
         function_code = function_model.get_function_code()
         if called_wrapper_functions:
