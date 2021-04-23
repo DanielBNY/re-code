@@ -25,18 +25,18 @@ class CallTreeExtractor:
     def attach_nodes_sons(self, models, tree_head_model: FunctionModel):
         neighbors_to_revisit = []
         for model in models:
-            neighbors_to_revisit += self.attach_parent_node_to_sons(model, tree_head_model)
+            neighbors_to_revisit += self.attach_parent_to_one_entry_sons(parent_function=model,
+                                                                         tree_head_model=tree_head_model)
         return neighbors_to_revisit
 
-    def attach_parent_node_to_sons(self, origin_function_model, tree_head_model: FunctionModel):
+    def attach_parent_to_one_entry_sons(self, parent_function: FunctionModel, tree_head_model: FunctionModel):
         neighbors_to_revisit = []
-        functions_calls_out_models = origin_function_model.get_call_out_models()
+        functions_calls_out_models = parent_function.get_call_out_models()
+        parent_file_model = parent_function.get_parent_file_model()
         for called_function_model in functions_calls_out_models:
             called_file_model = called_function_model.get_parent_file_model()
-            file_calls_in_models = called_file_model.get_call_in_files()
-            origin_file_repo = origin_function_model.get_parent_file_model()
-            if not bool(file_calls_in_models) and not called_file_model.is_multiple_entries_models():
-                origin_file_repo.recursion_add_edge(called_file_model)
+            if not called_file_model.is_multiple_entries_models():
+                parent_file_model.recursion_add_edge(called_file_model)
                 called_function_model.set_tree_head_function_model_id(tree_head_model.model_id)
                 neighbors_to_revisit.append(FunctionModel(function_id=called_function_model.model_id,
                                                           redis_session=self.redis_session))
