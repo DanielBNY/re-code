@@ -6,7 +6,6 @@ from BinaryExtractor import BinaryExtractor
 from os import listdir
 from os.path import isfile, join
 import subprocess
-import psutil
 
 
 class ImportRetdecData:
@@ -88,14 +87,8 @@ class ImportRetdecData:
             last_decompiler_process.communicate()
 
     def calculate_analyzed_chunks_size(self, file_size) -> int:
-        available_memory_space_kb = psutil.virtual_memory().available
-        minimized_memory_percentage = available_memory_space_kb / (
-                1024 * self.number_of_processes * self.number_of_processes)
-        minimized_file_chunk = file_size / (self.number_of_processes * 2)
-        if minimized_file_chunk >= minimized_memory_percentage:
-            return int(minimized_memory_percentage / 1024)
-        else:
-            return int(minimized_file_chunk)
+        divided_file_chunk = int(file_size / (self.number_of_processes * 2))
+        return divided_file_chunk
 
 
 class FunctionDetector:
