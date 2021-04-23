@@ -14,7 +14,7 @@ class NodeModel:
         self.calls_out_set_id = self.model_id + b':calls_out'
         self.calls_in_set_id = self.model_id + b':calls_in'
 
-    def get_name(self):
+    def get_name(self) -> bytes:
         return self.model_id.replace(b':', b'_')
 
     def set_size(self, size: int):
@@ -64,7 +64,7 @@ class TreeNodeModel(NodeModel):
     def set_folders_path(self, folders_path):
         self.redis_session.hset(self.model_id, b'folders_path', folders_path)
 
-    def get_folders_path(self):
+    def get_folders_path(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'folders_path')
 
     def get_contained_nodes_ids(self):
@@ -198,7 +198,7 @@ class FileModel(TreeNodeModel):
                                                                  redis_session=self.redis_session)
         return contained_functions_models
 
-    def get_parent_folder_id(self) -> bin:
+    def get_parent_folder_id(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'folder_id')
 
     def get_parent_folder_model(self):
@@ -278,7 +278,7 @@ class FunctionModel(NodeModel):
     def set_tree_head_function_model_id(self, tree_head_model_id):
         self.redis_session.hset(self.model_id, b'tree_head_function_model_id', tree_head_model_id)
 
-    def get_tree_head_function_model_id(self) -> bin:
+    def get_tree_head_function_model_id(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
     def is_api_wrapper(self) -> bool:
@@ -287,7 +287,7 @@ class FunctionModel(NodeModel):
     def set_function_code(self, decompiled_code):
         self.redis_session.hset(self.model_id, b'decompiled_code', decompiled_code)
 
-    def set_called_function_wrapper(self, function_model_id: bin):
+    def set_called_function_wrapper(self, function_model_id: bytes):
         self.redis_session.sadd(self.model_id + b':called_function_wrapper', function_model_id)
 
     def get_called_functions_wrapper(self) -> List[FunctionModel]:
@@ -301,7 +301,7 @@ class FunctionModel(NodeModel):
     def get_function_code(self):
         return self.redis_session.hget(self.model_id, b'decompiled_code')
 
-    def get_parent_file_id(self) -> bin:
+    def get_parent_file_id(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'file_id')
 
     def get_parent_file_model(self) -> FileModel:
@@ -366,13 +366,13 @@ class MultipleEntriesSortedSet:
         self.redis_session = redis_session
         self.key = b'sorted_set_multiple_entries'
 
-    def add_element(self, number_of_calling_in_trees: int, function_model_id: bin):
+    def add_element(self, number_of_calling_in_trees: int, function_model_id: bytes):
         """
         Add a multiple entry model id with the score (number of calling in trees)
         """
         self.redis_session.zadd(self.key, {function_model_id: number_of_calling_in_trees})
 
-    def get_sorted_elements(self) -> List[bin]:
+    def get_sorted_elements(self) -> List[bytes]:
         """
         Get the sorted list of multiple entries by the (number of calling in trees)
         """
@@ -386,7 +386,7 @@ class APIWrapperModel(FunctionModel):
     def set_api_name(self, api_name):
         self.redis_session.hset(self.model_id, b'api_name', api_name)
 
-    def get_api_name(self) -> bin:
+    def get_api_name(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'api_name')
 
 
@@ -402,7 +402,7 @@ class SpecialModels:
         self.key_name = key_name
         self.redis_session = redis_session
 
-    def get_functions_addresses(self) -> Set[bin]:
+    def get_functions_addresses(self) -> Set[bytes]:
         return self.redis_session.smembers(self.key_name)
 
     def add_address(self, address: int):
@@ -479,7 +479,7 @@ class ApiWrappers:
     def add_function(self, model_id):
         self.redis_session.sadd(self.key, model_id)
 
-    def get_api_wrappers(self) -> Set[bin]:
+    def get_api_wrappers(self) -> Set[bytes]:
         return self.redis_session.smembers(self.key)
 
     def is_api_wrapper(self, model_id) -> bool:
@@ -502,7 +502,7 @@ class MultipleNodesModels:
         average_models_size = get_average_models_size(nodes_models=nodes_models)
         return average_models_size
 
-    def get_model_ids(self) -> Set[bin]:
+    def get_model_ids(self) -> Set[bytes]:
         return self.redis_session.smembers(self.multiple_nodes_models_key)
 
     def add_model_id(self, model_id):
@@ -575,21 +575,21 @@ def get_average_models_size(nodes_models: List[NodeModel]) -> float:
     return size_sum / float(len(nodes_models))
 
 
-def get_functions_models_by_ids(functions_models_ids: Set[bin], redis_session: redis.Redis) -> List[FunctionModel]:
+def get_functions_models_by_ids(functions_models_ids: Set[bytes], redis_session: redis.Redis) -> List[FunctionModel]:
     function_models = []
     for function_id in functions_models_ids:
         function_models.append(FunctionModel(redis_session=redis_session, function_id=function_id))
     return function_models
 
 
-def get_files_models_by_ids(files_models_ids: Set[bin], redis_session: redis.Redis) -> List[FileModel]:
+def get_files_models_by_ids(files_models_ids: Set[bytes], redis_session: redis.Redis) -> List[FileModel]:
     files_models = []
     for file_id in files_models_ids:
         files_models.append(FileModel(redis_session=redis_session, file_id=file_id))
     return files_models
 
 
-def get_folders_models_by_ids(folders_models_ids: Set[bin], redis_session: redis.Redis) -> List[FolderModel]:
+def get_folders_models_by_ids(folders_models_ids: Set[bytes], redis_session: redis.Redis) -> List[FolderModel]:
     folders_models = []
     for folder_id in folders_models_ids:
         folders_models.append(FolderModel(redis_session=redis_session, folder_id=folder_id))
@@ -603,7 +603,7 @@ def get_functions_by_addresses(functions_addresses, redis_session: redis.Redis) 
     return functions_models
 
 
-def get_files_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
+def get_files_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bytes]:
     files_models_ids = set()
     for address in functions_addresses:
         function_model = FunctionModel(address=address, redis_session=redis_session)
@@ -612,7 +612,7 @@ def get_files_ids_by_functions_addresses(functions_addresses, redis_session: red
     return files_models_ids
 
 
-def get_folders_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bin]:
+def get_folders_ids_by_functions_addresses(functions_addresses, redis_session: redis.Redis) -> Set[bytes]:
     folders_models_ids = set()
     for address in functions_addresses:
         function_model = FunctionModel(address=address, redis_session=redis_session)
@@ -630,14 +630,14 @@ def get_multiple_entries_functions_by_addresses(functions_addresses, redis_sessi
     return multiple_entries_functions
 
 
-def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bin]) -> List[NodeModel]:
+def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bytes]) -> List[NodeModel]:
     node_models = []
     for model_id in models_ids:
         node_models.append(NodeModel(model_id=model_id, redis_session=redis_session))
     return node_models
 
 
-def get_tree_models_by_ids(redis_session: redis.Redis, model_ids: Set[bin]) -> List[Union[FileModel, FolderModel]]:
+def get_tree_models_by_ids(redis_session: redis.Redis, model_ids: Set[bytes]) -> List[Union[FileModel, FolderModel]]:
     tree_models = []
     for model_id in model_ids:
         if b'file' in model_id:
