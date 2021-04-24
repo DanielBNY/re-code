@@ -49,13 +49,13 @@ class ClusterFilesAndFolders(Action):
             return []
         if sum_of_sons < max_node_size:
             if sum_of_sons > max_node_size / 2:
-                return self.merge_multiple_nodes(sons_models)
+                return [self.merge_multiple_nodes(sons_models)]
             else:
                 if father_node.get_size() + sum_of_sons < max_node_size:
                     father_and_sons = [father_node] + sons_models
-                    return self.merge_multiple_nodes(father_and_sons)
+                    return [self.merge_multiple_nodes(father_and_sons)]
                 else:
-                    return self.merge_multiple_nodes(sons_models)
+                    return [self.merge_multiple_nodes(sons_models)]
         else:
             num_of_cluster = (sum_of_sons / max_node_size) + 1
             return self.divide_to_cluster(num_of_cluster, sons_models, max_node_size)
@@ -86,8 +86,8 @@ class ClusterFilesAndFolders(Action):
 
     @staticmethod
     def merge_multiple_nodes(nodes_to_cluster: List[Union[FileModel, FolderModel]]) -> \
-            List[Union[FileModel, FolderModel]]:
+            Union[FileModel, FolderModel]:
         node_to_cluster_into = nodes_to_cluster[0]
         for node in nodes_to_cluster[1:]:
             node_to_cluster_into.recursion_cluster(node)
-        return [node_to_cluster_into]
+        return node_to_cluster_into
