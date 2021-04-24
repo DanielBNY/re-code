@@ -21,7 +21,7 @@ SAMPLES_DIR_NAME = "Samples"
 RETDEC_DECOMPILER_FOLDER_NAME = "RetdecDecompiler"
 
 
-class ExtractorsManager(Action):
+class ReCodeActionRunner(Action):
     def __init__(self, redis_ip: str, mongo_ip: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
                  max_file_size=200,
                  mongo_db_port=27017, number_of_processes=None):
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # Basic run
     file_name = input("Please Enter the Samples/{file name} to analyze:    (try bin_ls for test)\n")
     start_flow_time = time.time()
-    ExtractorsManager(redis_ip='localhost', mongo_ip='localhost',
-                      file_name_to_analyze=file_name).run()
+    ReCodeActionRunner(redis_ip='localhost', mongo_ip='localhost',
+                       file_name_to_analyze=file_name).run()
     end_flow_time = time.time()
     print(f"total time    {end_flow_time - start_flow_time}")
