@@ -10,24 +10,33 @@ import redis
 from AbstractClasses import Action
 
 
-class ImportRetdecData(Action):
-    def __init__(self, redis_session: redis.Redis, binary_extractor: BinaryExtractor, analyzed_file,
-                 number_of_processes,
-                 decompiler_path: str, decompiled_files_path: str):
+class ImportRadareNRetdecData(Action):
+    def __init__(self, redis_session: redis.Redis, analyzed_file,
+                 number_of_processes, functions_info_file_path, imported_collection_name, mongo_db_name,
+                 decompiler_path: str, decompiled_files_path: str, file_path_to_analyze):
+
         self.analyzed_file = analyzed_file
         self.redis_session = redis_session
         self.decompiled_files_path = decompiled_files_path
         self.decompiler_path = decompiler_path
-        self.binary_extractor = binary_extractor
+        self.binary_extractor = BinaryExtractor(file_path_to_analyze, self.redis_session)
         self.number_of_processes = number_of_processes
+        self.functions_info_file_path = functions_info_file_path
+        self.functions_info_collection_name = imported_collection_name
+        self.mongo_db_name = mongo_db_name
 
     def run(self):
+        self.binary_extractor.analyze_all_functions_calls()
+
         self.binary_extractor.import_functions_addresses()
         self.decompile_to_multiple_files()
         decompiled_files = [file for file in listdir(self.decompiled_files_path) if
                             isfile(join(self.decompiled_files_path, file)) and file.endswith(".c")]
         for file in decompiled_files:
             self.import_decompiled_functions(file_name=file)
+        self.binary_extractor.extract_functions_info(output_path=self.functions_info_file_path,
+                                                     imported_collection_name=self.functions_info_collection_name,
+                                                     mongo_db_name=self.mongo_db_name)
 
     def import_decompiled_functions(self, file_name):
         with open(os.path.join(self.decompiled_files_path, file_name)) as file:

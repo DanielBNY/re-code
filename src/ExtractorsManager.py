@@ -2,11 +2,10 @@ import redis
 from FunctionsGraphExtractor import FunctionsGraphExtractor
 from DirectedTreeExtractor import DirectedTreeExtractor
 from ClusterFilesAndFolders import ClusterFilesAndFolders
-from BinaryExtractor import BinaryExtractor
 from pymongo import MongoClient
 from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
-from ImportRetdecData import ImportRetdecData
+from ImportRadareNRetdecData import ImportRadareNRetdecData
 from ClusterTrees import ClusterTrees
 import multiprocessing
 import time
@@ -66,24 +65,26 @@ class ExtractorsManager(Action):
 
     def run(self):
         self.cleanup()
-        bin_ex = BinaryExtractor(self.file_path_to_analyze, self.redis_session)
-        bin_ex.analyze_all_functions_calls()
-        import_retdec_data = ImportRetdecData(redis_session=self.redis_session,
-                                              binary_extractor=bin_ex, analyzed_file=self.file_path_to_analyze,
-                                              number_of_processes=self.number_of_processes,
-                                              decompiler_path=self.decompiler_path,
-                                              decompiled_files_path=self.decompiled_files_path)
-        import_retdec_data.run()
-        bin_ex.extract_functions_info(self.functions_info_file_path,
-                                      imported_collection_name=self.functions_info_collection_name,
-                                      mongo_db_name=self.mongo_db_name)
+        ImportRadareNRetdecData(redis_session=self.redis_session,
+                                file_path_to_analyze=self.file_path_to_analyze, analyzed_file=self.file_path_to_analyze,
+                                number_of_processes=self.number_of_processes,
+                                decompiler_path=self.decompiler_path,
+                                decompiled_files_path=self.decompiled_files_path,
+                                functions_info_file_path=self.functions_info_file_path,
+                                imported_collection_name=self.functions_info_collection_name,
+                                mongo_db_name=self.mongo_db_name).run()
+
         FunctionsGraphExtractor(redis_session=self.redis_session, mongodb_client=self.mongo_client,
                                 functions_info_collection_name=self.functions_info_collection_name,
                                 mongo_db_name=self.mongo_db_name).run()
+
         DirectedTreeExtractor(self.redis_session).run()
+
         ClusterTrees(redis_session=self.redis_session).run()
+
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
+
         BuildSampleStructure(recovered_project_path=self.recovered_project_path.encode(),
                              redis_session=self.redis_session).run()
 
