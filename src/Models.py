@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import redis
 from typing import Set, List, Union
+import abc
 
 
 class NodeModel:
@@ -109,6 +110,14 @@ class TreeNodeModel(NodeModel):
         call_in_models = get_tree_models_by_ids(redis_session=self.redis_session, model_ids=call_in_models_ids)
         for call_in_model in call_in_models:
             call_in_model.change_edge_target(last_target_node=merging_node, new_target_node=self)
+
+    @abc.abstractmethod
+    def remove(self):
+        pass
+
+    @abc.abstractmethod
+    def recursion_cluster(self, file_to_cluster: Union[FolderModel, FileModel]):
+        pass
 
 
 class FolderModel(TreeNodeModel):
