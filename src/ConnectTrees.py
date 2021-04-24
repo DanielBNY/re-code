@@ -4,7 +4,7 @@ import redis
 from AbstractClasses import Action
 
 
-class ClusterTrees(Action):
+class ConnectTrees(Action):
     def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
 

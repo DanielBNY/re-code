@@ -6,7 +6,7 @@ from pymongo import MongoClient
 from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
 from ImportRadareNRetdecData import ImportRadareNRetdecData
-from ClusterTrees import ClusterTrees
+from ConnectTrees import ConnectTrees
 import multiprocessing
 import time
 from AbstractClasses import Action
@@ -80,7 +80,7 @@ class ReCodeActionRunner(Action):
 
         DirectedTreeExtractor(self.redis_session).run()
 
-        ClusterTrees(redis_session=self.redis_session).run()
+        ConnectTrees(redis_session=self.redis_session).run()
 
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
