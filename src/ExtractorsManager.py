@@ -1,6 +1,6 @@
 import redis
 from FunctionsGraphExtractor import FunctionsGraphExtractor
-from CallTreeExtractor import CallTreeExtractor
+from DirectedTreeExtractor import DirectedTreeExtractor
 from ClusterFilesAndFolders import ClusterFilesAndFolders
 from BinaryExtractor import BinaryExtractor
 from pymongo import MongoClient
@@ -79,7 +79,7 @@ class ExtractorsManager:
         FunctionsGraphExtractor(redis_session=self.redis_session, mongodb_client=self.mongo_client,
                                 functions_info_collection_name=self.functions_info_collection_name,
                                 mongo_db_name=self.mongo_db_name).run()
-        CallTreeExtractor(self.redis_session).run()
+        DirectedTreeExtractor(self.redis_session).run()
         ClusterTrees(redis_session=self.redis_session).run()
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
