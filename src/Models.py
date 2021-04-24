@@ -290,6 +290,10 @@ class FunctionModel(NodeModel):
     def get_tree_head_function_model_id(self) -> bytes:
         return self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
 
+    def get_tree_head_function_model(self) -> FunctionModel:
+        tree_head_function_model_id = self.redis_session.hget(self.model_id, b'tree_head_function_model_id')
+        return FunctionModel(function_id=tree_head_function_model_id, redis_session=self.redis_session)
+
     def is_api_wrapper(self) -> bool:
         return bool(APIWrapperModel(redis_session=self.redis_session, function_id=self.model_id).get_api_name())
 
