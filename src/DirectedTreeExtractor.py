@@ -1,9 +1,10 @@
 from Models import FunctionModel, EntryModels, MultipleEntriesModels
 import redis
 from typing import List
+from AbstractClasses import Action
 
 
-class DirectedTreeExtractor:
+class DirectedTreeExtractor(Action):
     r"""
     In a directed tree each node has one parent except the head. Example:
           (_)

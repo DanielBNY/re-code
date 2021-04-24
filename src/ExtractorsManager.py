@@ -10,6 +10,7 @@ from ImportRetdecData import ImportRetdecData
 from ClusterTrees import ClusterTrees
 import multiprocessing
 import time
+from AbstractClasses import Action
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
@@ -21,7 +22,7 @@ SAMPLES_DIR_NAME = "Samples"
 RETDEC_DECOMPILER_FOLDER_NAME = "RetdecDecompiler"
 
 
-class ExtractorsManager:
+class ExtractorsManager(Action):
     def __init__(self, redis_ip: str, mongo_ip: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
                  max_file_size=200,
                  mongo_db_port=27017, number_of_processes=None):

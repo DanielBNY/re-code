@@ -2,9 +2,10 @@ from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyMod
     MultipleEntriesModels
 from pymongo import MongoClient
 import redis
+from AbstractClasses import Action
 
 
-class FunctionsGraphExtractor:
+class FunctionsGraphExtractor(Action):
     """
     Functions call graph - functions are nodes and edges are calls to other functions
     """

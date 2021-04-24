@@ -1,9 +1,10 @@
 from Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, \
     FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
 import redis
+from AbstractClasses import Action
 
 
-class ClusterTrees:
+class ClusterTrees(Action):
     def __init__(self, redis_session: redis.Redis):
         self.redis_session = redis_session
 

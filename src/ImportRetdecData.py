@@ -7,9 +7,10 @@ from os import listdir
 from os.path import isfile, join
 import subprocess
 import redis
+from AbstractClasses import Action
 
 
-class ImportRetdecData:
+class ImportRetdecData(Action):
     def __init__(self, redis_session: redis.Redis, binary_extractor: BinaryExtractor, analyzed_file,
                  number_of_processes,
                  decompiler_path: str, decompiled_files_path: str):

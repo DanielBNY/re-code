@@ -2,9 +2,10 @@ from Models import Files, TreesEntriesFunctionsAddresses, get_tree_models_by_ids
 from Models import FileModel, FolderModel
 from typing import Union, List
 import redis
+from AbstractClasses import Action
 
 
-class ClusterFilesAndFolders:
+class ClusterFilesAndFolders(Action):
     def __init__(self, redis_session: redis.Redis, max_file_size: int, max_number_of_max_files_in_folder: int):
         self.max_file_size = max_file_size
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
