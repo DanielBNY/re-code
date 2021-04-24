@@ -75,11 +75,11 @@ class BinaryExtractor:
 
     def extract_functions_info(self, output_path: str, imported_collection_name: str, mongo_db_name: str):
         """
-        :param output_path:
-        :param imported_collection_name:
-        :param mongo_db_name:
+        :param output_path: str, json array output file path.
+        :param imported_collection_name: str, mongodb collection name to import the documents.
+        :param mongo_db_name: str, mongodb name.
 
-        Export the functions info into a json file and then import it into mongodb for fast function info read time.
+        Export the functions info into a json file and then import it into mongodb for fast functions info read time.
         """
         self.export_functions_info(output_json_path=output_path)
         self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name,
