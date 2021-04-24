@@ -6,7 +6,7 @@ import redis
 from typing import List
 
 
-class BinaryExtractor:
+class Radare2BinaryExtractor:
     def __init__(self, binary_path: str, redis_session: redis.Redis):
         self.command_pipe = r2pipe.open(binary_path)
         self.redis_session = redis_session

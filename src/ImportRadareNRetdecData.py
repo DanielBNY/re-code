@@ -2,7 +2,7 @@ import shutil, os.path
 import os
 import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
-from BinaryExtractor import BinaryExtractor
+from Radare2BinaryExtractor import Radare2BinaryExtractor
 from os import listdir
 from os.path import isfile, join
 import subprocess
@@ -19,7 +19,7 @@ class ImportRadareNRetdecData(Action):
         self.redis_session = redis_session
         self.decompiled_files_path = decompiled_files_path
         self.decompiler_path = decompiler_path
-        self.binary_extractor = BinaryExtractor(file_path_to_analyze, self.redis_session)
+        self.binary_extractor = Radare2BinaryExtractor(file_path_to_analyze, self.redis_session)
         self.number_of_processes = number_of_processes
         self.functions_info_file_path = functions_info_file_path
         self.functions_info_collection_name = imported_collection_name
