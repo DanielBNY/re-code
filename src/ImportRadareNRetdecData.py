@@ -4,7 +4,7 @@ import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
 from Radare2BinaryExtractor import Radare2BinaryExtractor
 from os import listdir
-from os.path import isfile, join
+from os.path import isfile, join, exists
 import subprocess
 import redis
 from AbstractClasses import Action
@@ -41,8 +41,8 @@ class ImportRadareNRetdecData(Action):
     def get_decompiled_files_paths(self) -> List[str]:
         decompiled_files = []
         for file in listdir(self.decompiled_files_path):
-            if isfile(os.path.join(self.decompiled_files_path, file)) and file.endswith(".c"):
-                decompiled_files.append(os.path.join(self.decompiled_files_path, file))
+            if isfile(join(self.decompiled_files_path, file)) and file.endswith(".c"):
+                decompiled_files.append(join(self.decompiled_files_path, file))
         return decompiled_files
 
     def import_decompiled_functions(self, file_path):
@@ -82,7 +82,7 @@ class ImportRadareNRetdecData(Action):
                         function_model.set_size(size=function_detector.functions_lines)
 
     def decompile_to_multiple_files(self):
-        if os.path.exists(self.decompiled_files_path):
+        if exists(self.decompiled_files_path):
             shutil.rmtree(self.decompiled_files_path)
         os.mkdir(self.decompiled_files_path)
         file_size = os.stat(self.analyzed_file).st_size
