@@ -8,6 +8,7 @@ from os.path import isfile, join
 import subprocess
 import redis
 from AbstractClasses import Action
+from typing import List
 
 
 class ImportRadareNRetdecData(Action):
@@ -30,16 +31,22 @@ class ImportRadareNRetdecData(Action):
 
         self.binary_extractor.import_functions_addresses()
         self.decompile_to_multiple_files()
-        decompiled_files = [file for file in listdir(self.decompiled_files_path) if
-                            isfile(join(self.decompiled_files_path, file)) and file.endswith(".c")]
-        for file in decompiled_files:
-            self.import_decompiled_functions(file_name=file)
+        decompiled_files_paths = self.get_decompiled_files_paths()
+        for file_path in decompiled_files_paths:
+            self.import_decompiled_functions(file_path=file_path)
         self.binary_extractor.extract_functions_info(output_path=self.functions_info_file_path,
                                                      imported_collection_name=self.functions_info_collection_name,
                                                      mongo_db_name=self.mongo_db_name)
 
-    def import_decompiled_functions(self, file_name):
-        with open(os.path.join(self.decompiled_files_path, file_name)) as file:
+    def get_decompiled_files_paths(self) -> List[str]:
+        decompiled_files = []
+        for file in listdir(self.decompiled_files_path):
+            if isfile(os.path.join(self.decompiled_files_path, file)) and file.endswith(".c"):
+                decompiled_files.append(os.path.join(self.decompiled_files_path, file))
+        return decompiled_files
+
+    def import_decompiled_functions(self, file_path):
+        with open(file_path) as file:
             function_detector = FunctionDetector(redis_session=self.redis_session)
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
