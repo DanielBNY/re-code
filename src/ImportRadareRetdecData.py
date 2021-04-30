@@ -35,9 +35,7 @@ class ImportRadareRetdecData(Action):
         self.binary_extractor.analyze_all_functions_calls()
 
         self.binary_extractor.import_functions_addresses()
-        decompiled_files_paths = self.get_decompiled_files_paths()
-        for file_path in decompiled_files_paths:
-            self.import_decompiled_functions(file_path=file_path)
+        self.import_decompiled_functions()
         self.binary_extractor.extract_functions_info(output_path=self.functions_info_file_path,
                                                      imported_collection_name=self.functions_info_collection_name,
                                                      mongo_db_name=self.mongo_db_name)
@@ -49,7 +47,12 @@ class ImportRadareRetdecData(Action):
                 decompiled_files.append(join(self.decompiled_files_path, file))
         return decompiled_files
 
-    def import_decompiled_functions(self, file_path):
+    def import_decompiled_functions(self):
+        decompiled_files_paths = self.get_decompiled_files_paths()
+        for file_path in decompiled_files_paths:
+            self.import_file_functions(file_path=file_path)
+
+    def import_file_functions(self, file_path):
         with open(file_path) as file:
             function_detector = FunctionDetector(redis_session=self.redis_session)
             for line in file:
