@@ -5,7 +5,7 @@ from ClusterFilesAndFolders import ClusterFilesAndFolders
 from pymongo import MongoClient
 from BuildSampleStructure import BuildSampleStructure
 import shutil, os.path
-from ImportRadareNRetdecData import ImportRadareNRetdecData
+from ImportRadareRetdecData import ImportRadareRetdecData
 from ConnectTrees import ConnectTrees
 import multiprocessing
 import time
@@ -65,14 +65,14 @@ class ReCodeActionRunner(Action):
 
     def run(self):
         self.cleanup()
-        ImportRadareNRetdecData(redis_session=self.redis_session,
-                                file_path_to_analyze=self.file_path_to_analyze, analyzed_file=self.file_path_to_analyze,
-                                number_of_processes=self.number_of_processes,
-                                decompiler_path=self.decompiler_path,
-                                decompiled_files_path=self.decompiled_files_path,
-                                functions_info_file_path=self.functions_info_file_path,
-                                imported_collection_name=self.functions_info_collection_name,
-                                mongo_db_name=self.mongo_db_name).run()
+        ImportRadareRetdecData(redis_session=self.redis_session,
+                               file_path_to_analyze=self.file_path_to_analyze, analyzed_file=self.file_path_to_analyze,
+                               number_of_processes=self.number_of_processes,
+                               decompiler_path=self.decompiler_path,
+                               decompiled_files_path=self.decompiled_files_path,
+                               functions_info_file_path=self.functions_info_file_path,
+                               imported_collection_name=self.functions_info_collection_name,
+                               mongo_db_name=self.mongo_db_name).run()
 
         FunctionsGraphExtractor(redis_session=self.redis_session, mongodb_client=self.mongo_client,
                                 functions_info_collection_name=self.functions_info_collection_name,

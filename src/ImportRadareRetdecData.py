@@ -11,7 +11,7 @@ from AbstractClasses import Action
 from typing import List
 
 
-class ImportRadareNRetdecData(Action):
+class ImportRadareRetdecData(Action):
     def __init__(self, redis_session: redis.Redis, analyzed_file,
                  number_of_processes, functions_info_file_path, imported_collection_name, mongo_db_name,
                  decompiler_path: str, decompiled_files_path: str, file_path_to_analyze):
