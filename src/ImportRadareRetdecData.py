@@ -1,14 +1,12 @@
-import shutil, os.path
-import os
 import re
 from Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
 from Radare2BinaryExtractor import Radare2BinaryExtractor
 from os import listdir
-from os.path import isfile, join, exists
-import subprocess
+from os.path import isfile, join
 import redis
 from AbstractClasses import Action
 from typing import List
+from MultiprocessingRetdec import MultiprocessingRetdec
 
 
 class ImportRadareRetdecData(Action):
@@ -27,10 +25,16 @@ class ImportRadareRetdecData(Action):
         self.mongo_db_name = mongo_db_name
 
     def run(self):
+        MultiprocessingRetdec(number_of_processes=self.number_of_processes,
+                              decompiler_path=self.decompiler_path,
+                              analyzed_file=self.analyzed_file,
+                              start_virtual_address=self.binary_extractor.start_virtual_address,
+                              end_virtual_address=self.binary_extractor.end_virtual_address,
+                              decompiled_files_path=self.decompiled_files_path).run()
+
         self.binary_extractor.analyze_all_functions_calls()
 
         self.binary_extractor.import_functions_addresses()
-        self.decompile_to_multiple_files()
         decompiled_files_paths = self.get_decompiled_files_paths()
         for file_path in decompiled_files_paths:
             self.import_decompiled_functions(file_path=file_path)
@@ -80,34 +84,6 @@ class ImportRadareRetdecData(Action):
                                 address=function_detector.function_address)
                         function_model.set_function_code(function_detector.function_code)
                         function_model.set_size(size=function_detector.functions_lines)
-
-    def decompile_to_multiple_files(self):
-        if exists(self.decompiled_files_path):
-            shutil.rmtree(self.decompiled_files_path)
-        os.mkdir(self.decompiled_files_path)
-        file_size = os.stat(self.analyzed_file).st_size
-        decompilers_processes = []
-        start_address = self.binary_extractor.start_virtual_address
-        while start_address < self.binary_extractor.end_virtual_address:
-            analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
-            decompiler_process = subprocess.Popen(["python", self.decompiler_path, "--select-ranges",
-                                                   f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
-                                                   "-o",
-                                                   f"{self.decompiled_files_path + '/file' + str(start_address)}.c",
-                                                   self.analyzed_file,
-                                                   "--cleanup", "--select-decode-only"])
-            decompilers_processes.append(decompiler_process)
-            if len(decompilers_processes) == self.number_of_processes:
-                decompilers_processes[0].communicate()
-                del decompilers_processes[0]
-            start_address += analyzed_chunks_size
-
-        for last_decompiler_process in decompilers_processes:
-            last_decompiler_process.communicate()
-
-    def calculate_analyzed_chunks_size(self, file_size) -> int:
-        divided_file_chunk = int(file_size / (self.number_of_processes * 2))
-        return divided_file_chunk
 
 
 class FunctionDetector:
