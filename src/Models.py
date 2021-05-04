@@ -119,12 +119,20 @@ class TreeNodeModel(NodeModel):
     def recursion_cluster(self, file_to_cluster: Union[FolderModel, FileModel]):
         pass
 
+    @abc.abstractmethod
+    def get_call_in_models(self):
+        pass
+
+    @abc.abstractmethod
+    def get_call_out_models(self):
+        pass
+
 
 class FolderModel(TreeNodeModel):
     def __init__(self, redis_session: redis.Redis, folder_id):
         TreeNodeModel.__init__(self, redis_session=redis_session, model_id=folder_id)
 
-    def get_call_in_folders(self):
+    def get_call_in_models(self):
         call_in_folders_ids = self.get_call_in_models_ids()
         call_in_folders = get_folders_models_by_ids(redis_session=self.redis_session,
                                                     folders_models_ids=call_in_folders_ids)
@@ -189,7 +197,7 @@ class FileModel(TreeNodeModel):
     def __init__(self, redis_session: redis.Redis, file_id):
         TreeNodeModel.__init__(self, redis_session=redis_session, model_id=file_id)
 
-    def get_call_in_files(self):
+    def get_call_in_models(self):
         call_in_files_ids = self.get_call_in_models_ids()
         call_in_files_models = get_files_models_by_ids(redis_session=self.redis_session,
                                                        files_models_ids=call_in_files_ids)

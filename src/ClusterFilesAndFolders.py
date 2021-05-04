@@ -75,8 +75,7 @@ class ClusterFilesAndFolders(Action):
         Otherwise cluster to one node, if the sum of sons and father is smaller than the max size cluster the father
         and sons, and if not just cluster the sons.
         """
-        model_ids = father_node.get_call_out_models_ids()
-        sons_models = get_tree_models_by_ids(model_ids=model_ids, redis_session=self.redis_session)
+        sons_models = father_node.get_call_out_models()
         sum_of_sons = father_node.get_sum_of_sons()
         if not sons_models:
             return []

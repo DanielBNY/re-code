@@ -122,12 +122,12 @@ class ConnectTrees(Action):
         Get the tree head by traversing up from the file model until the last father is reached.
         """
         relative_distance = 0
-        file_father = file_model.get_call_in_files()
+        file_father = file_model.get_call_in_models()
         last_father = file_model
         while file_father:
             relative_distance += 1
             last_father = file_father[0]
-            file_father = file_father[0].get_call_in_files()
+            file_father = file_father[0].get_call_in_models()
         return last_father
 
     def set_trees_heads(self):
