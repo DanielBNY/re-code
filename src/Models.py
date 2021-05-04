@@ -634,8 +634,13 @@ def get_folders_ids_by_functions_addresses(functions_addresses, redis_session: r
     return folders_models_ids
 
 
-def get_multiple_entries_functions_by_addresses(functions_addresses, redis_session: redis.Redis) \
+def get_multiple_entries_functions_by_addresses(functions_addresses: Set[bytes], redis_session: redis.Redis) \
         -> List[MultipleEntriesFunctionNode]:
+    """
+    :param functions_addresses: A set of bytes.
+    :param redis_session: Redis session.
+    :returns: List of multiple entries functions nodes.
+    """
     multiple_entries_functions = []
     for address in functions_addresses:
         multiple_entries_function = MultipleEntriesFunctionNode(address=address, redis_session=redis_session)
@@ -644,6 +649,11 @@ def get_multiple_entries_functions_by_addresses(functions_addresses, redis_sessi
 
 
 def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bytes]) -> List[NodeModel]:
+    """
+    :param redis_session: Redis session.
+    :param models_ids: A set of models ids in bytes type.
+    :returns: List of node models.
+    """
     node_models = []
     for model_id in models_ids:
         node_models.append(NodeModel(model_id=model_id, redis_session=redis_session))
@@ -651,6 +661,11 @@ def get_node_models_by_ids(redis_session: redis.Redis, models_ids: Set[bytes]) -
 
 
 def get_tree_models_by_ids(redis_session: redis.Redis, model_ids: Set[bytes]) -> List[Union[FileModel, FolderModel]]:
+    """
+    :param redis_session: Redis session.
+    :param model_ids: A set of models ids in bytes type.
+    :returns: List of file models or folder models
+    """
     tree_models = []
     for model_id in model_ids:
         if b'file' in model_id:
