@@ -1,6 +1,4 @@
-import shutil
 import os
-from os.path import exists
 import subprocess
 from AbstractClasses import Action
 
@@ -16,9 +14,6 @@ class Decompiler(Action):
         self.decompiler_path = decompiler_path
 
     def run(self):
-        if exists(self.decompiled_files_path):
-            shutil.rmtree(self.decompiled_files_path)
-        os.mkdir(self.decompiled_files_path)
         file_size = os.stat(self.analyzed_file).st_size
         decompilers_processes = []
         start_address = self.start_virtual_address

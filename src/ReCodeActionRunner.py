@@ -10,6 +10,7 @@ from ConnectTrees import ConnectTrees
 import multiprocessing
 import time
 from AbstractClasses import Action
+from os.path import exists
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
@@ -57,9 +58,15 @@ class ReCodeActionRunner(Action):
         os.mkdir(self.temporary_sample_data_directory)
         os.mkdir(self.decompiled_files_path)
 
+    def decompiled_files_cleanup(self):
+        if exists(self.decompiled_files_path):
+            shutil.rmtree(self.decompiled_files_path)
+        os.mkdir(self.decompiled_files_path)
+
     def cleanup(self):
         self.re_create_recovered_project_path()
         self.re_create_temporary_sample_directories()
+        self.decompiled_files_cleanup()
         self.redis_session.flushdb()
         self.mongo_client.drop_database(self.mongo_db_name)
 
