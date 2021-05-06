@@ -3,7 +3,7 @@ from FunctionsGraphExtractor import FunctionsGraphExtractor
 from DirectedTreeExtractor import DirectedTreeExtractor
 from ClusterFilesAndFolders import ClusterFilesAndFolders
 from pymongo import MongoClient
-from BuildSampleStructure import BuildSampleStructure
+from RecoveredCodeBuild import ReCodeBuild
 import shutil, os.path
 from ImportBinaryData import ImportBinaryData
 from ConnectTrees import ConnectTrees
@@ -92,8 +92,8 @@ class ReCodeActionRunner(Action):
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
 
-        BuildSampleStructure(recovered_project_path=self.recovered_project_path.encode(),
-                             redis_session=self.redis_session).run()
+        ReCodeBuild(recovered_project_path=self.recovered_project_path.encode(),
+                    redis_session=self.redis_session).run()
 
 
 if __name__ == "__main__":

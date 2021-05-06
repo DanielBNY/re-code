@@ -6,7 +6,7 @@ from typing import List
 from AbstractClasses import Action
 
 
-class BuildSampleStructure(Action):
+class ReCodeBuild(Action):
     def __init__(self, recovered_project_path, redis_session: redis.Redis):
         self.recovered_project_path = recovered_project_path
         self.redis_session = redis_session
