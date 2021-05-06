@@ -24,8 +24,7 @@ class Decompiler(Action):
             decompiler_process = self.open_decompiler_process(chunk_start_address, chunk_end_address)
             self.decompilers_processes.append(decompiler_process)
             if len(self.decompilers_processes) == self.number_of_processes:
-                self.decompilers_processes[0].communicate()
-                del self.decompilers_processes[0]
+                self.wait_last_process_terminated()
 
         self.wait_decompiler_processes_terminated()
 
@@ -51,3 +50,7 @@ class Decompiler(Action):
                                                self.analyzed_file,
                                                "--cleanup", "--select-decode-only"])
         return decompiler_process
+
+    def wait_last_process_terminated(self):
+        self.decompilers_processes[0].communicate()
+        del self.decompilers_processes[0]
