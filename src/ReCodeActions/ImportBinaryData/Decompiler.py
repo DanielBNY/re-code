@@ -21,14 +21,8 @@ class Decompiler(Action):
         analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
         for chunk_start_address in range(self.start_virtual_address, self.end_virtual_address, analyzed_chunks_size):
             chunk_end_address = self.calculate_end_address(chunk_start_address, analyzed_chunks_size)
-            decompiler_process = subprocess.Popen(["python", self.decompiler_path, "--select-ranges",
-                                                   f"{hex(chunk_start_address)}-{hex(chunk_end_address)}",
-                                                   "-o",
-                                                   f"{self.decompiled_files_path + '/file' + str(chunk_start_address)}.c",
-                                                   self.analyzed_file,
-                                                   "--cleanup", "--select-decode-only"])
+            decompiler_process = self.open_decompiler_process(chunk_start_address, chunk_end_address)
             self.decompilers_processes.append(decompiler_process)
-
             if len(self.decompilers_processes) == self.number_of_processes:
                 self.decompilers_processes[0].communicate()
                 del self.decompilers_processes[0]
@@ -48,3 +42,12 @@ class Decompiler(Action):
         if self.end_virtual_address < start + analyzed_chunks_size:
             end_address = self.end_virtual_address
         return end_address
+
+    def open_decompiler_process(self, chunk_start_address, chunk_end_address):
+        decompiler_process = subprocess.Popen(["python", self.decompiler_path, "--select-ranges",
+                                               f"{hex(chunk_start_address)}-{hex(chunk_end_address)}",
+                                               "-o",
+                                               f"{self.decompiled_files_path + '/file' + str(chunk_start_address)}.c",
+                                               self.analyzed_file,
+                                               "--cleanup", "--select-decode-only"])
+        return decompiler_process
