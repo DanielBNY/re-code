@@ -23,7 +23,8 @@ class Decompiler(Action):
             chunk_end_address = self.calculate_end_address(chunk_start_address, analyzed_chunks_size)
             decompiler_process = self.open_decompiler_process(chunk_start_address, chunk_end_address)
             self.decompilers_processes.append(decompiler_process)
-            if len(self.decompilers_processes) == self.number_of_processes:
+            is_max_process_number = len(self.decompilers_processes) == self.number_of_processes
+            if is_max_process_number:
                 self.wait_last_process_terminated()
 
         self.wait_decompiler_processes_terminated()
