@@ -18,20 +18,20 @@ class Decompiler(Action):
 
     def run(self):
         file_size = os.stat(self.analyzed_file).st_size
-        start_address = self.start_virtual_address
-        while start_address < self.end_virtual_address:
-            analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
+        analyzed_chunks_size = self.calculate_analyzed_chunks_size(file_size)
+        for chunk_start_address in range(self.start_virtual_address, self.end_virtual_address, analyzed_chunks_size):
+            chunk_end_address = self.calculate_end_address(chunk_start_address, analyzed_chunks_size)
             decompiler_process = subprocess.Popen(["python", self.decompiler_path, "--select-ranges",
-                                                   f"{hex(start_address)}-{hex(start_address + analyzed_chunks_size)}",
+                                                   f"{hex(chunk_start_address)}-{hex(chunk_end_address)}",
                                                    "-o",
-                                                   f"{self.decompiled_files_path + '/file' + str(start_address)}.c",
+                                                   f"{self.decompiled_files_path + '/file' + str(chunk_start_address)}.c",
                                                    self.analyzed_file,
                                                    "--cleanup", "--select-decode-only"])
             self.decompilers_processes.append(decompiler_process)
+
             if len(self.decompilers_processes) == self.number_of_processes:
                 self.decompilers_processes[0].communicate()
                 del self.decompilers_processes[0]
-            start_address += analyzed_chunks_size
 
         self.wait_decompiler_processes_terminated()
 
@@ -42,3 +42,9 @@ class Decompiler(Action):
     def wait_decompiler_processes_terminated(self):
         for last_decompiler_process in self.decompilers_processes:
             last_decompiler_process.communicate()
+
+    def calculate_end_address(self, start, analyzed_chunks_size):
+        end_address = start + analyzed_chunks_size
+        if self.end_virtual_address < start + analyzed_chunks_size:
+            end_address = self.end_virtual_address
+        return end_address
