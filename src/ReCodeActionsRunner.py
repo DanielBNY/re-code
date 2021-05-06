@@ -1,15 +1,15 @@
 import redis
-from src.ReCodeActions.FunctionsGraphExtractor import FunctionsGraphExtractor
-from src.ReCodeActions.DirectedTreeExtractor import DirectedTreeExtractor
-from src.ReCodeActions.ClusterFilesAndFolders import ClusterFilesAndFolders
+from src.ReCodeActions.FunctionsGraphExtractor.FunctionsGraphExtractor import FunctionsGraphExtractor
+from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import DirectedTreeExtractor
+from src.ReCodeActions.ClusterFilesAndFolders.ClusterFilesAndFolders import ClusterFilesAndFolders
 from pymongo import MongoClient
-from src.ReCodeActions.RecoveredCodeBuild import ReCodeBuild
+from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCodeBuild
 import shutil, os.path
-from src.ReCodeActions.ImportBinaryData import ImportBinaryData
-from src.ReCodeActions.ConnectTrees import ConnectTrees
+from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
+from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
 import multiprocessing
 import time
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 from os.path import exists
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
@@ -92,8 +92,8 @@ class ReCodeActionsRunner(Action):
         ClusterFilesAndFolders(redis_session=self.redis_session, max_file_size=self.max_file_size,
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
 
-        ReCodeBuild(recovered_project_path=self.recovered_project_path.encode(),
-                    redis_session=self.redis_session).run()
+        RecoveredCodeBuild(recovered_project_path=self.recovered_project_path.encode(),
+                           redis_session=self.redis_session).run()
 
 
 if __name__ == "__main__":

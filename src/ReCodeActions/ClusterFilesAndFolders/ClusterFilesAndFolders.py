@@ -2,7 +2,7 @@ from src.ReCodeActions.Models import Files, TreesEntriesFunctionsAddresses
 from src.ReCodeActions.Models import FileModel, FolderModel
 from typing import Union, List
 import redis
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 
 
 class ClusterFilesAndFolders(Action):

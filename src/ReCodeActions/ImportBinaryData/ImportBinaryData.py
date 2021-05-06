@@ -1,12 +1,12 @@
 from src.ReCodeActions.Models import FunctionModel, APIWrapperModel, ApiWrappers, RadareDetectedModels, RetdecDetectedModels
-from src.ReCodeActions.Radare2BinaryExtractor import Radare2BinaryExtractor
+from src.ReCodeActions.ImportBinaryData.Radare2BinaryExtractor import Radare2BinaryExtractor
 from os import listdir
 from os.path import isfile, join
 import redis
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 from typing import List
-from src.ReCodeActions.Decompiler import Decompiler
-from src.ReCodeActions.FunctionDetector import FunctionDetector
+from src.ReCodeActions.ImportBinaryData.Decompiler import Decompiler
+from src.ReCodeActions.ImportBinaryData.FunctionDetector import FunctionDetector
 
 
 class ImportBinaryData(Action):

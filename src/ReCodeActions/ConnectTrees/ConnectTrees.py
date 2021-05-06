@@ -1,7 +1,7 @@
 from src.ReCodeActions.Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, \
     FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
 import redis
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 from typing import List
 
 

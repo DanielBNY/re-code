@@ -3,10 +3,10 @@ from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, Lon
 import redis
 import os
 from typing import List
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 
 
-class ReCodeBuild(Action):
+class RecoveredCodeBuild(Action):
     def __init__(self, recovered_project_path, redis_session: redis.Redis):
         self.recovered_project_path = recovered_project_path
         self.redis_session = redis_session

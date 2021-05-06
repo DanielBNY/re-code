@@ -2,7 +2,7 @@ from src.ReCodeActions.Models import FunctionModel, ApiWrappers, Functions, Entr
     MultipleEntriesModels
 from pymongo import MongoClient
 import redis
-from src.ReCodeActions.AbstractClasses import Action
+from src.AbstractClasses import Action
 
 
 class FunctionsGraphExtractor(Action):
