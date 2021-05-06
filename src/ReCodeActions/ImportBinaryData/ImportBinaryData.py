@@ -7,7 +7,7 @@ from src.ReCodeActions.Models import FunctionModel, APIWrapperModel, ApiWrappers
     RetdecDetectedModels
 from src.ReCodeActions.ImportBinaryData.Radare2BinaryExtractor import Radare2BinaryExtractor
 from src.ReCodeActions.ImportBinaryData.FunctionDetector import FunctionDetector
-from src.ReCodeActions.ImportBinaryData.Decompiler import Decompiler
+from src.ReCodeActions.ImportBinaryData.MultiProcessedDecompilation import MultiProcessedDecompilation
 from src.AbstractClasses import Action
 
 
@@ -27,12 +27,12 @@ class ImportBinaryData(Action):
         self.mongo_db_name = mongo_db_name
 
     def run(self):
-        Decompiler(number_of_processes=self.number_of_processes,
-                   decompiler_path=self.decompiler_path,
-                   analyzed_file=self.analyzed_file,
-                   start_virtual_address=self.binary_extractor.start_virtual_address,
-                   end_virtual_address=self.binary_extractor.end_virtual_address,
-                   decompiled_files_path=self.decompiled_files_path).run()
+        MultiProcessedDecompilation(number_of_processes=self.number_of_processes,
+                                    decompiler_path=self.decompiler_path,
+                                    analyzed_file=self.analyzed_file,
+                                    start_virtual_address=self.binary_extractor.start_virtual_address,
+                                    end_virtual_address=self.binary_extractor.end_virtual_address,
+                                    decompiled_files_path=self.decompiled_files_path).run()
 
         self.binary_extractor.analyze_all_functions_calls()
 
