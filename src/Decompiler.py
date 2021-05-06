@@ -5,7 +5,7 @@ import subprocess
 from AbstractClasses import Action
 
 
-class MultiprocessingRetdec(Action):
+class Decompiler(Action):
     def __init__(self, number_of_processes: int, decompiled_files_path: str, analyzed_file: str,
                  start_virtual_address: int, end_virtual_address: int, decompiler_path: str):
         self.number_of_processes = number_of_processes

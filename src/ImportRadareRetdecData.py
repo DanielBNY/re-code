@@ -5,7 +5,7 @@ from os.path import isfile, join
 import redis
 from AbstractClasses import Action
 from typing import List
-from MultiprocessingRetdec import MultiprocessingRetdec
+from Decompiler import Decompiler
 from FunctionDetector import FunctionDetector
 
 
@@ -25,12 +25,12 @@ class ImportRadareRetdecData(Action):
         self.mongo_db_name = mongo_db_name
 
     def run(self):
-        MultiprocessingRetdec(number_of_processes=self.number_of_processes,
-                              decompiler_path=self.decompiler_path,
-                              analyzed_file=self.analyzed_file,
-                              start_virtual_address=self.binary_extractor.start_virtual_address,
-                              end_virtual_address=self.binary_extractor.end_virtual_address,
-                              decompiled_files_path=self.decompiled_files_path).run()
+        Decompiler(number_of_processes=self.number_of_processes,
+                   decompiler_path=self.decompiler_path,
+                   analyzed_file=self.analyzed_file,
+                   start_virtual_address=self.binary_extractor.start_virtual_address,
+                   end_virtual_address=self.binary_extractor.end_virtual_address,
+                   decompiled_files_path=self.decompiled_files_path).run()
 
         self.binary_extractor.analyze_all_functions_calls()
 
