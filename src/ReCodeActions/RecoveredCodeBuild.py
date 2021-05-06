@@ -1,9 +1,9 @@
-from Models import FolderModel, FileModel, Folders, Files, LonelyModels, FunctionModel, APIWrapperModel, \
+from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, LonelyModels, FunctionModel, APIWrapperModel, \
     TreesEntriesFunctionsAddresses
 import redis
 import os
 from typing import List
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class ReCodeBuild(Action):

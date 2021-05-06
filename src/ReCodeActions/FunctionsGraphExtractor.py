@@ -1,8 +1,8 @@
-from Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, \
+from src.ReCodeActions.Models import FunctionModel, ApiWrappers, Functions, EntryModels, LonelyModels, RetdecDetectedModels, \
     MultipleEntriesModels
 from pymongo import MongoClient
 import redis
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class FunctionsGraphExtractor(Action):

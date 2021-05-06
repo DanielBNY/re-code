@@ -1,7 +1,7 @@
-from Models import FunctionModel, EntryModels, MultipleEntriesModels
+from src.ReCodeActions.Models import FunctionModel, EntryModels, MultipleEntriesModels
 import redis
 from typing import List
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class DirectedTreeExtractor(Action):

@@ -1,8 +1,8 @@
-from Models import Files, TreesEntriesFunctionsAddresses, get_tree_models_by_ids
-from Models import FileModel, FolderModel
+from src.ReCodeActions.Models import Files, TreesEntriesFunctionsAddresses
+from src.ReCodeActions.Models import FileModel, FolderModel
 from typing import Union, List
 import redis
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class ClusterFilesAndFolders(Action):

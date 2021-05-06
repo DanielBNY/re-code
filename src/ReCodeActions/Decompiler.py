@@ -1,6 +1,6 @@
 import os
 import subprocess
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class Decompiler(Action):

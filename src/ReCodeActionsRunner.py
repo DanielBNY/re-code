@@ -1,15 +1,15 @@
 import redis
-from FunctionsGraphExtractor import FunctionsGraphExtractor
-from DirectedTreeExtractor import DirectedTreeExtractor
-from ClusterFilesAndFolders import ClusterFilesAndFolders
+from src.ReCodeActions.FunctionsGraphExtractor import FunctionsGraphExtractor
+from src.ReCodeActions.DirectedTreeExtractor import DirectedTreeExtractor
+from src.ReCodeActions.ClusterFilesAndFolders import ClusterFilesAndFolders
 from pymongo import MongoClient
-from RecoveredCodeBuild import ReCodeBuild
+from src.ReCodeActions.RecoveredCodeBuild import ReCodeBuild
 import shutil, os.path
-from ImportBinaryData import ImportBinaryData
-from ConnectTrees import ConnectTrees
+from src.ReCodeActions.ImportBinaryData import ImportBinaryData
+from src.ReCodeActions.ConnectTrees import ConnectTrees
 import multiprocessing
 import time
-from AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 from os.path import exists
 
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
