@@ -1,31 +1,32 @@
-import redis
-from src.ReCodeActions.FunctionsGraphExtractor.FunctionsGraphExtractor import FunctionsGraphExtractor
-from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import DirectedTreeExtractor
-from src.ReCodeActions.ClusterFilesAndFolders.ClusterFilesAndFolders import ClusterFilesAndFolders
 from pymongo import MongoClient
+from os.path import exists
+import multiprocessing
+import os.path
+import shutil
+import redis
+import time
+
+from src.ReCodeActions.FunctionsGraphExtractor.FunctionsGraphExtractor import FunctionsGraphExtractor
+from src.ReCodeActions.ClusterFilesAndFolders.ClusterFilesAndFolders import ClusterFilesAndFolders
+from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import DirectedTreeExtractor
 from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCodeBuild
-import shutil, os.path
 from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
 from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
-import multiprocessing
-import time
 from src.AbstractClasses import Action
-from os.path import exists
 
-RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
-FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
-MONGO_DB_NAME = "re-code"
-TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
-FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
-SAMPLES_DIR_NAME = "Samples"
+RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
 RETDEC_DECOMPILER_FOLDER_NAME = "RetdecDecompiler"
+FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
+FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
+TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
+SAMPLES_DIR_NAME = "Samples"
+MONGO_DB_NAME = "re-code"
 
 
 class ReCodeActionsRunner(Action):
     def __init__(self, redis_ip: str, mongo_ip: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
-                 max_file_size=200,
-                 mongo_db_port=27017, number_of_processes=None):
+                 max_file_size=200, mongo_db_port=27017, number_of_processes=None):
         self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
         self.max_file_size = max_file_size

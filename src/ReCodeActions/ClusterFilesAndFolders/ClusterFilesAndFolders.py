@@ -1,7 +1,8 @@
+import redis
+from typing import Union, List
+
 from src.ReCodeActions.Models import Files, TreesEntriesFunctionsAddresses
 from src.ReCodeActions.Models import FileModel, FolderModel
-from typing import Union, List
-import redis
 from src.AbstractClasses import Action
 
 

@@ -1,9 +1,10 @@
-import r2pipe
 import os
 import json
-from src.ReCodeActions.Models import RadareDetectedModels
 import redis
+import r2pipe
 from typing import List
+
+from src.ReCodeActions.Models import RadareDetectedModels
 
 
 class Radare2BinaryExtractor:

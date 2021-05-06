@@ -1,8 +1,9 @@
+import redis
+from typing import List
+
 from src.ReCodeActions.Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, \
     FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
-import redis
 from src.AbstractClasses import Action
-from typing import List
 
 
 class ConnectTrees(Action):

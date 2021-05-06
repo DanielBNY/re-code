@@ -1,7 +1,6 @@
 from __future__ import annotations
-
-import redis
 from typing import Set, List, Union
+import redis
 import abc
 
 

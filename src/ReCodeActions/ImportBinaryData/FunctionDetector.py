@@ -1,5 +1,5 @@
-import redis
 import re
+import redis
 
 
 class FunctionDetector:
