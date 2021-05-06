@@ -3,6 +3,10 @@ import redis
 
 
 class FunctionDetector:
+    __slots__ = "function_code", "functions_lines", "redis_session", "function_address", \
+                "currently_analyzing_function", "finished_analyzing_function", "finished_analyzing_function", \
+                "wrapped_function_name", "empty_function"
+
     def __init__(self, redis_session: redis.Redis):
         self.function_code = ""
         self.functions_lines = 0
