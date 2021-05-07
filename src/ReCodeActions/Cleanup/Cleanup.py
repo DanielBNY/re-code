@@ -18,6 +18,13 @@ class Cleanup(Action):
         self.mongo_db_name = mongo_db_name
 
     def run(self):
+        """
+        Remove and recreate the recovered project folder.
+        Remove and recreate the temporary sample data folder.
+        Remove and recreate the decompiled files folder.
+        Flush the redisDB.
+        Drop the mongoDB.
+        """
         self.remove_and_recreate(self.recovered_project_path)
         self.remove_and_recreate(self.temporary_sample_data_directory)
         self.remove_and_recreate(self.decompiled_files_path)
