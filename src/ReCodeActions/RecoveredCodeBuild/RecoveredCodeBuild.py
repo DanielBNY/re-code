@@ -1,6 +1,8 @@
 import os
 import redis
 from typing import List
+from pathlib import Path
+from zipfile import ZipFile
 
 from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, LonelyModels, \
     FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
@@ -28,6 +30,17 @@ class RecoveredCodeBuild(Action):
         self.set_all_files_paths()
         self.write_functions_to_files()
         self.create_lonely_functions_file()
+        output_zip_path = os.path.join(Path(self.recovered_project_path.decode()).parent.absolute(),
+                                       RecoveredCodeBuild.__name__ + ".zip")
+        self.zip_files_in_dir(self.recovered_project_path, output_zip_path)
+
+    @staticmethod
+    def zip_files_in_dir(dir_to_zip, zip_name):
+        with ZipFile(zip_name, 'w') as zipObj:
+            for folderName, sub_folders, filenames in os.walk(dir_to_zip):
+                for filename in filenames:
+                    file_path = os.path.join(folderName, filename)
+                    zipObj.write(file_path.decode(), file_path.decode().replace(dir_to_zip.decode(), ''))
 
     def create_lonely_functions_file(self):
         """
