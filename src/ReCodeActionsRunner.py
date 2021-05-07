@@ -1,9 +1,7 @@
 from pymongo import MongoClient
-from os.path import exists
 from pathlib import Path
 import multiprocessing
 import os.path
-import shutil
 import redis
 import time
 
@@ -56,11 +54,8 @@ class ReCodeActionsRunner(Action):
 
     def run(self):
         Cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
-                file_path_to_analyze=self.file_path_to_analyze,
-                functions_info_file_path=self.functions_info_file_path,
                 temporary_sample_data_directory=self.temporary_sample_data_directory,
                 decompiled_files_path=self.decompiled_files_path,
-                decompiler_path=self.decompiler_path,
                 mongo_db_name=self.mongo_db_name,
                 recovered_project_path=self.recovered_project_path).run()
 
