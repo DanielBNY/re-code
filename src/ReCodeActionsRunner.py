@@ -38,6 +38,10 @@ class ReCodeActionsRunner(Action):
             self.number_of_processes = number_of_processes
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
+        self.__init_paths(file_name_to_analyze)
+        self.mongo_db_name = MONGO_DB_NAME
+
+    def __init_paths(self, file_name_to_analyze):
         current_working_directory = Path(os.getcwd())
         parent_cwd = current_working_directory.parent.absolute()
         self.file_path_to_analyze = os.path.join(parent_cwd, SAMPLES_DIR_NAME, file_name_to_analyze)
@@ -49,7 +53,6 @@ class ReCodeActionsRunner(Action):
                                                      FUNCTIONS_INFO_FILE_NAME)
         self.decompiled_files_path = os.path.join(self.temporary_sample_data_directory,
                                                   MULTIPLE_DECOMPILED_FILES_DIRECTORY)
-        self.mongo_db_name = MONGO_DB_NAME
 
     def run(self):
         Cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
