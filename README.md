@@ -79,4 +79,5 @@ sudo apt-get install -y mongo-tools
 `sudo docker start MONGO_CONTAINER_ID`
 
 #### Run the src/ExtractorsManager.py
-The output is in src/RecoveredCodeOutput
+The output is in src/RecoveredCodeOutput 
+(Checkout to the branch dev-py)
