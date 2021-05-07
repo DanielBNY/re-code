@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from os.path import exists
+from pathlib import Path
 import multiprocessing
 import os.path
 import shutil
@@ -36,12 +37,13 @@ class ReCodeActionsRunner(Action):
             self.number_of_processes = number_of_processes
         self.redis_session = redis.Redis(redis_ip)
         self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
-        current_working_directory = os.getcwd()
-        self.file_path_to_analyze = os.path.join(current_working_directory, SAMPLES_DIR_NAME, file_name_to_analyze)
-        self.recovered_project_path = os.path.join(current_working_directory, RECOVERED_CODE_DIRECTORY_NAME)
-        self.decompiler_path = os.path.join(current_working_directory, RETDEC_DECOMPILER_FOLDER_NAME, "bin",
+        current_working_directory = Path(os.getcwd())
+        parent_cwd = current_working_directory.parent.absolute()
+        self.file_path_to_analyze = os.path.join(parent_cwd, SAMPLES_DIR_NAME, file_name_to_analyze)
+        self.recovered_project_path = os.path.join(parent_cwd, RECOVERED_CODE_DIRECTORY_NAME)
+        self.decompiler_path = os.path.join(parent_cwd, RETDEC_DECOMPILER_FOLDER_NAME, "bin",
                                             "retdec-decompiler.py")
-        self.temporary_sample_data_directory = os.path.join(current_working_directory, TEMPORARY_SAMPLE_DATA_DIRECTORY)
+        self.temporary_sample_data_directory = os.path.join(parent_cwd, TEMPORARY_SAMPLE_DATA_DIRECTORY)
         self.functions_info_file_path = os.path.join(self.temporary_sample_data_directory,
                                                      FUNCTIONS_INFO_FILE_NAME)
         self.decompiled_files_path = os.path.join(self.temporary_sample_data_directory,
