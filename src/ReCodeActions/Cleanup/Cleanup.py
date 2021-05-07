@@ -5,16 +5,18 @@ from os import mkdir
 import shutil
 import redis
 
+from PathSource import get_temporary_sample_data_directory_path, get_decompiled_files_path, \
+    get_recovered_code_directory_path
+
 
 class Cleanup(Action):
     def __init__(self, redis_session: redis.Redis, mongo_client: MongoClient,
-                 temporary_sample_data_directory: str, mongo_db_name: str,
-                 decompiled_files_path: str, recovered_project_path: str):
+                 mongo_db_name: str):
         self.redis_session = redis_session
         self.mongo_client = mongo_client
-        self.recovered_project_path = recovered_project_path
-        self.temporary_sample_data_directory = temporary_sample_data_directory
-        self.decompiled_files_path = decompiled_files_path
+        self.recovered_project_path = get_recovered_code_directory_path()
+        self.temporary_sample_data_directory = get_temporary_sample_data_directory_path()
+        self.decompiled_files_path = get_decompiled_files_path()
         self.mongo_db_name = mongo_db_name
 
     def run(self):
