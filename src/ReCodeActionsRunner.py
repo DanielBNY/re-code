@@ -13,6 +13,7 @@ from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import Direct
 from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCodeBuild
 from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
 from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
+from src.ReCodeActions.Cleanup.Cleanup import Cleanup
 from src.AbstractClasses import Action
 
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
@@ -50,31 +51,16 @@ class ReCodeActionsRunner(Action):
                                                   MULTIPLE_DECOMPILED_FILES_DIRECTORY)
         self.mongo_db_name = MONGO_DB_NAME
 
-    def re_create_recovered_project_path(self):
-        if os.path.exists(self.recovered_project_path):
-            shutil.rmtree(self.recovered_project_path)
-        os.mkdir(self.recovered_project_path)
-
-    def re_create_temporary_sample_directories(self):
-        if os.path.exists(self.temporary_sample_data_directory):
-            shutil.rmtree(self.temporary_sample_data_directory)
-        os.mkdir(self.temporary_sample_data_directory)
-        os.mkdir(self.decompiled_files_path)
-
-    def decompiled_files_cleanup(self):
-        if exists(self.decompiled_files_path):
-            shutil.rmtree(self.decompiled_files_path)
-        os.mkdir(self.decompiled_files_path)
-
-    def cleanup(self):
-        self.re_create_recovered_project_path()
-        self.re_create_temporary_sample_directories()
-        self.decompiled_files_cleanup()
-        self.redis_session.flushdb()
-        self.mongo_client.drop_database(self.mongo_db_name)
-
     def run(self):
-        self.cleanup()
+        Cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
+                file_path_to_analyze=self.file_path_to_analyze,
+                functions_info_file_path=self.functions_info_file_path,
+                temporary_sample_data_directory=self.temporary_sample_data_directory,
+                decompiled_files_path=self.decompiled_files_path,
+                decompiler_path=self.decompiler_path,
+                mongo_db_name=self.mongo_db_name,
+                recovered_project_path=self.recovered_project_path).run()
+
         ImportBinaryData(redis_session=self.redis_session,
                          file_path_to_analyze=self.file_path_to_analyze, analyzed_file=self.file_path_to_analyze,
                          number_of_processes=self.number_of_processes,
