@@ -9,7 +9,7 @@ from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import Direct
 from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCodeBuild
 from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
 from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
-from src.ReCodeActions.Cleanup.Cleanup import Cleanup
+from src.ReCodeActions.Cleanup.Cleanup import db_cleanup
 from src.AbstractClasses import Action
 
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
@@ -32,8 +32,8 @@ class ReCodeActionsRunner(Action):
         self.file_name_to_analyze = file_name_to_analyze
 
     def run(self):
-        Cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
-                mongo_db_name=self.mongo_db_name).run()
+        db_cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
+                   mongo_db_name=self.mongo_db_name)
 
         ImportBinaryData(redis_session=self.redis_session,
                          number_of_processes=self.number_of_processes,
