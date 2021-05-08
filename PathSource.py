@@ -10,10 +10,15 @@ TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
 FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'
 SAMPLES_DIR_NAME = "Samples"
 ZIP_FILE_NAME = "RecoveredCodeBuild.zip"
+OUT = "OUT"
+
+
+def get_out_directory_path() -> str:
+    return os.path.join(relative_path(), OUT)
 
 
 def get_recovered_code_zip_path() -> str:
-    return os.path.join(relative_path(), RECOVERED_CODE_DIRECTORY_NAME, ZIP_FILE_NAME)
+    return os.path.join(relative_path(), OUT, ZIP_FILE_NAME)
 
 
 def get_file_to_analyze_directory_path() -> str:
@@ -21,7 +26,7 @@ def get_file_to_analyze_directory_path() -> str:
 
 
 def get_recovered_code_directory_path() -> str:
-    return os.path.join(relative_path(), RECOVERED_CODE_DIRECTORY_NAME)
+    return os.path.join(relative_path(), OUT, RECOVERED_CODE_DIRECTORY_NAME)
 
 
 def get_temporary_sample_data_directory_path() -> str:
