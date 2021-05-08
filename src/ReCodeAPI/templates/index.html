@@ -1,8 +1,26 @@
 <html>
-    <body>
-        <form enctype="multipart/form-data" method="post" action="uploader">
-            <input type="file" name="file"/>
-            <input type="submit"/>
-        </form>
-    </body>
+<head>
+</head>
+<style>
+
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+
+    }
+
+</style>
+
+<body>
+<img src="Logo" alt="ReCode" width="200" height="200">
+
+<form enctype="multipart/form-data" method="post" action="uploader">
+    <input type="file" name="file"/>
+    <input type="submit"/>
+</form>
+<form enctype="multipart/form-data" method="get" action="download">
+    <button name="download"></button>
+</form>
+</body>
 </html>
