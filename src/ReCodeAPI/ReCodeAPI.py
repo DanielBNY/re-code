@@ -1,26 +1,18 @@
 import os
 from flask import send_file
 from flask import Flask, request
+from flask import render_template
 
 from src.ReCodeActionsRunner import ReCodeActionsRunner
 from PathSource import get_file_to_analyze_directory_path, get_recovered_code_zip_path
 from src.Cleanup import folders_recreation
+
 app = Flask(__name__)
 
 
 @app.route('/')
-def form():
-    return """
-<html>
-   <body>
-      <form action = "http://localhost:5000/uploader" method = "POST"
-         enctype = "multipart/form-data">
-         <input type = "file" name = "file" />
-         <input type = "submit"/>
-      </form>
-   </body>
-</html>
-"""
+def root():
+    return render_template('index.html')
 
 
 @app.route('/uploader', methods=['POST', 'GET'])
