@@ -64,8 +64,6 @@ class ImportBinaryData(Action):
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
-                    RetdecDetectedModels(redis_session=self.redis_session).add_address(
-                        function_detector.function_address)
                     radare_detected_address = None
                     radare_detected_models = RadareDetectedModels(self.redis_session)
                     if radare_detected_models.is_member(function_detector.function_address):
@@ -93,3 +91,5 @@ class ImportBinaryData(Action):
                                 address=function_detector.function_address)
                         function_model.set_function_code(function_detector.function_code)
                         function_model.set_size(size=function_detector.functions_lines)
+                        RetdecDetectedModels(redis_session=self.redis_session).add_address(
+                            function_detector.function_address)
