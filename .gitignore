@@ -138,3 +138,5 @@ RetdecDecompiler/
 Samples/
 
 .idea/
+
+OUT/
