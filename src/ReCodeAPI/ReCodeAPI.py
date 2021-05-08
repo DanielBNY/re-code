@@ -20,8 +20,6 @@ def logo():
     return send_from_directory('templates', 'Logo.PNG')
 
 
-
-
 @app.route('/uploader', methods=['POST', 'GET'])
 def upload():
     if request.method == 'POST':
@@ -30,12 +28,7 @@ def upload():
         file.save(os.path.join(get_file_to_analyze_directory_path(), file.filename))
         ReCodeActionsRunner(redis_ip='localhost', mongo_ip='localhost',
                             file_name_to_analyze=file.filename).run()
-        return "Finished Analyzing"
-
-
-@app.route('/download')
-def down_load_file():
-    return send_file(get_recovered_code_zip_path(), as_attachment=True)
+        return send_file(get_recovered_code_zip_path(), as_attachment=True)
 
 
 if __name__ == '__main__':
