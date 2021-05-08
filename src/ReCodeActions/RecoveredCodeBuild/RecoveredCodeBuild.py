@@ -6,8 +6,7 @@ from zipfile import ZipFile
 from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, LonelyModels, \
     FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
 from src.AbstractClasses import Action
-from PathSource import get_recovered_code_directory_path
-from PathSource import get_output_zip_directory_path
+from PathSource import get_recovered_code_directory_path, get_recovered_code_zip_path
 
 
 class RecoveredCodeBuild(Action):
@@ -31,7 +30,7 @@ class RecoveredCodeBuild(Action):
         self.set_all_files_paths()
         self.write_functions_to_files()
         self.create_lonely_functions_file()
-        output_zip_path = os.path.join(get_output_zip_directory_path(), RecoveredCodeBuild.__name__ + ".zip")
+        output_zip_path = get_recovered_code_zip_path()
         self.zip_files_in_dir(self.recovered_project_path, output_zip_path)
 
     @staticmethod
