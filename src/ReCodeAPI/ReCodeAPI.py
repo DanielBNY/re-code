@@ -4,7 +4,7 @@ from flask import Flask, request
 
 from src.ReCodeActionsRunner import ReCodeActionsRunner
 from PathSource import get_file_to_analyze_directory_path, get_recovered_code_zip_path
-from src.ReCodeActions.Cleanup.Cleanup import folders_recreation
+from src.Cleanup import folders_recreation
 app = Flask(__name__)
 
 

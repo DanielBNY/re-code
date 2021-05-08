@@ -9,7 +9,7 @@ from src.ReCodeActions.DirectedTreeExtractor.DirectedTreeExtractor import Direct
 from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCodeBuild
 from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
 from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
-from src.ReCodeActions.Cleanup.Cleanup import db_cleanup
+from src.Cleanup import db_cleanup
 from src.AbstractClasses import Action
 
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
