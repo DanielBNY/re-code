@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, LonelyModels, \
     FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 from PathSource import get_recovered_code_directory_path, get_recovered_code_zip_path
 
 

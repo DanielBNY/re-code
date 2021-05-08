@@ -10,7 +10,7 @@ from src.ReCodeActions.Models import FunctionModel, APIWrapperModel, ApiWrappers
 from src.ReCodeActions.ImportBinaryData.Radare2BinaryExtractor import Radare2BinaryExtractor
 from src.ReCodeActions.ImportBinaryData.FunctionDetector import FunctionDetector
 from src.ReCodeActions.ImportBinaryData.MultiProcessedDecompilation import MultiProcessedDecompilation
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 from PathSource import get_functions_info_file_path, get_file_to_analyze_directory_path, get_decompiled_files_path, \
     get_retdec_decompiler_path
 

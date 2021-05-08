@@ -3,7 +3,7 @@ import redis
 
 from src.ReCodeActions.Models import FunctionModel, ApiWrappers, Functions, EntryModels, \
     LonelyModels, RetdecDetectedModels, MultipleEntriesModels
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class FunctionsGraphExtractor(Action):

@@ -10,7 +10,7 @@ from src.ReCodeActions.RecoveredCodeBuild.RecoveredCodeBuild import RecoveredCod
 from src.ReCodeActions.ImportBinaryData.ImportBinaryData import ImportBinaryData
 from src.ReCodeActions.ConnectTrees.ConnectTrees import ConnectTrees
 from src.Cleanup import db_cleanup
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
 MONGO_DB_NAME = "re-code"
