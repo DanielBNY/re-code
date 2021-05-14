@@ -78,5 +78,5 @@ sudo apt-get install -y mongo-tools
 
 `sudo docker start MONGO_CONTAINER_ID`
 
-#### Run the src/ExtractorsManager.py
-The output is in src/RecoveredCodeOutput
+#### Run the src/ReCodeActions/ReCodeActionsRunner.py
+The output is in src/OUT/RecoveredCodeOutput
