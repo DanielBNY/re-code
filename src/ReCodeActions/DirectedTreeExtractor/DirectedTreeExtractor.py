@@ -1,7 +1,7 @@
 import redis
 from typing import List
 
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 from src.ReCodeActions.Models import FunctionModel, EntryModels, MultipleEntriesModels
 
 

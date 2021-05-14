@@ -1,3 +1,5 @@
+import os.path
+
 import redis
 from os import listdir
 from typing import List
@@ -8,28 +10,30 @@ from src.ReCodeActions.Models import FunctionModel, APIWrapperModel, ApiWrappers
 from src.ReCodeActions.ImportBinaryData.Radare2BinaryExtractor import Radare2BinaryExtractor
 from src.ReCodeActions.ImportBinaryData.FunctionDetector import FunctionDetector
 from src.ReCodeActions.ImportBinaryData.MultiProcessedDecompilation import MultiProcessedDecompilation
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
+from PathSource import get_functions_info_file_path, get_file_to_analyze_directory_path, get_decompiled_files_path, \
+    get_retdec_decompiler_path
 
 
 class ImportBinaryData(Action):
-    def __init__(self, redis_session: redis.Redis, analyzed_file,
-                 number_of_processes, functions_info_file_path, imported_collection_name, mongo_db_name,
-                 decompiler_path: str, decompiled_files_path: str, file_path_to_analyze):
+    def __init__(self, redis_session: redis.Redis,
+                 number_of_processes, imported_collection_name, mongo_db_name,
+                 file_name_to_analyze):
 
-        self.analyzed_file = analyzed_file
         self.redis_session = redis_session
-        self.decompiled_files_path = decompiled_files_path
-        self.decompiler_path = decompiler_path
-        self.binary_extractor = Radare2BinaryExtractor(file_path_to_analyze, self.redis_session)
+        self.decompiled_files_path = get_decompiled_files_path()
+        self.decompiler_path = get_retdec_decompiler_path()
+        self.file_path_to_analyze = os.path.join(get_file_to_analyze_directory_path(), file_name_to_analyze)
+        self.binary_extractor = Radare2BinaryExtractor(self.file_path_to_analyze, self.redis_session)
         self.number_of_processes = number_of_processes
-        self.functions_info_file_path = functions_info_file_path
+        self.functions_info_file_path = get_functions_info_file_path()
         self.functions_info_collection_name = imported_collection_name
         self.mongo_db_name = mongo_db_name
 
     def run(self):
         MultiProcessedDecompilation(number_of_processes=self.number_of_processes,
                                     decompiler_path=self.decompiler_path,
-                                    analyzed_file=self.analyzed_file,
+                                    analyzed_file=self.file_path_to_analyze,
                                     start_virtual_address=self.binary_extractor.start_virtual_address,
                                     end_virtual_address=self.binary_extractor.end_virtual_address,
                                     decompiled_files_path=self.decompiled_files_path).run()
@@ -60,8 +64,6 @@ class ImportBinaryData(Action):
             for line in file:
                 function_detector.analyze_code_line(code_line=line)
                 if function_detector.is_function_detected():
-                    RetdecDetectedModels(redis_session=self.redis_session).add_address(
-                        function_detector.function_address)
                     radare_detected_address = None
                     radare_detected_models = RadareDetectedModels(self.redis_session)
                     if radare_detected_models.is_member(function_detector.function_address):
@@ -89,3 +91,5 @@ class ImportBinaryData(Action):
                                 address=function_detector.function_address)
                         function_model.set_function_code(function_detector.function_code)
                         function_model.set_size(size=function_detector.functions_lines)
+                        RetdecDetectedModels(redis_session=self.redis_session).add_address(
+                            function_detector.function_address)

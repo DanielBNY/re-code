@@ -2,7 +2,7 @@ import os
 import subprocess
 from typing import List
 
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class MultiProcessedDecompilation(Action):

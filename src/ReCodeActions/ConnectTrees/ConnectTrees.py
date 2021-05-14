@@ -3,7 +3,7 @@ from typing import List
 
 from src.ReCodeActions.Models import MultipleEntriesModels, MultipleEntriesFunctionNode, MultipleEntriesSortedSet, \
     FileModel, FunctionModel, Files, TreesEntriesFunctionsAddresses
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class ConnectTrees(Action):

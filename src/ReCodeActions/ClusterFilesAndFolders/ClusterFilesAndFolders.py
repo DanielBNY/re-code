@@ -3,7 +3,7 @@ from typing import Union, List
 
 from src.ReCodeActions.Models import Files, TreesEntriesFunctionsAddresses
 from src.ReCodeActions.Models import FileModel, FolderModel
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
 
 
 class ClusterFilesAndFolders(Action):

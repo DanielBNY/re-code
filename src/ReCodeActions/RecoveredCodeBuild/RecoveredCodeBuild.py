@@ -1,15 +1,17 @@
 import os
 import redis
 from typing import List
+from zipfile import ZipFile
 
 from src.ReCodeActions.Models import FolderModel, FileModel, Folders, Files, LonelyModels, \
     FunctionModel, APIWrapperModel, TreesEntriesFunctionsAddresses
-from src.AbstractClasses import Action
+from src.ReCodeActions.AbstractClasses import Action
+from PathSource import get_recovered_code_directory_path, get_recovered_code_zip_path
 
 
 class RecoveredCodeBuild(Action):
-    def __init__(self, recovered_project_path, redis_session: redis.Redis):
-        self.recovered_project_path = recovered_project_path
+    def __init__(self, redis_session: redis.Redis):
+        self.recovered_project_path = get_recovered_code_directory_path()
         self.redis_session = redis_session
 
     def run(self):
@@ -21,13 +23,23 @@ class RecoveredCodeBuild(Action):
         Write all the functions with no connection in a lonely file.
         """
         entry_folders_models = TreesEntriesFunctionsAddresses(redis_session=self.redis_session).get_folders_models()
-        self.create_folders_in_path(self.recovered_project_path, entry_folders_models)
+        self.create_folders_in_path(self.recovered_project_path.encode(), entry_folders_models)
         folders_to_revisit = entry_folders_models
         while folders_to_revisit:
             folders_to_revisit = self.create_folder_for_sons(folders_to_revisit)
         self.set_all_files_paths()
         self.write_functions_to_files()
         self.create_lonely_functions_file()
+        output_zip_path = get_recovered_code_zip_path()
+        self.zip_files_in_dir(self.recovered_project_path, output_zip_path)
+
+    @staticmethod
+    def zip_files_in_dir(dir_to_zip, zip_name):
+        with ZipFile(zip_name, 'w') as zipObj:
+            for folderName, sub_folders, filenames in os.walk(dir_to_zip):
+                for filename in filenames:
+                    file_path = os.path.join(folderName, filename)
+                    zipObj.write(file_path, file_path.replace(dir_to_zip, ''))
 
     def create_lonely_functions_file(self):
         """
@@ -35,7 +47,7 @@ class RecoveredCodeBuild(Action):
         """
         lonely_files_models = LonelyModels(redis_session=self.redis_session).get_files_models()
         self.write_files_to_file(files=lonely_files_models,
-                                 file_path=os.path.join(self.recovered_project_path, b'lonely_file'))
+                                 file_path=os.path.join(self.recovered_project_path.encode(), b'lonely_file'))
 
     def create_folder_for_sons(self, folders: List[FolderModel]):
         """

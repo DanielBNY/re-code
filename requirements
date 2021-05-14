@@ -3,3 +3,4 @@ networkx == 2.5
 pymongo
 redis
 psutil
+flask
