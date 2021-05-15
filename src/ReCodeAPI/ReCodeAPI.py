@@ -31,5 +31,9 @@ def upload():
         return send_file(get_recovered_code_zip_path(), as_attachment=True)
 
 
-if __name__ == '__main__':
+def main():
     app.run(debug=True)
+
+
+if __name__ == '__main__':
+    main()
