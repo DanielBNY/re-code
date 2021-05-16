@@ -17,7 +17,7 @@ MONGO_DB_NAME = "re-code"
 
 
 class ReCodeActionsRunner(Action):
-    def __init__(self, redis_ip: str, mongo_ip: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
+    def __init__(self, redis_host: str, mongo_host: str, file_name_to_analyze: str, max_number_of_max_files_in_folder=4,
                  max_file_size=200, mongo_db_port=27017, number_of_processes=None):
         self.functions_info_collection_name = FUNCTIONS_INFO_COLLECTION_NAME
         self.max_number_of_max_files_in_folder = max_number_of_max_files_in_folder
@@ -26,8 +26,8 @@ class ReCodeActionsRunner(Action):
             self.number_of_processes = multiprocessing.cpu_count()
         else:
             self.number_of_processes = number_of_processes
-        self.redis_session = redis.Redis(redis_ip)
-        self.mongo_client = MongoClient(mongo_ip, mongo_db_port)
+        self.redis_session = redis.Redis(host=redis_host)
+        self.mongo_client = MongoClient(host=mongo_host, port=mongo_db_port)
         self.mongo_db_name = MONGO_DB_NAME
         self.file_name_to_analyze = file_name_to_analyze
 

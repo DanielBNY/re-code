@@ -26,7 +26,7 @@ def upload():
         file = request.files['file']
         folders_recreation()
         file.save(os.path.join(get_file_to_analyze_directory_path(), file.filename))
-        ReCodeActionsRunner(redis_ip='localhost', mongo_ip='localhost',
+        ReCodeActionsRunner(redis_host='redis', mongo_host='mongo',
                             file_name_to_analyze=file.filename).run()
         return send_file(get_recovered_code_zip_path(), as_attachment=True)
 
