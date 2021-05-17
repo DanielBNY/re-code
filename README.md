@@ -26,57 +26,13 @@ https://github.com/mongodb/mongo
 ## Use
 ### Installations and configurations
 
-#### Step 1: installing and moving the decompiler
-The src/RetdecDecompiler need to contain the retdec decompiler. 
-1) Install it from https://github.com/avast/retdec/releases/ (version 4.0)
-2) Extract the content. 
-3) Copy the content from the first retdec folder, So the first folders in this directory would be: bin, include, lib, share
-
-#### Step 2: install docker on your system
+#### Step 1: install docker on your system
 https://docs.docker.com/engine/install/
 
-#### Step 3: pull redis image
-`sudo docker pull redis:6.2.1`
+#### Step 2: Run the project
+First if the project locally uncomment the static ip settings in the docker-compose.yml.
 
-#### Step 4: pull mongodb image
-`sudo docker pull mongo:4.0`
+Run the docker compose:
+>docker-compose up
 
-#### Step 5: creating a redis container
-`sudo docker run -d --name redis -p 6379:6379 redis`
-
-#### Step 6: creating a mongo container
-`sudo docker run -d --name mongo -p 27017:27017 mongo`
-
-#### Step 7: install radare2
-1) Install the binary for radare2 from https://radare.mikelloc.com/list
-2) Restart the system
-
-#### Step 8: install packages
-`pip install -r requirements`
-
-#### Step 9: install the MongoDB Database Tools (for mongoimport)
-##### Windows
-Installing from https://www.mongodb.com/try/download/database-tools
-1) Moving the directory to the Program Files directory
-2) WinKey search 'Environment variables' 
-3) Click on **Environment Variables** 
-4) Double click on User variables **Path**
-5) Click on **New**
-6) Add the path to the mongodb database-tools bin
-##### Linux
-sudo apt-get update -y
-
-sudo apt-get install -y mongo-tools
-
-------------------
-
-### Running the program
-#### Start a redis and a mongo container 
-`sudo docker ps -a` Return a table the container id is in the first column, and the container name at the last column
-
-`sudo docker start REDIS_CONTAINER_ID`
-
-`sudo docker start MONGO_CONTAINER_ID`
-
-#### Run the src/ReCodeActions/ReCodeActionsRunner.py
-The output is in src/OUT/RecoveredCodeOutput
+-  Open http://THE_ADDRESS:5000/
