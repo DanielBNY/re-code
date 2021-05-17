@@ -54,13 +54,3 @@ class ReCodeActionsRunner(Action):
                                max_number_of_max_files_in_folder=self.max_number_of_max_files_in_folder).run()
 
         RecoveredCodeBuild(redis_session=self.redis_session).run()
-
-
-if __name__ == "__main__":
-    # Basic run
-    file_name = input("Please Enter the Samples/{file name} to analyze:    (try bin_ls for test)\n")
-    start_flow_time = time.time()
-    ReCodeActionsRunner(redis_ip='localhost', mongo_ip='localhost',
-                        file_name_to_analyze=file_name).run()
-    end_flow_time = time.time()
-    print(f"total time    {end_flow_time - start_flow_time}")
