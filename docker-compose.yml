@@ -7,7 +7,16 @@ services:
       - redis
     ports:
       - "5000:5000"
+#    networks:
+#      outnet:
+#        ipv4_address: 160.20.0.7
   redis:
     image: "redis:6.2-buster"
   mongo:
     image: "mongo:4.4.6-bionic"
+
+#networks:
+#  outnet:
+#    ipam:
+#      config:
+#        - subnet: 160.20.0.0/24
