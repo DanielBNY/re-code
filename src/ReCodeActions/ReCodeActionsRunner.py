@@ -26,6 +26,7 @@ class ReCodeActionsRunner(Action):
             self.number_of_processes = multiprocessing.cpu_count()
         else:
             self.number_of_processes = number_of_processes
+        self.mongo_host = mongo_host
         self.redis_session = redis.Redis(host=redis_host)
         self.mongo_client = MongoClient(host=mongo_host, port=mongo_db_port)
         self.mongo_db_name = MONGO_DB_NAME
@@ -35,7 +36,8 @@ class ReCodeActionsRunner(Action):
         db_cleanup(redis_session=self.redis_session, mongo_client=self.mongo_client,
                    mongo_db_name=self.mongo_db_name)
 
-        ImportBinaryData(redis_session=self.redis_session,
+        ImportBinaryData(mongodb_host_name=self.mongo_host,
+                         redis_session=self.redis_session,
                          number_of_processes=self.number_of_processes,
                          imported_collection_name=self.functions_info_collection_name,
                          mongo_db_name=self.mongo_db_name, file_name_to_analyze=self.file_name_to_analyze).run()

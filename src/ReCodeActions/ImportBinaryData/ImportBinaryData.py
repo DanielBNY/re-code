@@ -18,7 +18,7 @@ from PathSource import get_functions_info_file_path, get_file_to_analyze_directo
 class ImportBinaryData(Action):
     def __init__(self, redis_session: redis.Redis,
                  number_of_processes, imported_collection_name, mongo_db_name,
-                 file_name_to_analyze):
+                 file_name_to_analyze, mongodb_host_name: str):
 
         self.redis_session = redis_session
         self.decompiled_files_path = get_decompiled_files_path()
@@ -29,6 +29,7 @@ class ImportBinaryData(Action):
         self.functions_info_file_path = get_functions_info_file_path()
         self.functions_info_collection_name = imported_collection_name
         self.mongo_db_name = mongo_db_name
+        self.mongodb_host_name = mongodb_host_name
 
     def run(self):
         MultiProcessedDecompilation(number_of_processes=self.number_of_processes,
@@ -42,7 +43,8 @@ class ImportBinaryData(Action):
 
         self.binary_extractor.import_functions_addresses()
         self.import_decompiled_functions()
-        self.binary_extractor.extract_functions_info(output_path=self.functions_info_file_path,
+        self.binary_extractor.extract_functions_info(mongodb_host_name=self.mongodb_host_name,
+                                                     output_path=self.functions_info_file_path,
                                                      imported_collection_name=self.functions_info_collection_name,
                                                      mongo_db_name=self.mongo_db_name)
 
