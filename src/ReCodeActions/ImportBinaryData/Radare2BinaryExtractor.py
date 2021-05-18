@@ -74,8 +74,10 @@ class Radare2BinaryExtractor:
             if address:
                 RadareDetectedModels(redis_session=self.redis_session).add_address(int(address, 16))
 
-    def extract_functions_info(self, output_path: str, imported_collection_name: str, mongo_db_name: str):
+    def extract_functions_info(self, mongodb_host_name: str, output_path: str, imported_collection_name: str,
+                               mongo_db_name: str):
         """
+        :param mongodb_host_name: str, the mongodb host name
         :param output_path: str, json array output file path.
         :param imported_collection_name: str, mongodb collection name to import the documents.
         :param mongo_db_name: str, mongodb name.
@@ -83,7 +85,8 @@ class Radare2BinaryExtractor:
         Export the functions info into a json file and then import it into mongodb for fast functions info read time.
         """
         self.export_functions_info(output_json_path=output_path)
-        self.import_functions_info(input_json_path=output_path, imported_collection_name=imported_collection_name,
+        self.import_functions_info(mongodb_host_name=mongodb_host_name, input_json_path=output_path,
+                                   imported_collection_name=imported_collection_name,
                                    mongo_db_name=mongo_db_name)
 
     def export_functions_info(self, output_json_path: str):
@@ -96,8 +99,11 @@ class Radare2BinaryExtractor:
         self.command_pipe.cmd(f"aflj > {output_json_path}")
 
     @staticmethod
-    def import_functions_info(mongo_db_name: str, input_json_path: str, imported_collection_name: str):
+    def import_functions_info(mongodb_host_name: str, mongo_db_name: str, input_json_path: str,
+                              imported_collection_name: str, mongodb_port=27017):
         """
+        :param mongodb_host_name: str, the mongodb host name
+        :param mongodb_port: int, mongodb port
         :param mongo_db_name: str, mongodb name.
         :param input_json_path: str, json array file path.
         :param imported_collection_name: str, collection name to import the json array.
@@ -105,7 +111,7 @@ class Radare2BinaryExtractor:
         Import a json array file with the mongoimport cli tool to a mongo DB collection.
         """
         stream = os.popen(
-            f"mongoimport --db {mongo_db_name} --collection {imported_collection_name} --file {input_json_path} --jsonArray")
+            f"mongoimport --host={mongodb_host_name}:{mongodb_port} --db {mongo_db_name} --collection {imported_collection_name} --file {input_json_path} --jsonArray")
         output = stream.read()
         return output
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 MULTIPLE_DECOMPILED_FILES_DIRECTORY = "MultipleDecompiledFiles"
 RECOVERED_CODE_DIRECTORY_NAME = "RecoveredCodeOutput"
-RETDEC_DECOMPILER_FOLDER_NAME = "RetdecDecompiler"
+RETDEC_DECOMPILER_FOLDER_NAME = "retdec"
 FUNCTIONS_INFO_COLLECTION_NAME = "FunctionsInfo"
 TEMPORARY_SAMPLE_DATA_DIRECTORY = ".SampleData"
 FUNCTIONS_INFO_FILE_NAME = 'functions_info.json'

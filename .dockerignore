@@ -133,11 +133,10 @@ RecoveredCodeOutput/
 
 .SampleData/
 
+retdec/
 
 Samples/
 
 .idea/
 
 OUT/
-
-retdec/
