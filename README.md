@@ -35,4 +35,10 @@ First if the project locally uncomment the static ip settings in the docker-comp
 Run the docker compose:
 >docker-compose up
 
--  Open http://THE_ADDRESS:5000/
+Open http://THE_ADDRESS:5000/
+
+### Upload the binary and get a zip with .c like code
+![alt text](https://github.com/DanielBNY/re-code/blob/main/images/web_interface.png?raw=true)
+
+### Output example:
+![alt text](https://github.com/DanielBNY/re-code/blob/main/images/output.png?raw=true)
